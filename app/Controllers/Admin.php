@@ -60,7 +60,7 @@ class Admin extends BaseController
             return redirect()->to('/admin/users')->with('error', 'User not found');
         }
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $data = [
                 'username' => $this->request->getPost('username'),
                 'email' => $this->request->getPost('email'),
@@ -169,7 +169,7 @@ class Admin extends BaseController
         $redirect = $this->requireAdmin();
         if ($redirect) return $redirect;
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $categoryModel = new CategoryModel();
 
             $data = [
@@ -203,7 +203,7 @@ class Admin extends BaseController
             return redirect()->to('/admin/categories')->with('error', 'Category not found');
         }
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $data = [
                 'name' => $this->request->getPost('name'),
                 'slug' => url_title($this->request->getPost('name'), '-', true),
@@ -297,7 +297,7 @@ class Admin extends BaseController
 
         $settingModel = new SettingModel();
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $settings = $this->request->getPost('settings');
 
             foreach ($settings as $key => $value) {

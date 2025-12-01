@@ -54,7 +54,7 @@ class Dashboard extends BaseController
         $categoryModel = new CategoryModel();
         $this->data['categories'] = $categoryModel->getActiveCategories();
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $listModel = new ListModel();
 
             $title = $this->request->getPost('title');
@@ -106,7 +106,7 @@ class Dashboard extends BaseController
         $this->data['categories'] = $categoryModel->getActiveCategories();
         $this->data['products'] = $listProductModel->getListProducts($listId);
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $title = $this->request->getPost('title');
             $slug = url_title($title, '-', true);
 
@@ -184,7 +184,7 @@ class Dashboard extends BaseController
         $redirect = $this->requireLogin();
         if ($redirect) return $redirect;
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $listId = $this->request->getPost('list_id');
             $productData = $this->request->getPost('product');
 
@@ -243,7 +243,7 @@ class Dashboard extends BaseController
         $redirect = $this->requireLogin();
         if ($redirect) return $redirect;
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $listId = $this->request->getPost('list_id');
             $productId = $this->request->getPost('product_id');
 
@@ -278,7 +278,7 @@ class Dashboard extends BaseController
         $redirect = $this->requireLogin();
         if ($redirect) return $redirect;
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $listId = $this->request->getPost('list_id');
             $positions = $this->request->getPost('positions');
 
