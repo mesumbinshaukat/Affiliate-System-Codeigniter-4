@@ -23,7 +23,7 @@ class Filters extends BaseConfig
             'invalidchars',
         ],
         'after' => [
-            'toolbar',
+            // 'toolbar', // Disabled - causing 500 errors
             // 'honeypot',
             'secureheaders',
         ],

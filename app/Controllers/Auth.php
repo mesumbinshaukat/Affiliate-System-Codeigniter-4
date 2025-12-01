@@ -12,7 +12,7 @@ class Auth extends BaseController
             return redirect()->to('/dashboard');
         }
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             // Validation rules
             $rules = [
                 'email' => 'required|valid_email',
@@ -70,11 +70,14 @@ class Auth extends BaseController
 
     public function register()
     {
+        // Check if already logged in
         if ($this->isLoggedIn()) {
             return redirect()->to('/dashboard');
         }
 
-        if ($this->request->getMethod() === 'post') {
+        // Handle POST request (case-insensitive)
+        if (strtolower($this->request->getMethod()) === 'post') {
+            
             // Validation rules
             $rules = [
                 'first_name' => 'required|min_length[2]|max_length[100]',
@@ -98,7 +101,9 @@ class Auth extends BaseController
                 ]
             ];
 
+            // Validate input
             if (!$this->validate($rules, $messages)) {
+                log_message('error', 'Validation failed: ' . json_encode($this->validator->getErrors()));
                 return redirect()->back()
                     ->withInput()
                     ->with('errors', $this->validator->getErrors());
@@ -116,9 +121,14 @@ class Auth extends BaseController
                 'status' => 'active',
             ];
 
+            log_message('info', 'Attempting to insert user: ' . $data['email']);
+
             try {
-                if ($userModel->insert($data)) {
+                $insertResult = $userModel->insert($data);
+                
+                if ($insertResult) {
                     $userId = $userModel->getInsertID();
+                    log_message('info', 'User created successfully with ID: ' . $userId);
                     
                     // Set session data
                     $this->session->set([
@@ -128,24 +138,31 @@ class Auth extends BaseController
                         'logged_in' => true
                     ]);
 
+                    log_message('info', 'Session set, redirecting to dashboard');
+                    
                     return redirect()->to('/dashboard')
                         ->with('success', 'Welcome to Lijstje.nl, ' . $data['first_name'] . '! Your account has been created successfully.');
                 }
 
                 // If insert failed, get model errors
                 $errors = $userModel->errors();
+                log_message('error', 'User insert failed: ' . json_encode($errors));
+                
                 return redirect()->back()
                     ->withInput()
                     ->with('errors', $errors);
                     
             } catch (\Exception $e) {
-                log_message('error', 'Registration error: ' . $e->getMessage());
+                log_message('error', 'Registration exception: ' . $e->getMessage());
+                log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+                
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', 'An error occurred during registration. Please try again.');
+                    ->with('error', 'An error occurred during registration. Please try again. Error: ' . $e->getMessage());
             }
         }
 
+        // Show registration form
         return view('auth/register', $this->data);
     }
 

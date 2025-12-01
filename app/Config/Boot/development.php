@@ -12,5 +12,6 @@ ini_set('display_errors', '1');
  |--------------------------------------------------------------------------
  | DEBUG MODE
  |--------------------------------------------------------------------------
+ | Set to false to disable debug toolbar completely
  */
-defined('CI_DEBUG') || define('CI_DEBUG', true);
+defined('CI_DEBUG') || define('CI_DEBUG', false);

@@ -40,10 +40,10 @@ Events::on('pre_system', static function () {
      * --------------------------------------------------------------------
      * Debug Toolbar Listeners.
      * --------------------------------------------------------------------
-     * If you delete, they will no longer be collected.
+     * Disabled to prevent 500 errors in production.
      */
-    if (CI_DEBUG && ! is_cli()) {
-        Events::on('DBQuery', 'CodeIgniter\Debug\Toolbar\Collectors\Database::collect');
-        Services::toolbar()->respond();
-    }
+    // if (CI_DEBUG && ! is_cli()) {
+    //     Events::on('DBQuery', 'CodeIgniter\Debug\Toolbar\Collectors\Database::collect');
+    //     Services::toolbar()->respond();
+    // }
 });
