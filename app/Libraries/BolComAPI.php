@@ -71,6 +71,12 @@ class BolComAPI
      * Search products using Marketing Catalog API v1
      * Endpoint: GET /products/search
      * Docs: https://api.bol.com/marketing/docs/catalog-api/
+     * 
+     * @param string $query Search term
+     * @param int $limit Number of results per page (max 50)
+     * @param int $offset Offset for pagination
+     * @param string $countryCode Country code (NL or BE)
+     * @return array
      */
     public function searchProducts($query, $limit = 20, $offset = 0, $countryCode = 'NL')
     {
@@ -85,16 +91,27 @@ class BolComAPI
         try {
             $token = $this->getAccessToken();
 
-            // Build URL with correct parameters for Marketing Catalog API v1
-            $url = $this->apiEndpoint . '/products/search?' . http_build_query([
-                'q' => $query,
-                'limit' => min($limit, 100), // Max 100 per request
-                'offset' => $offset,
+            // Calculate page number from offset (API uses page-based pagination)
+            $pageSize = min($limit, 50); // Max 50 per page
+            $page = floor($offset / $pageSize) + 1;
+
+            // Build URL with correct Marketing Catalog API v1 parameters
+            $params = [
+                'search-term' => $query,
                 'country-code' => $countryCode,
-            ]);
+                'page-size' => $pageSize,
+                'page' => $page,
+                'include-offer' => 'true',
+                'include-image' => 'true',
+                'include-rating' => 'true',
+                'sort' => 'RELEVANCE'
+            ];
+            
+            $url = $this->apiEndpoint . '/products/search?' . http_build_query($params);
 
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Authorization: Bearer ' . $token,
                 'Accept: application/json',
@@ -104,19 +121,26 @@ class BolComAPI
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $curlError = curl_error($ch);
-            
-            // Check rate limit headers
-            $rateLimitRemaining = curl_getinfo($ch, CURLINFO_HEADER_OUT);
-            
             curl_close($ch);
 
             if ($httpCode === 200) {
                 $data = json_decode($response, true);
+                
+                // Marketing Catalog API v1 returns 'results' array, not 'products'
+                $results = $data['results'] ?? [];
+                $totalResults = $data['totalResults'] ?? 0;
+                
+                // Log if no results for debugging
+                if ($totalResults === 0 && function_exists('log_message')) {
+                    log_message('info', "Bol.com API: No results for query '$query' in $countryCode");
+                }
+                
                 return [
                     'success' => true,
-                    'products' => $this->formatProducts($data['products'] ?? []),
-                    'total' => $data['totalResultSize'] ?? 0,
-                    'paging' => $data['paging'] ?? null,
+                    'products' => $this->formatProducts($results),
+                    'total' => $totalResults,
+                    'page' => $page,
+                    'page_size' => $pageSize,
                 ];
             }
 
@@ -124,10 +148,14 @@ class BolComAPI
             $errorMsg = "API request failed (HTTP $httpCode)";
             if ($httpCode === 401) {
                 $errorMsg = 'Unauthorized - Check API credentials';
+            } elseif ($httpCode === 406) {
+                $errorMsg = 'Not Acceptable - Check Accept-Language header';
             } elseif ($httpCode === 429) {
                 $errorMsg = 'Rate limit exceeded - Please wait before retrying';
             } elseif ($httpCode === 403) {
                 $errorMsg = 'Forbidden - Check if affiliate account is active';
+            } elseif ($httpCode === 400) {
+                $errorMsg = 'Bad Request - Check parameters';
             }
             
             if ($curlError) {
@@ -208,50 +236,60 @@ class BolComAPI
 
     /**
      * Format single product from Marketing Catalog API v1 response
+     * v1 structure: results[].product, results[].offer, results[].image, results[].rating
      */
-    private function formatProduct($product)
+    private function formatProduct($result)
     {
-        // Extract product ID (bolProductId is the main identifier)
-        $productId = $product['bolProductId'] ?? $product['id'] ?? '';
+        // v1 API returns flat structure at root level
+        // Fields: ean, bolProductId, url, title, description, image{url}, rating, offer{price}
         
-        // Extract best price from offerData
+        // Extract product ID (bolProductId is the main identifier in v1)
+        $productId = $result['bolProductId'] ?? $result['id'] ?? '';
+        
+        // Extract EAN
+        $ean = $result['ean'] ?? '';
+        
+        // Extract title and description
+        $title = $result['title'] ?? '';
+        $description = $result['description'] ?? $result['shortDescription'] ?? $result['summary'] ?? '';
+        
+        // Strip HTML tags from description
+        $description = strip_tags($description);
+        
+        // Extract price from offer object (v1 structure)
         $price = 0;
-        if (isset($product['offerData']['bestOffer']['price'])) {
-            $price = $product['offerData']['bestOffer']['price'];
-        } elseif (isset($product['offerData']['offers'][0]['price'])) {
-            $price = $product['offerData']['offers'][0]['price'];
+        if (isset($result['offer']['price'])) {
+            $price = $result['offer']['price'];
         }
         
-        // Extract image URL
+        // Extract image URL from image object (v1 structure)
         $imageUrl = '';
-        if (isset($product['images'][0]['url'])) {
-            $imageUrl = $product['images'][0]['url'];
-        } elseif (isset($product['imageUrl'])) {
-            $imageUrl = $product['imageUrl'];
+        if (isset($result['image']['url'])) {
+            $imageUrl = $result['image']['url'];
         }
         
-        // Extract product URL
-        $productUrl = '';
-        if (isset($product['urls'])) {
-            foreach ($product['urls'] as $url) {
-                if ($url['key'] === 'DESKTOP') {
-                    $productUrl = $url['value'];
-                    break;
-                }
-            }
+        // Extract product URL (singular 'url' field at root level)
+        $productUrl = $result['url'] ?? '';
+        
+        // If no URL found, construct from product ID
+        if (empty($productUrl) && !empty($productId)) {
+            $productUrl = "https://www.bol.com/nl/nl/p/{$productId}/";
         }
+        
+        // Extract rating (v1 structure - at root level)
+        $ratingValue = $result['rating'] ?? null;
         
         return [
             'external_id' => $productId,
-            'title' => $product['title'] ?? '',
-            'description' => $product['shortDescription'] ?? $product['summary'] ?? '',
+            'title' => $title,
+            'description' => $description,
             'image_url' => $imageUrl,
             'price' => $price,
             'affiliate_url' => $this->generateAffiliateUrl($productId, $productUrl),
-            'ean' => $product['ean'] ?? '',
+            'ean' => $ean,
             'source' => 'bol.com',
-            'rating' => $product['rating'] ?? null,
-            'specs_tag' => $product['specsTag'] ?? null,
+            'rating' => $ratingValue,
+            'specs_tag' => $result['specsTag'] ?? null,
         ];
     }
 
