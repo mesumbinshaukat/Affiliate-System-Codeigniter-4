@@ -28,9 +28,15 @@ class AffiliateTracker
             throw new \Exception('Product not found');
         }
 
-        // Get user ID if logged in
-        $session = \Config\Services::session();
-        $userId = $session->get('user_id');
+        // Get list owner's user ID for commission attribution
+        $userId = null;
+        if ($listId) {
+            $listModel = new \App\Models\ListModel();
+            $list = $listModel->find($listId);
+            if ($list) {
+                $userId = $list['user_id']; // Attribute click to list owner
+            }
+        }
 
         // Log the click
         $this->clickModel->logClick($productId, $listId, $userId);

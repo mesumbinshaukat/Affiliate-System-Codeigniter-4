@@ -3,47 +3,35 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
-    <!-- List Header -->
     <div class="row mb-4">
-        <div class="col-lg-8">
-            <h1><?= esc($list['title']) ?></h1>
-            <p class="lead text-muted"><?= esc($list['description']) ?></p>
-            
-            <div class="d-flex align-items-center mb-3">
-                <div class="me-4">
-                    <i class="fas fa-user"></i>
-                    <strong><?= esc($list['first_name'] . ' ' . $list['last_name']) ?></strong>
-                    <small class="text-muted">@<?= esc($list['username']) ?></small>
-                </div>
-                <div class="me-4">
-                    <i class="fas fa-eye"></i> <?= number_format($list['views']) ?> views
-                </div>
-                <?php if ($list['category_name']): ?>
-                    <div>
-                        <a href="<?= base_url('index.php/category/' . $list['category_slug']) ?>" class="badge bg-secondary text-decoration-none">
-                            <?= esc($list['category_name']) ?>
-                        </a>
-                    </div>
-                <?php endif; ?>
-            </div>
-            
-            <!-- Share Buttons -->
-            <div class="mb-4">
-                <strong>Share:</strong>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode(current_url()) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                    <i class="fab fa-facebook"></i> Facebook
+        <div class="col">
+            <h1>Browse Products</h1>
+            <p class="text-muted">Discover products from our curated lists</p>
+        </div>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="btn-group" role="group">
+                <a href="<?= base_url('index.php/products') ?>" 
+                   class="btn <?= !$selectedCategory ? 'btn-primary' : 'btn-outline-primary' ?>">
+                    All Products
                 </a>
-                <a href="https://wa.me/?text=<?= urlencode($list['title'] . ' - ' . current_url()) ?>" target="_blank" class="btn btn-sm btn-outline-success">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </a>
-                <button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard('<?= current_url() ?>')">
-                    <i class="fas fa-copy"></i> Copy Link
-                </button>
+                <?php foreach ($categories as $category): ?>
+                    <a href="<?= base_url('index.php/products?category=' . $category['id']) ?>" 
+                       class="btn <?= $selectedCategory == $category['id'] ? 'btn-primary' : 'btn-outline-primary' ?>">
+                        <?php if ($category['icon']): ?>
+                            <i class="<?= esc($category['icon']) ?>"></i>
+                        <?php endif; ?>
+                        <?= esc($category['name']) ?>
+                    </a>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
 
-    <!-- Products -->
+    <!-- Products Grid -->
     <div class="row">
         <?php if (!empty($products)): ?>
             <?php foreach ($products as $product): ?>
@@ -64,19 +52,13 @@
                                 <p class="h4 text-primary">€<?= number_format($product['price'], 2) ?></p>
                             <?php endif; ?>
                             
-                            <?php if ($product['custom_note']): ?>
-                                <div class="alert alert-info">
-                                    <small><?= esc($product['custom_note']) ?></small>
-                                </div>
-                            <?php endif; ?>
-                            
                             <div class="d-flex gap-2 mb-2">
-                                <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>" 
+                                <a href="<?= base_url('index.php/out/' . $product['id']) ?>" 
                                    class="btn btn-primary flex-grow-1" target="_blank">
                                     View Product <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 <button class="btn btn-outline-secondary" 
-                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>')"
+                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['id']) ?>')"
                                         title="Copy Affiliate Link">
                                     <i class="fas fa-copy"></i>
                                 </button>
@@ -84,6 +66,9 @@
                             
                             <small class="text-muted d-block">
                                 <i class="fas fa-store"></i> <?= esc($product['source']) ?>
+                                <?php if (isset($product['list_count']) && $product['list_count'] > 0): ?>
+                                    | <i class="fas fa-list"></i> In <?= $product['list_count'] ?> list(s)
+                                <?php endif; ?>
                             </small>
                         </div>
                     </div>
@@ -92,25 +77,26 @@
         <?php else: ?>
             <div class="col-12">
                 <div class="alert alert-info">
-                    No products in this list yet.
+                    No products found. Try selecting a different category.
                 </div>
             </div>
         <?php endif; ?>
     </div>
+
+    <!-- Pagination -->
+    <?php if (!empty($products) && isset($pager)): ?>
+        <div class="row mt-4">
+            <div class="col">
+                <?= $pager->links() ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(function() {
-        alert('Link copied to clipboard!');
-    }, function(err) {
-        console.error('Could not copy text: ', err);
-    });
-}
-
 function copyAffiliateLink(url) {
     navigator.clipboard.writeText(url).then(function() {
         // Create a temporary toast notification

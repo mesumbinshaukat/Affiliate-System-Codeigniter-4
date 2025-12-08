@@ -9,7 +9,7 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="<?= base_url('admin/category/create') ?>">
+                    <form method="post" action="<?= base_url('index.php/admin/category/create') ?>">
                         <div class="mb-3">
                             <label for="name" class="form-label">Category Name *</label>
                             <input type="text" class="form-control" id="name" name="name" value="<?= old('name') ?>" required>

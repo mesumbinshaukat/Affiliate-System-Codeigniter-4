@@ -9,7 +9,7 @@
             <p class="text-muted">Welcome back, <?= esc($user['first_name']) ?>!</p>
         </div>
         <div class="col-auto">
-            <a href="<?= base_url('dashboard/list/create') ?>" class="btn btn-primary">
+            <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Create New List
             </a>
         </div>
@@ -40,7 +40,7 @@
     <!-- Quick Links -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <a href="<?= base_url('dashboard/lists') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/dashboard/lists') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-list fa-3x text-primary mb-3"></i>
                     <h5>My Lists</h5>
@@ -48,7 +48,7 @@
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url('dashboard/list/create') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
                     <h5>Create List</h5>
@@ -56,7 +56,7 @@
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url('dashboard/analytics') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-chart-line fa-3x text-warning mb-3"></i>
                     <h5>Analytics</h5>
@@ -64,7 +64,19 @@
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url() ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/products/categories') ?>" class="card text-center text-decoration-none">
+                <div class="card-body">
+                    <i class="fas fa-shopping-bag fa-3x text-danger mb-3"></i>
+                    <h5>View Products</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Secondary Quick Links -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <a href="<?= base_url('index.php') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-home fa-3x text-info mb-3"></i>
                     <h5>Home</h5>
@@ -107,11 +119,11 @@
                             <td><?= $list['product_count'] ?? 0 ?></td>
                             <td><?= number_format($list['views']) ?></td>
                             <td>
-                                <a href="<?= base_url('dashboard/list/edit/' . $list['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                <a href="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <?php if ($list['status'] === 'published'): ?>
-                                    <a href="<?= base_url('list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info" target="_blank">
+                                    <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info" target="_blank">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                 <?php endif; ?>
@@ -121,7 +133,7 @@
                 <?php else: ?>
                     <tr>
                         <td colspan="6" class="text-center text-muted">
-                            No lists yet. <a href="<?= base_url('dashboard/list/create') ?>">Create your first list</a>
+                            No lists yet. <a href="<?= base_url('index.php/dashboard/list/create') ?>">Create your first list</a>
                         </td>
                     </tr>
                 <?php endif; ?>

@@ -20,7 +20,7 @@
                     <div class="card list-card">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <a href="<?= base_url('list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
+                                <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
                                     <?= esc($list['title']) ?>
                                 </a>
                             </h5>

@@ -9,7 +9,7 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="<?= base_url('dashboard/list/create') ?>">
+                    <form method="post" action="<?= base_url('index.php/dashboard/list/create') ?>">
                         <div class="mb-3">
                             <label for="title" class="form-label">List Title *</label>
                             <input type="text" class="form-control" id="title" name="title" value="<?= old('title') ?>" required>
@@ -43,7 +43,7 @@
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Create List</button>
-                            <a href="<?= base_url('dashboard/lists') ?>" class="btn btn-secondary">Cancel</a>
+                            <a href="<?= base_url('index.php/dashboard/lists') ?>" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>

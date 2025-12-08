@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server Test - lijst.wmcdev.nl</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 { color: #28a745; }
+        .info {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="success">
+        <h1>✓ SUCCESS!</h1>
+        <h2>Server is Working!</h2>
+        <p>If you can see this page, your server is serving files correctly.</p>
+    </div>
+    
+    <div class="info">
+        <h3>Next Steps:</h3>
+        <ol>
+            <li><strong>Test PHP:</strong> Visit <a href="info.php">info.php</a></li>
+            <li><strong>Test CodeIgniter:</strong> Visit <a href="index.php">index.php</a></li>
+            <li><strong>Read Instructions:</strong> Check NGINX_SETUP.txt or TEMPORARY_WORKAROUND.txt</li>
+        </ol>
+        
+        <h3>What This Means:</h3>
+        <ul>
+            <li>✓ Files uploaded successfully</li>
+            <li>✓ Document root is accessible</li>
+            <li>✓ Server is responding</li>
+            <li>⚠️ Need to configure Nginx or use workaround</li>
+        </ul>
+        
+        <h3>Quick Fix:</h3>
+        <p>Edit your .env file and change:</p>
+        <code style="background: #f8f9fa; padding: 10px; display: block;">
+            app.indexPage = 'index.php'
+        </code>
+        <p>Then access your site at: <a href="index.php">http://lijst.wmcdev.nl/index.php</a></p>
+    </div>
+</body>
+</html>

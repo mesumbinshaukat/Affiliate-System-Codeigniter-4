@@ -25,7 +25,7 @@
                 <div class="col-lg-8">
                     <div class="card">
                         <div class="card-body">
-                            <form method="post" action="<?= base_url('dashboard/list/edit/' . $list['id']) ?>">
+                            <form method="post" action="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>">
                                 <div class="mb-3">
                                     <label for="title" class="form-label">List Title *</label>
                                     <input type="text" class="form-control" id="title" name="title" value="<?= esc($list['title']) ?>" required>
@@ -59,9 +59,9 @@
 
                                 <div class="d-flex gap-2">
                                     <button type="submit" class="btn btn-primary">Update List</button>
-                                    <a href="<?= base_url('dashboard/lists') ?>" class="btn btn-secondary">Back to Lists</a>
+                                    <a href="<?= base_url('index.php/dashboard/lists') ?>" class="btn btn-secondary">Back to Lists</a>
                                     <?php if ($list['status'] === 'published'): ?>
-                                        <a href="<?= base_url('list/' . $list['slug']) ?>" class="btn btn-info" target="_blank">
+                                        <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-info" target="_blank">
                                             <i class="fas fa-eye"></i> View Public
                                         </a>
                                     <?php endif; ?>
@@ -192,7 +192,7 @@ function searchProducts(page = 1) {
     
     document.getElementById('searchResults').innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted">Searching Bol.com...</p></div>';
 
-    fetch(`<?= base_url('dashboard/products/search') ?>?q=${encodeURIComponent(query)}&limit=${resultsPerPage}&offset=${offset}`)
+    fetch(`<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(query)}&limit=${resultsPerPage}&offset=${offset}`)
         .then(response => response.json())
         .then(data => {
             searchBtn.disabled = false;
@@ -292,7 +292,7 @@ function toggleProductSelection(productId, isSelected) {
         const resultDiv = document.getElementById(`result-${productId}`);
         
         // Extract product data from the result div
-        fetch(`<?= base_url('dashboard/products/search') ?>?q=${encodeURIComponent(currentSearchQuery)}&limit=${resultsPerPage}&offset=${(currentPage - 1) * resultsPerPage}`)
+        fetch(`<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(currentSearchQuery)}&limit=${resultsPerPage}&offset=${(currentPage - 1) * resultsPerPage}`)
             .then(response => response.json())
             .then(data => {
                 const product = data.products.find(p => p.external_id === productId);
@@ -377,7 +377,7 @@ function addSelectedProducts() {
         
         const product = productsArray[index];
         
-        fetch('<?= base_url('dashboard/product/add') ?>', {
+        fetch('<?= base_url('index.php/dashboard/product/add') ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -424,7 +424,7 @@ function addSingleProduct(product) {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
     
-    fetch('<?= base_url('dashboard/product/add') ?>', {
+    fetch('<?= base_url('index.php/dashboard/product/add') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -538,7 +538,7 @@ function escapeHtml(text) {
 
 // Refresh product list without page reload
 function refreshProductList() {
-    fetch('<?= base_url('dashboard/list/products/' . $list['id']) ?>')
+    fetch('<?= base_url('index.php/dashboard/list/products/' . $list['id']) ?>')
         .then(response => response.json())
         .then(data => {
             if (data.success && data.products) {
@@ -596,7 +596,7 @@ function removeProduct(productId) {
         productCard.style.opacity = '0.5';
     }
 
-    fetch('<?= base_url('dashboard/product/remove') ?>', {
+    fetch('<?= base_url('index.php/dashboard/product/remove') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

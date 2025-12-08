@@ -5,7 +5,7 @@
 <div class="container my-5">
     <h1 class="mb-4">Search Lists</h1>
 
-    <form method="get" action="<?= base_url('search') ?>" class="mb-4">
+    <form method="get" action="<?= base_url('index.php/search') ?>" class="mb-4">
         <div class="input-group input-group-lg">
             <input type="text" name="q" class="form-control" placeholder="Search for lists..." value="<?= esc($query ?? '') ?>">
             <button class="btn btn-primary" type="submit">
@@ -24,7 +24,7 @@
                         <div class="card list-card">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <a href="<?= base_url('list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
+                                    <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
                                         <?= esc($list['title']) ?>
                                     </a>
                                 </h5>

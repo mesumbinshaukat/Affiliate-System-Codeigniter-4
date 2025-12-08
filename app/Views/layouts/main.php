@@ -122,7 +122,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="<?= base_url() ?>">
+            <a class="navbar-brand" href="<?= base_url('index.php') ?>">
                 <i class="fas fa-list-ul"></i> Lijstje.nl
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -131,37 +131,37 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url() ?>">Home</a>
+                        <a class="nav-link" href="<?= base_url('index.php') ?>">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url('search') ?>">Browse Lists</a>
+                        <a class="nav-link" href="<?= base_url('index.php/search') ?>">Browse Lists</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
                     <?php if ($isLoggedIn): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('dashboard') ?>">
+                            <a class="nav-link" href="<?= base_url('index.php/dashboard') ?>">
                                 <i class="fas fa-tachometer-alt"></i> Dashboard
                             </a>
                         </li>
                         <?php if ($user && $user['role'] === 'admin'): ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="<?= base_url('admin') ?>">
+                                <a class="nav-link" href="<?= base_url('index.php/admin') ?>">
                                     <i class="fas fa-cog"></i> Admin
                                 </a>
                             </li>
                         <?php endif; ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('logout') ?>">
+                            <a class="nav-link" href="<?= base_url('index.php/logout') ?>">
                                 <i class="fas fa-sign-out-alt"></i> Logout
                             </a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('login') ?>">Login</a>
+                            <a class="nav-link" href="<?= base_url('index.php/login') ?>">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-primary btn-sm ms-2" href="<?= base_url('register') ?>">Sign Up</a>
+                            <a class="btn btn-primary btn-sm ms-2" href="<?= base_url('index.php/register') ?>">Sign Up</a>
                         </li>
                     <?php endif; ?>
                 </ul>

@@ -19,7 +19,7 @@
                         </div>
                     <?php endif; ?>
                     
-                    <form method="post" action="<?= base_url('login') ?>" id="loginForm">
+                    <form method="post" action="<?= base_url('index.php/login') ?>" id="loginForm">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control <?= session('errors.email') ? 'is-invalid' : '' ?>" id="email" name="email" value="<?= old('email') ?>" required autofocus>
@@ -40,7 +40,7 @@
                     </form>
                     
                     <div class="text-center mt-3">
-                        <p>Don't have an account? <a href="<?= base_url('register') ?>">Sign up</a></p>
+                        <p>Don't have an account? <a href="<?= base_url('index.php/register') ?>">Sign up</a></p>
                     </div>
                 </div>
             </div>

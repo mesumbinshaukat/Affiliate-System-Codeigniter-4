@@ -10,9 +10,9 @@
                 <h1 class="display-4 fw-bold mb-3">Create & Share Product Lists</h1>
                 <p class="lead mb-4">Curate your favorite products and share them with the world. Earn through affiliate links.</p>
                 <?php if (!$isLoggedIn): ?>
-                    <a href="<?= base_url('register') ?>" class="btn btn-light btn-lg">Get Started</a>
+                    <a href="<?= base_url('index.php/register') ?>" class="btn btn-light btn-lg">Get Started</a>
                 <?php else: ?>
-                    <a href="<?= base_url('dashboard/list/create') ?>" class="btn btn-light btn-lg">Create a List</a>
+                    <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="btn btn-light btn-lg">Create a List</a>
                 <?php endif; ?>
             </div>
         </div>
@@ -24,7 +24,7 @@
     <h2 class="mb-4">Browse by Category</h2>
     <div class="d-flex flex-wrap">
         <?php foreach ($categories as $category): ?>
-            <a href="<?= base_url('category/' . $category['slug']) ?>" class="category-badge">
+            <a href="<?= base_url('index.php/category/' . $category['slug']) ?>" class="category-badge">
                 <i class="fas fa-<?= $category['icon'] ?? 'folder' ?>"></i>
                 <?= esc($category['name']) ?>
             </a>
@@ -42,7 +42,7 @@
                 <div class="card list-card">
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a href="<?= base_url('list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
+                            <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
                                 <?= esc($list['title']) ?>
                             </a>
                         </h5>
@@ -76,7 +76,7 @@
                 <div class="card list-card">
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a href="<?= base_url('list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
+                            <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
                                 <?= esc($list['title']) ?>
                             </a>
                         </h5>
@@ -110,7 +110,7 @@
                     <div class="card list-card">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <a href="<?= base_url('list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
+                                <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
                                     <?= esc($list['title']) ?>
                                 </a>
                             </h5>

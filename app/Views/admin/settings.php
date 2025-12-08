@@ -9,7 +9,7 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="<?= base_url('admin/settings') ?>">
+                    <form method="post" action="<?= base_url('index.php/admin/settings') ?>">
                         <div class="mb-3">
                             <label for="site_name" class="form-label">Site Name</label>
                             <input type="text" class="form-control" id="site_name" name="settings[site_name]" value="<?= esc($settings['site_name'] ?? 'Lijstje.nl') ?>">

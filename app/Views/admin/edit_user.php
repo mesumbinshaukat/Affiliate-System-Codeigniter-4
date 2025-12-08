@@ -9,7 +9,7 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="<?= base_url('admin/user/edit/' . $editUser['id']) ?>">
+                    <form method="post" action="<?= base_url('index.php/admin/user/edit/' . $editUser['id']) ?>">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="first_name" class="form-label">First Name</label>

@@ -19,7 +19,7 @@
                         </div>
                     <?php endif; ?>
                     
-                    <form method="post" action="<?= base_url('register') ?>" id="registerForm">
+                    <form method="post" action="<?= base_url('index.php/register') ?>" id="registerForm">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="first_name" class="form-label">First Name</label>
@@ -76,7 +76,7 @@
                     </form>
                     
                     <div class="text-center mt-3">
-                        <p>Already have an account? <a href="<?= base_url('login') ?>">Login</a></p>
+                        <p>Already have an account? <a href="<?= base_url('index.php/login') ?>">Login</a></p>
                     </div>
                 </div>
             </div>

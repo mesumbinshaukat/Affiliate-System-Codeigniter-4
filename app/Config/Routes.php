@@ -11,6 +11,13 @@ $routes->get('/', 'Home::index');
 $routes->get('/category/(:segment)', 'Home::category/$1');
 $routes->get('/search', 'Home::search');
 
+// Product Routes
+$routes->get('/products', 'Products::index');
+$routes->get('/products/categories', 'Products::byCategory');
+$routes->get('/products/category/(:segment)', 'Products::byCategory/$1');
+$routes->get('/products/search', 'Products::search');
+$routes->get('/product/(:num)', 'Products::view/$1');
+
 // Authentication Routes
 $routes->get('/login', 'Auth::login');
 $routes->post('/login', 'Auth::login');
