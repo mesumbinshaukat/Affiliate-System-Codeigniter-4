@@ -162,20 +162,32 @@ class Dashboard extends BaseController
         if ($redirect) return $redirect;
 
         $query = $this->request->getGet('q');
+        $limit = (int)($this->request->getGet('limit') ?? 10);
+        $offset = (int)($this->request->getGet('offset') ?? 0);
+        
+        // Validate and sanitize parameters
+        $limit = max(1, min($limit, 50)); // Between 1 and 50
+        $offset = max(0, $offset);
+        
         $results = [];
+        $total = 0;
 
         if ($query) {
             $bolApi = new BolComAPI();
-            $response = $bolApi->searchProducts($query, 20);
+            $response = $bolApi->searchProducts($query, $limit, $offset);
             
             if ($response['success']) {
                 $results = $response['products'];
+                $total = $response['total'] ?? count($results);
             }
         }
 
         return $this->response->setJSON([
             'success' => true,
             'products' => $results,
+            'total' => $total,
+            'limit' => $limit,
+            'offset' => $offset,
         ]);
     }
 
@@ -188,6 +200,14 @@ class Dashboard extends BaseController
             $listId = $this->request->getPost('list_id');
             $productData = $this->request->getPost('product');
 
+            // Validate required fields
+            if (empty($listId) || empty($productData)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Missing required fields',
+                ]);
+            }
+
             // Verify list ownership
             $listModel = new ListModel();
             $list = $listModel->find($listId);
@@ -195,7 +215,7 @@ class Dashboard extends BaseController
             if (!$list || $list['user_id'] != $this->session->get('user_id')) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'List not found',
+                    'message' => 'List not found or access denied',
                 ]);
             }
 
@@ -209,32 +229,78 @@ class Dashboard extends BaseController
 
             // Create product if not exists
             if (!$product) {
+                // Validate product data
+                if (empty($productData['title']) || empty($productData['affiliate_url'])) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Product title and affiliate URL are required',
+                    ]);
+                }
+                
                 $productModel->insert($productData);
                 $productId = $productModel->getInsertID();
             } else {
                 $productId = $product['id'];
             }
 
-            // Add to list
+            // Check if product is already in this list (prevent duplicates)
             $listProductModel = new ListProductModel();
+            $existingLink = $listProductModel->where('list_id', $listId)
+                ->where('product_id', $productId)
+                ->first();
             
+            if ($existingLink) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Product already exists in this list',
+                ]);
+            }
+
             // Get next position
             $maxPosition = $listProductModel->where('list_id', $listId)
                 ->selectMax('position')
                 ->first();
             $position = ($maxPosition['position'] ?? 0) + 1;
 
+            // Add to list
             $listProductModel->addProductToList($listId, $productId, $position);
 
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Product added successfully',
+                'product_id' => $productId,
             ]);
         }
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'Invalid request',
+            'message' => 'Invalid request method',
+        ]);
+    }
+
+    public function getListProducts($listId)
+    {
+        $redirect = $this->requireLogin();
+        if ($redirect) return $redirect;
+
+        // Verify list ownership
+        $listModel = new ListModel();
+        $list = $listModel->find($listId);
+
+        if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'List not found or access denied',
+            ]);
+        }
+
+        // Get products for this list
+        $listProductModel = new ListProductModel();
+        $products = $listProductModel->getListProducts($listId);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'products' => $products,
         ]);
     }
 

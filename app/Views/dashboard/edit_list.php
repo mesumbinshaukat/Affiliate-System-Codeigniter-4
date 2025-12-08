@@ -81,13 +81,41 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Add Products from Bol.com</h5>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="productSearch" placeholder="Search for products...">
-                                <button class="btn btn-primary" type="button" onclick="searchProducts()">
-                                    <i class="fas fa-search"></i> Search
-                                </button>
+                            <div class="row g-2 mb-3">
+                                <div class="col">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="productSearch" placeholder="Search for products (e.g., iPhone, laptop, boek)...">
+                                        <button class="btn btn-primary" type="button" onclick="searchProducts(1)" id="searchBtn">
+                                            <i class="fas fa-search"></i> Search
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                            
+                            <!-- Selected Products Counter -->
+                            <div id="selectedCounter" class="alert alert-info d-none mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-check-circle"></i> <strong id="selectedCount">0</strong> product(s) selected</span>
+                                    <div>
+                                        <button class="btn btn-sm btn-success" onclick="addSelectedProducts()" id="addSelectedBtn">
+                                            <i class="fas fa-plus"></i> Add Selected
+                                        </button>
+                                        <button class="btn btn-sm btn-secondary" onclick="clearSelection()">
+                                            <i class="fas fa-times"></i> Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Search Results -->
                             <div id="searchResults" class="mt-3"></div>
+                            
+                            <!-- Pagination -->
+                            <div id="paginationContainer" class="mt-3 d-none">
+                                <nav>
+                                    <ul class="pagination justify-content-center" id="pagination"></ul>
+                                </nav>
+                            </div>
                         </div>
                     </div>
 
@@ -139,52 +167,263 @@
 <?= $this->section('scripts') ?>
 <script>
 const listId = <?= $list['id'] ?>;
+let selectedProducts = new Map();
+let currentSearchQuery = '';
+let currentPage = 1;
+let totalResults = 0;
+const resultsPerPage = 10;
 
-function searchProducts() {
-    const query = document.getElementById('productSearch').value;
-    if (!query) return;
+// Search products with pagination
+function searchProducts(page = 1) {
+    const query = document.getElementById('productSearch').value.trim();
+    if (!query) {
+        showToast('Please enter a search term', 'warning');
+        return;
+    }
 
-    document.getElementById('searchResults').innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+    currentSearchQuery = query;
+    currentPage = page;
+    const offset = (page - 1) * resultsPerPage;
 
-    fetch('<?= base_url('dashboard/products/search') ?>?q=' + encodeURIComponent(query))
+    // Show loading
+    const searchBtn = document.getElementById('searchBtn');
+    searchBtn.disabled = true;
+    searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Searching...';
+    
+    document.getElementById('searchResults').innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted">Searching Bol.com...</p></div>';
+
+    fetch(`<?= base_url('dashboard/products/search') ?>?q=${encodeURIComponent(query)}&limit=${resultsPerPage}&offset=${offset}`)
         .then(response => response.json())
         .then(data => {
-            if (data.success && data.products.length > 0) {
-                let html = '<div class="list-group">';
-                data.products.forEach(product => {
-                    html += `
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-2">
-                                    ${product.image_url ? `<img src="${product.image_url}" class="img-fluid" alt="${product.title}">` : ''}
-                                </div>
-                                <div class="col-md-8">
-                                    <h6>${product.title}</h6>
-                                    <p class="text-muted mb-0">${product.description ? product.description.substring(0, 100) : ''}</p>
-                                    ${product.price ? `<strong class="text-primary">€${parseFloat(product.price).toFixed(2)}</strong>` : ''}
-                                </div>
-                                <div class="col-md-2 text-end">
-                                    <button class="btn btn-sm btn-primary" onclick='addProduct(${JSON.stringify(product)})'>
-                                        <i class="fas fa-plus"></i> Add
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                document.getElementById('searchResults').innerHTML = html;
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Search';
+            
+            if (data.success && data.products && data.products.length > 0) {
+                totalResults = data.total || data.products.length;
+                renderSearchResults(data.products);
+                renderPagination();
             } else {
-                document.getElementById('searchResults').innerHTML = '<div class="alert alert-info">No products found. Try a different search term.</div>';
+                document.getElementById('searchResults').innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i> No products found for "<strong>${escapeHtml(query)}</strong>".
+                        <br><small>Try different keywords or check spelling.</small>
+                    </div>
+                `;
+                document.getElementById('paginationContainer').classList.add('d-none');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            document.getElementById('searchResults').innerHTML = '<div class="alert alert-danger">Error searching products. Please try again.</div>';
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Search';
+            document.getElementById('searchResults').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Error searching products. Please try again.
+                </div>
+            `;
         });
 }
 
-function addProduct(product) {
+// Render search results with checkboxes
+function renderSearchResults(products) {
+    let html = '<div class="list-group">';
+    
+    products.forEach(product => {
+        const isSelected = selectedProducts.has(product.external_id);
+        const checkboxId = `product-${product.external_id}`;
+        
+        html += `
+            <div class="list-group-item" id="result-${product.external_id}">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <div class="form-check">
+                            <input class="form-check-input product-checkbox" type="checkbox" 
+                                   id="${checkboxId}" 
+                                   ${isSelected ? 'checked' : ''}
+                                   onchange="toggleProductSelection('${product.external_id}', this.checked)">
+                            <label class="form-check-label" for="${checkboxId}"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" class="img-fluid rounded" alt="${escapeHtml(product.title)}" style="max-height: 80px; object-fit: contain;">` : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px;"><i class="fas fa-image text-muted"></i></div>'}
+                    </div>
+                    <div class="col-md-7">
+                        <h6 class="mb-1">${escapeHtml(product.title)}</h6>
+                        ${product.description ? `<p class="text-muted small mb-1">${escapeHtml(product.description.substring(0, 120))}${product.description.length > 120 ? '...' : ''}</p>` : ''}
+                        <div class="d-flex align-items-center gap-3">
+                            ${product.price ? `<strong class="text-primary">€${parseFloat(product.price).toFixed(2)}</strong>` : ''}
+                            ${product.rating ? `<span class="badge bg-warning text-dark"><i class="fas fa-star"></i> ${product.rating}</span>` : ''}
+                            ${product.ean ? `<small class="text-muted">EAN: ${escapeHtml(product.ean)}</small>` : ''}
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button class="btn btn-sm btn-outline-primary" onclick='addSingleProduct(${JSON.stringify(product)})' title="Add this product">
+                            <i class="fas fa-plus"></i> Add Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    
+    // Add select all option
+    const selectAllHtml = `
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)">
+                <label class="form-check-label" for="selectAll">
+                    <strong>Select all on this page</strong>
+                </label>
+            </div>
+            <small class="text-muted">Showing ${products.length} of ${totalResults} results</small>
+        </div>
+    `;
+    
+    document.getElementById('searchResults').innerHTML = selectAllHtml + html;
+}
+
+// Toggle product selection
+function toggleProductSelection(productId, isSelected) {
+    if (isSelected) {
+        // Find product data from current results
+        const checkbox = document.getElementById(`product-${productId}`);
+        const resultDiv = document.getElementById(`result-${productId}`);
+        
+        // Extract product data from the result div
+        fetch(`<?= base_url('dashboard/products/search') ?>?q=${encodeURIComponent(currentSearchQuery)}&limit=${resultsPerPage}&offset=${(currentPage - 1) * resultsPerPage}`)
+            .then(response => response.json())
+            .then(data => {
+                const product = data.products.find(p => p.external_id === productId);
+                if (product) {
+                    selectedProducts.set(productId, product);
+                    updateSelectedCounter();
+                }
+            });
+    } else {
+        selectedProducts.delete(productId);
+        updateSelectedCounter();
+    }
+}
+
+// Toggle select all
+function toggleSelectAll(isSelected) {
+    const checkboxes = document.querySelectorAll('.product-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = isSelected;
+        const productId = checkbox.id.replace('product-', '');
+        toggleProductSelection(productId, isSelected);
+    });
+}
+
+// Update selected counter
+function updateSelectedCounter() {
+    const count = selectedProducts.size;
+    const counter = document.getElementById('selectedCounter');
+    const countSpan = document.getElementById('selectedCount');
+    
+    countSpan.textContent = count;
+    
+    if (count > 0) {
+        counter.classList.remove('d-none');
+    } else {
+        counter.classList.add('d-none');
+    }
+}
+
+// Clear selection
+function clearSelection() {
+    selectedProducts.clear();
+    document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = false);
+    document.getElementById('selectAll').checked = false;
+    updateSelectedCounter();
+}
+
+// Add selected products in batch
+function addSelectedProducts() {
+    if (selectedProducts.size === 0) {
+        showToast('Please select at least one product', 'warning');
+        return;
+    }
+    
+    const addBtn = document.getElementById('addSelectedBtn');
+    addBtn.disabled = true;
+    addBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Adding...';
+    
+    const productsArray = Array.from(selectedProducts.values());
+    let addedCount = 0;
+    let failedCount = 0;
+    
+    // Add products sequentially to avoid race conditions
+    const addNext = (index) => {
+        if (index >= productsArray.length) {
+            // All done
+            addBtn.disabled = false;
+            addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Selected';
+            
+            if (failedCount === 0) {
+                showToast(`Successfully added ${addedCount} product(s)!`, 'success');
+                // Clear selection and refresh product list
+                clearSelection();
+                refreshProductList();
+            } else {
+                showToast(`Added ${addedCount} product(s). ${failedCount} failed.`, 'warning');
+                clearSelection();
+                refreshProductList();
+            }
+            return;
+        }
+        
+        const product = productsArray[index];
+        
+        fetch('<?= base_url('dashboard/product/add') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                list_id: listId,
+                'product[external_id]': product.external_id,
+                'product[title]': product.title,
+                'product[description]': product.description || '',
+                'product[image_url]': product.image_url || '',
+                'product[price]': product.price || 0,
+                'product[affiliate_url]': product.affiliate_url,
+                'product[source]': product.source,
+                'product[ean]': product.ean || ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addedCount++;
+            } else {
+                failedCount++;
+                console.log(`Failed to add product: ${product.title} - ${data.message}`);
+            }
+            // Add next product
+            addNext(index + 1);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            failedCount++;
+            // Continue with next product
+            addNext(index + 1);
+        });
+    };
+    
+    // Start adding
+    addNext(0);
+}
+
+// Add single product immediately
+function addSingleProduct(product) {
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    
     fetch('<?= base_url('dashboard/product/add') ?>', {
         method: 'POST',
         headers: {
@@ -205,20 +444,157 @@ function addProduct(product) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Product added successfully!');
-            location.reload();
+            btn.innerHTML = '<i class="fas fa-check"></i> Added';
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-success');
+            showToast(`Added "${product.title}"`, 'success');
+            // Refresh product list without page reload
+            refreshProductList();
         } else {
-            alert('Error adding product: ' + data.message);
+            showToast('Error: ' + data.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error adding product');
+        showToast('Error adding product', 'error');
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
     });
+}
+
+// Render pagination
+function renderPagination() {
+    const totalPages = Math.ceil(totalResults / resultsPerPage);
+    
+    if (totalPages <= 1) {
+        document.getElementById('paginationContainer').classList.add('d-none');
+        return;
+    }
+    
+    document.getElementById('paginationContainer').classList.remove('d-none');
+    
+    let html = '';
+    
+    // Previous button
+    html += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="searchProducts(${currentPage - 1}); return false;">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+    `;
+    
+    // Page numbers
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    
+    if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+    
+    if (startPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="searchProducts(1); return false;">1</a></li>`;
+        if (startPage > 2) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        html += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="searchProducts(${i}); return false;">${i}</a>
+            </li>
+        `;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="searchProducts(${totalPages}); return false;">${totalPages}</a></li>`;
+    }
+    
+    // Next button
+    html += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="searchProducts(${currentPage + 1}); return false;">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+    `;
+    
+    document.getElementById('pagination').innerHTML = html;
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Refresh product list without page reload
+function refreshProductList() {
+    fetch('<?= base_url('dashboard/list/products/' . $list['id']) ?>')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.products) {
+                updateProductListUI(data.products);
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing product list:', error);
+        });
+}
+
+// Update product list UI
+function updateProductListUI(products) {
+    const productListDiv = document.getElementById('productList');
+    
+    if (products.length === 0) {
+        productListDiv.innerHTML = '<p class="text-muted text-center">No products added yet. Search and add products from Bol.com.</p>';
+        return;
+    }
+    
+    let html = '';
+    products.forEach(product => {
+        html += `
+            <div class="card mb-3" data-product-id="${product.product_id}">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" class="img-fluid" alt="${escapeHtml(product.title)}">` : ''}
+                        </div>
+                        <div class="col-md-8">
+                            <h6>${escapeHtml(product.title)}</h6>
+                            <p class="text-muted mb-0">${product.description ? escapeHtml(product.description.substring(0, 100)) : ''}${product.description && product.description.length > 100 ? '...' : ''}</p>
+                            ${product.price ? `<strong class="text-primary">€${parseFloat(product.price).toFixed(2)}</strong>` : ''}
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-sm btn-danger" onclick="removeProduct(${product.product_id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    productListDiv.innerHTML = html;
 }
 
 function removeProduct(productId) {
     if (!confirm('Are you sure you want to remove this product?')) return;
+
+    // Show loading state on the product card
+    const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+    if (productCard) {
+        productCard.style.opacity = '0.5';
+    }
 
     fetch('<?= base_url('dashboard/product/remove') ?>', {
         method: 'POST',
@@ -233,14 +609,22 @@ function removeProduct(productId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload();
+            showToast('Product removed successfully', 'success');
+            // Refresh product list without page reload
+            refreshProductList();
         } else {
-            alert('Error removing product: ' + data.message);
+            showToast('Error: ' + data.message, 'error');
+            if (productCard) {
+                productCard.style.opacity = '1';
+            }
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error removing product');
+        showToast('Error removing product', 'error');
+        if (productCard) {
+            productCard.style.opacity = '1';
+        }
     });
 }
 

@@ -37,6 +37,7 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     
     // Product Management
     $routes->get('products/search', 'Dashboard::searchProducts');
+    $routes->get('list/products/(:num)', 'Dashboard::getListProducts/$1');
     $routes->post('product/add', 'Dashboard::addProduct');
     $routes->post('product/remove', 'Dashboard::removeProduct');
     $routes->post('product/positions', 'Dashboard::updateProductPositions');
