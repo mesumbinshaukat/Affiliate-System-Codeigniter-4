@@ -64,18 +64,6 @@
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url('index.php/products/categories') ?>" class="card text-center text-decoration-none">
-                <div class="card-body">
-                    <i class="fas fa-shopping-bag fa-3x text-danger mb-3"></i>
-                    <h5>View Products</h5>
-                </div>
-            </a>
-        </div>
-    </div>
-    
-    <!-- Secondary Quick Links -->
-    <div class="row mb-4">
-        <div class="col-md-3">
             <a href="<?= base_url('index.php') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-home fa-3x text-info mb-3"></i>

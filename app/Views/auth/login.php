@@ -1,6 +1,26 @@
 <?= $this->extend('layouts/main') ?>
 
+
 <?= $this->section('content') ?>
+
+
+<!-- Auth Header -->
+<div class="auth-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <form action="<?= base_url('index.php/find') ?>" method="get" class="d-flex">
+                    <input type="email" class="form-control me-2" placeholder="Your email address" name="email">
+                    <input type="password" class="form-control me-2" placeholder="Password" name="password">
+                    <button type="submit" class="btn btn-dark">Log in</button>
+                </form>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="#" class="text-muted">Forgot your password?</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="container my-5">
     <div class="row justify-content-center">

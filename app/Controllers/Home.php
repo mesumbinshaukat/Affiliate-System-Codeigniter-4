@@ -9,15 +9,46 @@ class Home extends BaseController
 {
     public function index()
     {
-        $listModel = new ListModel();
-        $categoryModel = new CategoryModel();
-
-        $this->data['featuredLists'] = $listModel->getFeaturedLists(6);
-        $this->data['trendingLists'] = $listModel->getTrendingLists(6);
-        $this->data['recentLists'] = $listModel->getPublishedLists(12);
-        $this->data['categories'] = $categoryModel->getActiveCategories();
-
+        // Homepage is now just informational - no public lists
+        $userModel = new \App\Models\UserModel();
+        
+        // Get stats for display
+        $this->data['totalUsers'] = $userModel->countAll();
+        $this->data['totalPresents'] = 0; // Can be calculated from products
+        $this->data['birthdaysThisMonth'] = 0; // Can be calculated from user birthdays
+        
         return view('home/index', $this->data);
+    }
+    
+    public function find($username = null)
+    {
+        if (!$username) {
+            $username = $this->request->getGet('username') ?? $this->request->getPost('username');
+        }
+        
+        if (!$username) {
+            return redirect()->to('/')->with('error', 'Please enter a username to find a list');
+        }
+        
+        $userModel = new \App\Models\UserModel();
+        $listModel = new ListModel();
+        
+        // Find user by username
+        $user = $userModel->where('username', $username)->first();
+        
+        if (!$user) {
+            return redirect()->to('/')->with('error', 'User not found');
+        }
+        
+        // Get user's published lists
+        $lists = $listModel->where('user_id', $user['id'])
+            ->where('status', 'published')
+            ->findAll();
+        
+        $this->data['user'] = $user;
+        $this->data['lists'] = $lists;
+        
+        return view('home/user_lists', $this->data);
     }
 
     public function category($slug)
