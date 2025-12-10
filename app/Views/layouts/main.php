@@ -322,7 +322,7 @@
         
         .stats-card h3 {
             font-size: 2rem;
-            font-weight: 700;
+            font-weight: 500;
             margin-bottom: 0.5rem;
         }
         
@@ -479,6 +479,38 @@
         
         .empty-state i {
             color: #ccc;
+        }
+        
+        /* Drag and Drop Styles */
+        .sortable-ghost {
+            opacity: 0.5;
+            background-color: #f0f0f0;
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .sortable-drag {
+            opacity: 1;
+        }
+        
+        #productList .card {
+            cursor: grab;
+            transition: all 0.2s ease;
+        }
+        
+        #productList .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        #productList .card:active {
+            cursor: grabbing;
+        }
+        
+        .fa-grip-vertical {
+            transition: color 0.2s ease;
+        }
+        
+        #productList .card:hover .fa-grip-vertical {
+            color: var(--primary-color) !important;
         }
     </style>
     

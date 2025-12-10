@@ -122,8 +122,11 @@
                     <!-- Current Products -->
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Products in this List</h5>
-                            <div id="productList">
+                            <h5 class="card-title">
+                                <i class="fas fa-grip-vertical"></i> Products in this List
+                                <small class="text-muted">(drag to reorder)</small>
+                            </h5>
+                            <div id="productList" class="sortable-list">
                                 <?php if (!empty($products)): ?>
                                     <?php foreach ($products as $product): ?>
                                         <div class="card mb-3" data-product-id="<?= $product['product_id'] ?>">
@@ -634,5 +637,112 @@ document.getElementById('productSearch').addEventListener('keypress', function(e
         searchProducts();
     }
 });
+
+// Initialize drag-and-drop for product reordering
+function initializeSortable() {
+    const productList = document.getElementById('productList');
+    if (!productList) return;
+    
+    // Remove existing Sortable instance if any
+    if (productList.sortableInstance) {
+        productList.sortableInstance.destroy();
+    }
+    
+    // Create new Sortable instance
+    productList.sortableInstance = Sortable.create(productList, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
+        handle: '.card-body',
+        onEnd: function(evt) {
+            // Save new order
+            saveProductOrder();
+        }
+    });
+}
+
+// Save product order after drag-and-drop
+function saveProductOrder() {
+    const productCards = document.querySelectorAll('#productList .card[data-product-id]');
+    const positions = {};
+    
+    productCards.forEach((card, index) => {
+        const productId = card.getAttribute('data-product-id');
+        positions[productId] = index + 1; // Position starts from 1
+    });
+    
+    fetch('<?= base_url('index.php/dashboard/product/positions') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            list_id: listId,
+            positions: JSON.stringify(positions)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Product order updated', 'success');
+        } else {
+            showToast('Error updating order: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error updating product order', 'error');
+    });
+}
+
+// Update product list UI with sortable
+function updateProductListUI(products) {
+    const productListDiv = document.getElementById('productList');
+    
+    if (products.length === 0) {
+        productListDiv.innerHTML = '<p class="text-muted text-center">No products added yet. Search and add products from Bol.com.</p>';
+        return;
+    }
+    
+    let html = '';
+    products.forEach(product => {
+        html += `
+            <div class="card mb-3" data-product-id="${product.product_id}">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-grip-vertical text-muted" style="cursor: grab;"></i>
+                        </div>
+                        <div class="col-md-2">
+                            ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" class="img-fluid" alt="${escapeHtml(product.title)}">` : ''}
+                        </div>
+                        <div class="col-md-7">
+                            <h6>${escapeHtml(product.title)}</h6>
+                            <p class="text-muted mb-0">${product.description ? escapeHtml(product.description.substring(0, 100)) : ''}${product.description && product.description.length > 100 ? '...' : ''}</p>
+                            ${product.price ? `<strong class="text-primary">€${parseFloat(product.price).toFixed(2)}</strong>` : ''}
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-sm btn-danger" onclick="removeProduct(${product.product_id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    productListDiv.innerHTML = html;
+    initializeSortable();
+}
+
+// Initialize sortable on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSortable();
+});
 </script>
+
+<!-- Sortable.js for drag-and-drop -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
 <?= $this->endSection() ?>
