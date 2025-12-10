@@ -396,6 +396,90 @@
         .auth-header .btn {
             border-radius: 6px;
         }
+        
+        /* Product Card Enhancements */
+        .product-card {
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-4px);
+        }
+        
+        .product-card .card-body {
+            padding: 1.25rem;
+        }
+        
+        .product-card .card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        .product-card .card-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .product-card .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .product-card .btn-primary:hover {
+            background-color: #c41a1f;
+            border-color: #c41a1f;
+        }
+        
+        /* List View Enhancements */
+        .list-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .creator-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .creator-profile a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .creator-profile a:hover {
+            color: var(--primary-color);
+        }
+        
+        .share-buttons .btn-group .btn {
+            border-radius: 6px;
+            margin-right: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .share-buttons .btn-group .btn:last-child {
+            margin-right: 0;
+        }
+        
+        .alert-sm {
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-state i {
+            color: #ccc;
+        }
     </style>
     
     <?= $this->renderSection('styles') ?>
