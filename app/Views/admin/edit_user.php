@@ -55,7 +55,7 @@
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Update User</button>
-                            <a href="<?= base_url('admin/users') ?>" class="btn btn-secondary">Cancel</a>
+                            <a href="<?= base_url('index.php/admin/users') ?>" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>

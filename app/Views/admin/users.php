@@ -41,11 +41,11 @@
                                 <td><?= date('M d, Y', strtotime($user['created_at'])) ?></td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="<?= base_url('admin/user/edit/' . $user['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                        <a href="<?= base_url('index.php/admin/user/edit/' . $user['id']) ?>" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <?php if ($user['id'] != session()->get('user_id')): ?>
-                                            <a href="<?= base_url('admin/user/delete/' . $user['id']) ?>" 
+                                            <a href="<?= base_url('index.php/admin/user/delete/' . $user['id']) ?>" 
                                                class="btn btn-sm btn-outline-danger"
                                                onclick="return confirm('Are you sure you want to delete this user?')">
                                                 <i class="fas fa-trash"></i>

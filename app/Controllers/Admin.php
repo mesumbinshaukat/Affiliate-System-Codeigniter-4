@@ -57,25 +57,77 @@ class Admin extends BaseController
         $user = $userModel->find($userId);
 
         if (!$user) {
-            return redirect()->to('/admin/users')->with('error', 'User not found');
+            return redirect()->to('index.php/admin/users')->with('error', 'User not found');
         }
 
         if (strtolower($this->request->getMethod()) === 'post') {
-            $data = [
-                'username' => $this->request->getPost('username'),
-                'email' => $this->request->getPost('email'),
-                'first_name' => $this->request->getPost('first_name'),
-                'last_name' => $this->request->getPost('last_name'),
-                'role' => $this->request->getPost('role'),
-                'status' => $this->request->getPost('status'),
-            ];
-
-            // Only update password if provided
+            // Get form data
+            $username = $this->request->getPost('username');
+            $email = $this->request->getPost('email');
+            $firstName = $this->request->getPost('first_name');
+            $lastName = $this->request->getPost('last_name');
+            $role = $this->request->getPost('role');
+            $status = $this->request->getPost('status');
             $password = $this->request->getPost('password');
+
+            // Build data array with only changed fields
+            $data = [];
+            
+            if ($username !== $user['username']) {
+                $data['username'] = $username;
+            }
+            if ($email !== $user['email']) {
+                $data['email'] = $email;
+            }
+            if ($firstName !== $user['first_name']) {
+                $data['first_name'] = $firstName;
+            }
+            if ($lastName !== $user['last_name']) {
+                $data['last_name'] = $lastName;
+            }
+            if ($role !== $user['role']) {
+                $data['role'] = $role;
+            }
+            if ($status !== $user['status']) {
+                $data['status'] = $status;
+            }
+            
+            // Only add password if provided
             if (!empty($password)) {
                 $data['password'] = $password;
             }
 
+            // If no changes, return success message
+            if (empty($data)) {
+                return redirect()->back()->with('success', 'No changes made');
+            }
+
+            // Set validation rules only for fields being updated
+            $validationRules = [];
+            if (isset($data['username'])) {
+                $validationRules['username'] = 'required|min_length[3]|max_length[100]|is_unique[users.username,id,' . $userId . ']';
+            }
+            if (isset($data['email'])) {
+                $validationRules['email'] = 'required|valid_email|is_unique[users.email,id,' . $userId . ']';
+            }
+            if (isset($data['password'])) {
+                $validationRules['password'] = 'required|min_length[8]';
+            }
+            if (isset($data['first_name'])) {
+                $validationRules['first_name'] = 'required|min_length[2]|max_length[100]';
+            }
+            if (isset($data['last_name'])) {
+                $validationRules['last_name'] = 'required|min_length[2]|max_length[100]';
+            }
+
+            // Validate only changed fields
+            if (!empty($validationRules)) {
+                if (!$this->validate($validationRules)) {
+                    return redirect()->back()->with('errors', $this->validator->getErrors())->withInput();
+                }
+            }
+
+            // Update user
             if ($userModel->update($userId, $data)) {
                 return redirect()->back()->with('success', 'User updated successfully');
             }
@@ -95,12 +147,12 @@ class Admin extends BaseController
 
         // Prevent deleting own account
         if ($userId == $this->session->get('user_id')) {
-            return redirect()->to('/admin/users')->with('error', 'Cannot delete your own account');
+            return redirect()->to('index.php/admin/users')->with('error', 'Cannot delete your own account');
         }
 
         $userModel = new UserModel();
         if ($userModel->delete($userId)) {
-            return redirect()->to('/admin/users')->with('success', 'User deleted successfully');
+            return redirect()->to('index.php/admin/users')->with('success', 'User deleted successfully');
         }
 
         return redirect()->back()->with('error', 'Failed to delete user');

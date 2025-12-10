@@ -36,7 +36,7 @@
     <!-- Quick Links -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <a href="<?= base_url('admin/users') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/admin/users') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-users fa-3x text-primary mb-3"></i>
                     <h5>Manage Users</h5>
@@ -44,7 +44,7 @@
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url('admin/lists') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/admin/lists') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-list fa-3x text-success mb-3"></i>
                     <h5>Manage Lists</h5>
@@ -52,7 +52,7 @@
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url('admin/categories') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/admin/categories') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-folder fa-3x text-warning mb-3"></i>
                     <h5>Categories</h5>
@@ -60,7 +60,7 @@
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url('admin/analytics') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/admin/analytics') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-chart-bar fa-3x text-info mb-3"></i>
                     <h5>Analytics</h5>
