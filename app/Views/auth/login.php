@@ -10,7 +10,7 @@
         <div class="col-md-5">
             <div class="card">
                 <div class="card-body p-5">
-                    <h2 class="text-center mb-4">Login</h2>
+                    <h2 class="text-center mb-4">Inloggen</h2>
                     
                     <?php if (session()->has('errors')): ?>
                         <div class="alert alert-danger">
@@ -24,7 +24,7 @@
                     
                     <form method="post" action="<?= base_url('index.php/login') ?>" id="loginForm">
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label">E-mailadres</label>
                             <input type="email" class="form-control <?= session('errors.email') ? 'is-invalid' : '' ?>" id="email" name="email" value="<?= old('email') ?>" required autofocus>
                             <?php if (session('errors.email')): ?>
                                 <div class="invalid-feedback"><?= session('errors.email') ?></div>
@@ -32,18 +32,18 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
+                            <label for="password" class="form-label">Wachtwoord</label>
                             <input type="password" class="form-control <?= session('errors.password') ? 'is-invalid' : '' ?>" id="password" name="password" required>
                             <?php if (session('errors.password')): ?>
                                 <div class="invalid-feedback"><?= session('errors.password') ?></div>
                             <?php endif; ?>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary w-100" id="loginBtn">Login</button>
+                        <button type="submit" class="btn btn-primary w-100" id="loginBtn">Inloggen</button>
                     </form>
                     
                     <div class="text-center mt-3">
-                        <p>Don't have an account? <a href="<?= base_url('index.php/register') ?>">Sign up</a></p>
+                        <p>Geen account? <a href="<?= base_url('index.php/register') ?>">Registreer hier</a></p>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     
     // Disable button to prevent double submission
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...';
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Inloggen...';
 });
 </script>
 <?= $this->endSection() ?>

@@ -543,15 +543,15 @@
                         <?php endif; ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= base_url('index.php/logout') ?>">
-                                <i class="fas fa-sign-out-alt"></i> Logout
+                                <i class="fas fa-sign-out-alt"></i> Afmelden
                             </a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="btn btn-outline-dark btn-sm me-2" href="<?= base_url('index.php/register') ?>">Make a list</a>
+                            <a class="btn btn-outline-dark btn-sm me-2" href="<?= base_url('index.php/register') ?>">Maak een lijst</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-dark btn-sm" href="<?= base_url('index.php/login') ?>">Log in</a>
+                            <a class="btn btn-dark btn-sm" href="<?= base_url('index.php/login') ?>">Inloggen</a>
                         </li>
                     <?php endif; ?>
                 </ul>
@@ -609,7 +609,7 @@
             </div>
             <div class="row mt-4">
                 <div class="col-12">
-                    <p class="footer-copyright mb-0">&copy; <?= date('Y') ?> LIJST.NL &nbsp;&bull;&nbsp; <a href="#">Terms of Use</a> &nbsp;&bull;&nbsp; <a href="#">Privacy Statement</a></p>
+                    <p class="footer-copyright mb-0">&copy; <?= date('Y') ?> LIJST.NL &nbsp;&bull;&nbsp; <a href="#">Gebruiksvoorwaarden</a> &nbsp;&bull;&nbsp; <a href="#">Privacyverklaring</a></p>
                 </div>
             </div>
         </div>

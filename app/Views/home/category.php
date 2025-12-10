@@ -40,7 +40,7 @@
         <?php else: ?>
             <div class="col-12">
                 <div class="alert alert-info">
-                    No lists found in this category yet.
+                    Nog geen lijsten gevonden in deze categorie.
                 </div>
             </div>
         <?php endif; ?>

@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
-    <h1 class="mb-4">Edit List: <?= esc($list['title']) ?></h1>
+    <h1 class="mb-4">Lijst Bewerken: <?= esc($list['title']) ?></h1>
 
     <ul class="nav nav-tabs mb-4" id="listTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -13,7 +13,7 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button">
-                <i class="fas fa-box"></i> Products
+                <i class="fas fa-box"></i> Producten
             </button>
         </li>
     </ul>
@@ -27,14 +27,14 @@
                         <div class="card-body">
                             <form method="post" action="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>">
                                 <div class="mb-3">
-                                    <label for="title" class="form-label">List Title *</label>
+                                    <label for="title" class="form-label">Lijsttitel *</label>
                                     <input type="text" class="form-control" id="title" name="title" value="<?= esc($list['title']) ?>" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="category_id" class="form-label">Category</label>
+                                    <label for="category_id" class="form-label">Categorie</label>
                                     <select class="form-select" id="category_id" name="category_id">
-                                        <option value="">Select a category</option>
+                                        <option value="">Selecteer een categorie</option>
                                         <?php foreach ($categories as $category): ?>
                                             <option value="<?= $category['id'] ?>" <?= $list['category_id'] == $category['id'] ? 'selected' : '' ?>>
                                                 <?= esc($category['name']) ?>
@@ -44,25 +44,16 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="description" class="form-label">Description</label>
+                                    <label for="description" class="form-label">Beschrijving</label>
                                     <textarea class="form-control" id="description" name="description" rows="4"><?= esc($list['description']) ?></textarea>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="status" class="form-label">Status</label>
-                                    <select class="form-select" id="status" name="status">
-                                        <option value="draft" <?= $list['status'] === 'draft' ? 'selected' : '' ?>>Draft</option>
-                                        <option value="published" <?= $list['status'] === 'published' ? 'selected' : '' ?>>Published</option>
-                                        <option value="private" <?= $list['status'] === 'private' ? 'selected' : '' ?>>Private</option>
-                                    </select>
-                                </div>
-
                                 <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary">Update List</button>
-                                    <a href="<?= base_url('index.php/dashboard/lists') ?>" class="btn btn-secondary">Back to Lists</a>
+                                    <button type="submit" class="btn btn-primary">Lijst Bijwerken</button>
+                                    <a href="<?= base_url('index.php/dashboard/lists') ?>" class="btn btn-secondary">Terug naar Lijsten</a>
                                     <?php if ($list['status'] === 'published'): ?>
                                         <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-info" target="_blank">
-                                            <i class="fas fa-eye"></i> View Public
+                                            <i class="fas fa-eye"></i> Openbare Weergave
                                         </a>
                                     <?php endif; ?>
                                 </div>
@@ -77,16 +68,49 @@
         <div class="tab-pane fade" id="products" role="tabpanel">
             <div class="row">
                 <div class="col-lg-8">
+                    <!-- Example Lists -->
+                    <?php if (!empty($exampleLists)): ?>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-lightbulb"></i> Vergelijkbare Lijsten in deze Categorie
+                                <?php if ($userAge): ?>
+                                    <small class="text-muted">(voor leeftijd <?= $userAge ?>)</small>
+                                <?php endif; ?>
+                            </h5>
+                            <p class="text-muted small">Laat u inspireren door andere lijsten in dezelfde categorie</p>
+                            <div class="row">
+                                <?php foreach ($exampleLists as $exampleList): ?>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card border-light">
+                                            <div class="card-body">
+                                                <h6 class="card-title"><?= esc(character_limiter($exampleList['title'], 40)) ?></h6>
+                                                <p class="card-text small text-muted"><?= esc(character_limiter($exampleList['description'], 60)) ?></p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">door <?= esc($exampleList['username']) ?></small>
+                                                    <a href="<?= base_url('index.php/list/' . $exampleList['slug']) ?>" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                        <i class="fas fa-eye"></i> Bekijken
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    
                     <!-- Search Products -->
                     <div class="card mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Add Products from Bol.com</h5>
+                            <h5 class="card-title">Producten Toevoegen van Bol.com</h5>
                             <div class="row g-2 mb-3">
                                 <div class="col">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="productSearch" placeholder="Search for products (e.g., iPhone, laptop, boek)...">
+                                        <input type="text" class="form-control" id="productSearch" placeholder="Zoeken naar producten (bijv. iPhone, laptop, boek)...">
                                         <button class="btn btn-primary" type="button" onclick="searchProducts(1)" id="searchBtn">
-                                            <i class="fas fa-search"></i> Search
+                                            <i class="fas fa-search"></i> Zoeken
                                         </button>
                                     </div>
                                 </div>
@@ -95,13 +119,13 @@
                             <!-- Selected Products Counter -->
                             <div id="selectedCounter" class="alert alert-info d-none mb-3">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-check-circle"></i> <strong id="selectedCount">0</strong> product(s) selected</span>
+                                    <span><i class="fas fa-check-circle"></i> <strong id="selectedCount">0</strong> product(en) geselecteerd</span>
                                     <div>
                                         <button class="btn btn-sm btn-success" onclick="addSelectedProducts()" id="addSelectedBtn">
-                                            <i class="fas fa-plus"></i> Add Selected
+                                            <i class="fas fa-plus"></i> Geselecteerde Toevoegen
                                         </button>
                                         <button class="btn btn-sm btn-secondary" onclick="clearSelection()">
-                                            <i class="fas fa-times"></i> Clear
+                                            <i class="fas fa-times"></i> Wissen
                                         </button>
                                     </div>
                                 </div>
@@ -123,8 +147,8 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <i class="fas fa-grip-vertical"></i> Products in this List
-                                <small class="text-muted">(drag to reorder)</small>
+                                <i class="fas fa-grip-vertical"></i> Producten in deze Lijst
+                                <small class="text-muted">(sleep om opnieuw in te delen)</small>
                             </h5>
                             <div id="productList" class="sortable-list">
                                 <?php if (!empty($products)): ?>
@@ -154,7 +178,7 @@
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <p class="text-muted text-center">No products added yet. Search and add products from Bol.com.</p>
+                                    <p class="text-muted text-center">Nog geen producten toegevoegd. Zoeken en voeg producten van Bol.com toe.</p>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -180,7 +204,7 @@ const resultsPerPage = 10;
 function searchProducts(page = 1) {
     const query = document.getElementById('productSearch').value.trim();
     if (!query) {
-        showToast('Please enter a search term', 'warning');
+        showToast('Voer een zoekterm in', 'warning');
         return;
     }
 
@@ -191,15 +215,15 @@ function searchProducts(page = 1) {
     // Show loading
     const searchBtn = document.getElementById('searchBtn');
     searchBtn.disabled = true;
-    searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Searching...';
+    searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Zoeken...';
     
-    document.getElementById('searchResults').innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted">Searching Bol.com...</p></div>';
+    document.getElementById('searchResults').innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Laden...</span></div><p class="mt-2 text-muted">Bol.com doorzoeken...</p></div>';
 
     fetch(`<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(query)}&limit=${resultsPerPage}&offset=${offset}`)
         .then(response => response.json())
         .then(data => {
             searchBtn.disabled = false;
-            searchBtn.innerHTML = '<i class="fas fa-search"></i> Search';
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Zoeken';
             
             if (data.success && data.products && data.products.length > 0) {
                 totalResults = data.total || data.products.length;
@@ -208,8 +232,8 @@ function searchProducts(page = 1) {
             } else {
                 document.getElementById('searchResults').innerHTML = `
                     <div class="alert alert-warning">
-                        <i class="fas fa-info-circle"></i> No products found for "<strong>${escapeHtml(query)}</strong>".
-                        <br><small>Try different keywords or check spelling.</small>
+                        <i class="fas fa-info-circle"></i> Geen producten gevonden voor "<strong>${escapeHtml(query)}</strong>".
+                        <br><small>Probeer andere zoektermen of controleer de spelling.</small>
                     </div>
                 `;
                 document.getElementById('paginationContainer').classList.add('d-none');
@@ -218,10 +242,10 @@ function searchProducts(page = 1) {
         .catch(error => {
             console.error('Error:', error);
             searchBtn.disabled = false;
-            searchBtn.innerHTML = '<i class="fas fa-search"></i> Search';
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Zoeken';
             document.getElementById('searchResults').innerHTML = `
                 <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> Error searching products. Please try again.
+                    <i class="fas fa-exclamation-triangle"></i> Fout bij het zoeken naar producten. Probeer het opnieuw.
                 </div>
             `;
         });
@@ -310,14 +334,31 @@ function toggleProductSelection(productId, isSelected) {
     }
 }
 
-// Toggle select all
+// Toggle select all - instantly add all products on current page
 function toggleSelectAll(isSelected) {
     const checkboxes = document.querySelectorAll('.product-checkbox');
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = isSelected;
-        const productId = checkbox.id.replace('product-', '');
-        toggleProductSelection(productId, isSelected);
-    });
+    
+    if (isSelected) {
+        // Get all products from current search results and add them instantly
+        fetch(`<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(currentSearchQuery)}&limit=${resultsPerPage}&offset=${(currentPage - 1) * resultsPerPage}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.products) {
+                    // Add all products to selectedProducts map instantly
+                    data.products.forEach(product => {
+                        selectedProducts.set(product.external_id, product);
+                    });
+                    // Check all checkboxes
+                    checkboxes.forEach(checkbox => checkbox.checked = true);
+                    updateSelectedCounter();
+                }
+            });
+    } else {
+        // Uncheck all and clear selection
+        checkboxes.forEach(checkbox => checkbox.checked = false);
+        selectedProducts.clear();
+        updateSelectedCounter();
+    }
 }
 
 // Update selected counter

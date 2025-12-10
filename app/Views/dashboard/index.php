@@ -6,11 +6,11 @@
     <div class="row mb-4">
         <div class="col">
             <h1>Dashboard</h1>
-            <p class="text-muted">Welcome back, <?= esc($user['first_name']) ?>!</p>
+            <p class="text-muted">Welkom terug, <?= esc($user['first_name']) ?>!</p>
         </div>
         <div class="col-auto">
             <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Create New List
+                <i class="fas fa-plus"></i> Nieuwe Lijst
             </a>
         </div>
     </div>
@@ -20,19 +20,19 @@
         <div class="col-md-4">
             <div class="stats-card">
                 <h3><?= $totalLists ?></h3>
-                <p class="mb-0">Total Lists</p>
+                <p class="mb-0">Totale Lijsten</p>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stats-card" style="background: linear-gradient(135deg, #10b981, #059669);">
                 <h3><?= $totalClicks ?></h3>
-                <p class="mb-0">Total Clicks</p>
+                <p class="mb-0">Totale Klikken</p>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
                 <h3><?= count($lists) ?></h3>
-                <p class="mb-0">Active Lists</p>
+                <p class="mb-0">Actieve Lijsten</p>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
             <a href="<?= base_url('index.php/dashboard/lists') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-list fa-3x text-primary mb-3"></i>
-                    <h5>My Lists</h5>
+                    <h5>Mijn Lijsten</h5>
                 </div>
             </a>
         </div>
@@ -51,7 +51,7 @@
             <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
-                    <h5>Create List</h5>
+                    <h5>Lijst Maken</h5>
                 </div>
             </a>
         </div>
@@ -59,7 +59,7 @@
             <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-chart-line fa-3x text-warning mb-3"></i>
-                    <h5>Analytics</h5>
+                    <h5>Analytica</h5>
                 </div>
             </a>
         </div>
@@ -74,17 +74,17 @@
     </div>
 
     <!-- Recent Lists -->
-    <h3 class="mb-3">Your Recent Lists</h3>
+    <h3 class="mb-3">Uw Recente Lijsten</h3>
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Category</th>
+                    <th>Titel</th>
+                    <th>Categorie</th>
                     <th>Status</th>
-                    <th>Products</th>
-                    <th>Views</th>
-                    <th>Actions</th>
+                    <th>Producten</th>
+                    <th>Weergaven</th>
+                    <th>Acties</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,14 +94,14 @@
                             <td>
                                 <strong><?= esc($list['title']) ?></strong>
                             </td>
-                            <td><?= esc($list['category_name'] ?? 'Uncategorized') ?></td>
+                            <td><?= esc($list['category_name'] ?? 'Zonder categorie') ?></td>
                             <td>
                                 <?php if ($list['status'] === 'published'): ?>
-                                    <span class="badge bg-success">Published</span>
+                                    <span class="badge bg-success">Gepubliceerd</span>
                                 <?php elseif ($list['status'] === 'draft'): ?>
-                                    <span class="badge bg-warning">Draft</span>
+                                    <span class="badge bg-warning">Concept</span>
                                 <?php else: ?>
-                                    <span class="badge bg-secondary">Private</span>
+                                    <span class="badge bg-secondary">Privé</span>
                                 <?php endif; ?>
                             </td>
                             <td><?= $list['product_count'] ?? 0 ?></td>
@@ -121,7 +121,7 @@
                 <?php else: ?>
                     <tr>
                         <td colspan="6" class="text-center text-muted">
-                            No lists yet. <a href="<?= base_url('index.php/dashboard/list/create') ?>">Create your first list</a>
+                            Nog geen lijsten. <a href="<?= base_url('index.php/dashboard/list/create') ?>">Maak uw eerste lijst</a>
                         </td>
                     </tr>
                 <?php endif; ?>

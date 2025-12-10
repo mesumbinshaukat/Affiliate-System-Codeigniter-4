@@ -72,7 +72,7 @@ class Dashboard extends BaseController
                 'title' => $title,
                 'slug' => $slug,
                 'description' => $this->request->getPost('description'),
-                'status' => $this->request->getPost('status') ?: 'draft',
+                'status' => 'published',
             ];
 
             if ($listModel->insert($data)) {
@@ -105,6 +105,32 @@ class Dashboard extends BaseController
         $this->data['list'] = $list;
         $this->data['categories'] = $categoryModel->getActiveCategories();
         $this->data['products'] = $listProductModel->getListProducts($listId);
+        
+        // Get example lists based on category and user age
+        $userAge = null;
+        $user = $this->session->get('user_id');
+        if ($user) {
+            $userModel = new \App\Models\UserModel();
+            $userData = $userModel->find($user);
+            if ($userData && $userData['date_of_birth']) {
+                $birthDate = new \DateTime($userData['date_of_birth']);
+                $today = new \DateTime();
+                $userAge = $today->diff($birthDate)->y;
+            }
+        }
+        
+        // Get example lists from same category (excluding current list)
+        $exampleLists = $listModel->select('lists.*, users.username')
+            ->join('users', 'users.id = lists.user_id')
+            ->where('lists.category_id', $list['category_id'])
+            ->where('lists.id !=', $listId)
+            ->where('lists.status', 'published')
+            ->orderBy('lists.views', 'DESC')
+            ->limit(5)
+            ->findAll();
+        
+        $this->data['exampleLists'] = $exampleLists;
+        $this->data['userAge'] = $userAge;
 
         if (strtolower($this->request->getMethod()) === 'post') {
             $title = $this->request->getPost('title');
@@ -123,7 +149,6 @@ class Dashboard extends BaseController
                 'title' => $title,
                 'slug' => $slug,
                 'description' => $this->request->getPost('description'),
-                'status' => $this->request->getPost('status'),
             ];
 
             if ($listModel->update($listId, $data)) {

@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
-    <h1 class="mb-4">Manage Lists</h1>
+    <h1 class="mb-4">Lijsten Beheren</h1>
 
     <div class="card">
         <div class="card-body">
@@ -12,14 +12,14 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Category</th>
+                            <th>Titel</th>
+                            <th>Auteur</th>
+                            <th>Categorie</th>
                             <th>Status</th>
-                            <th>Featured</th>
-                            <th>Views</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th>Uitgelicht</th>
+                            <th>Weergaven</th>
+                            <th>Gemaakt op</th>
+                            <th>Acties</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,7 +50,7 @@
                                         <?php endif; ?>
                                         <a href="<?= base_url('index.php/admin/list/delete/' . $list['id']) ?>" 
                                            class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('Are you sure you want to delete this list?')">
+                                           onclick="return confirm('Weet u zeker dat u deze lijst wilt verwijderen?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
-    <h1 class="mb-4">Manage Users</h1>
+    <h1 class="mb-4">Gebruikers Beheren</h1>
 
     <div class="card">
         <div class="card-body">
@@ -12,13 +12,13 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Name</th>
-                            <th>Role</th>
+                            <th>Gebruikersnaam</th>
+                            <th>E-mail</th>
+                            <th>Naam</th>
+                            <th>Rol</th>
                             <th>Status</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th>Gemaakt op</th>
+                            <th>Acties</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,7 +47,7 @@
                                         <?php if ($user['id'] != session()->get('user_id')): ?>
                                             <a href="<?= base_url('index.php/admin/user/delete/' . $user['id']) ?>" 
                                                class="btn btn-sm btn-outline-danger"
-                                               onclick="return confirm('Are you sure you want to delete this user?')">
+                                               onclick="return confirm('Weet u zeker dat u deze gebruiker wilt verwijderen?')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         <?php endif; ?>

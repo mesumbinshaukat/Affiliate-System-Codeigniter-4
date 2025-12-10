@@ -5,7 +5,7 @@
 <div class="container my-5">
     <div class="row mb-4">
         <div class="col">
-            <h1><?= esc($user['first_name'] . ' ' . $user['last_name']) ?>'s Lists</h1>
+            <h1>Lijsten van <?= esc($user['first_name'] . ' ' . $user['last_name']) ?></h1>
             <p class="text-muted">@<?= esc($user['username']) ?></p>
         </div>
     </div>
@@ -27,7 +27,7 @@
                                     <i class="fas fa-calendar"></i> <?= date('M d, Y', strtotime($list['created_at'])) ?>
                                 </small>
                                 <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-sm btn-primary">
-                                    View List
+                                    Bekijk Lijst
                                 </a>
                             </div>
                         </div>
@@ -37,7 +37,7 @@
         <?php else: ?>
             <div class="col-12">
                 <div class="alert alert-info">
-                    This user hasn't published any lists yet.
+                    Deze gebruiker heeft nog geen lijsten gepubliceerd.
                 </div>
             </div>
         <?php endif; ?>

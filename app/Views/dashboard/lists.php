@@ -5,11 +5,11 @@
 <div class="container my-5">
     <div class="row mb-4">
         <div class="col">
-            <h1>My Lists</h1>
+            <h1>Mijn Lijsten</h1>
         </div>
         <div class="col-auto">
             <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Create New List
+                <i class="fas fa-plus"></i> Nieuwe Lijst
             </a>
         </div>
     </div>
@@ -18,13 +18,13 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Category</th>
+                    <th>Titel</th>
+                    <th>Categorie</th>
                     <th>Status</th>
-                    <th>Products</th>
-                    <th>Views</th>
-                    <th>Created</th>
-                    <th>Actions</th>
+                    <th>Producten</th>
+                    <th>Weergaven</th>
+                    <th>Gemaakt op</th>
+                    <th>Acties</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,14 +34,14 @@
                             <td>
                                 <strong><?= esc($list['title']) ?></strong>
                             </td>
-                            <td><?= esc($list['category_name'] ?? 'Uncategorized') ?></td>
+                            <td><?= esc($list['category_name'] ?? 'Zonder categorie') ?></td>
                             <td>
                                 <?php if ($list['status'] === 'published'): ?>
-                                    <span class="badge bg-success">Published</span>
+                                    <span class="badge bg-success">Gepubliceerd</span>
                                 <?php elseif ($list['status'] === 'draft'): ?>
-                                    <span class="badge bg-warning">Draft</span>
+                                    <span class="badge bg-warning">Concept</span>
                                 <?php else: ?>
-                                    <span class="badge bg-secondary">Private</span>
+                                    <span class="badge bg-secondary">Privé</span>
                                 <?php endif; ?>
                             </td>
                             <td><?= $list['product_count'] ?? 0 ?></td>
@@ -59,7 +59,7 @@
                                     <?php endif; ?>
                                     <a href="<?= base_url('index.php/dashboard/list/delete/' . $list['id']) ?>" 
                                        class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('Are you sure you want to delete this list?')">
+                                       onclick="return confirm('Weet u zeker dat u deze lijst wilt verwijderen?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
@@ -69,7 +69,7 @@
                 <?php else: ?>
                     <tr>
                         <td colspan="7" class="text-center text-muted">
-                            No lists yet. <a href="<?= base_url('index.php/dashboard/list/create') ?>">Create your first list</a>
+                            Nog geen lijsten. <a href="<?= base_url('index.php/dashboard/list/create') ?>">Maak uw eerste lijst</a>
                         </td>
                     </tr>
                 <?php endif; ?>

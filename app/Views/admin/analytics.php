@@ -3,19 +3,19 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
-    <h1 class="mb-4">Analytics</h1>
+    <h1 class="mb-4">Analytica</h1>
 
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Top Products</h5>
+                    <h5 class="card-title">Populairste Producten</h5>
                     <div class="table-responsive">
                         <table class="table table-sm">
                             <thead>
                                 <tr>
                                     <th>Product</th>
-                                    <th>Clicks</th>
+                                    <th>Klikken</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -35,14 +35,14 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Top Lists</h5>
+                    <h5 class="card-title">Populairste Lijsten</h5>
                     <div class="table-responsive">
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>List</th>
-                                    <th>Author</th>
-                                    <th>Clicks</th>
+                                    <th>Lijst</th>
+                                    <th>Auteur</th>
+                                    <th>Klikken</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -63,13 +63,13 @@
 
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Click Statistics</h5>
+            <h5 class="card-title">Klikstatistieken</h5>
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Clicks</th>
+                            <th>Datum</th>
+                            <th>Klikken</th>
                         </tr>
                     </thead>
                     <tbody>

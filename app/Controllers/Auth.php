@@ -78,21 +78,17 @@ class Auth extends BaseController
         // Handle POST request (case-insensitive)
         if (strtolower($this->request->getMethod()) === 'post') {
             
-            // Validation rules
+            // Validation rules (no username required)
             $rules = [
                 'first_name' => 'required|min_length[2]|max_length[100]',
                 'last_name' => 'required|min_length[2]|max_length[100]',
-                'username' => 'required|min_length[3]|max_length[100]|alpha_numeric_punct|is_unique[users.username]',
+                'date_of_birth' => 'required|valid_date',
                 'email' => 'required|valid_email|is_unique[users.email]',
                 'password' => 'required|min_length[8]',
                 'password_confirm' => 'required|matches[password]'
             ];
 
             $messages = [
-                'username' => [
-                    'is_unique' => 'This username is already taken.',
-                    'alpha_numeric_punct' => 'Username can only contain letters, numbers, and basic punctuation.'
-                ],
                 'email' => [
                     'is_unique' => 'This email is already registered.'
                 ],
@@ -110,13 +106,26 @@ class Auth extends BaseController
             }
 
             $userModel = new UserModel();
+            
+            // Generate username from email (before @)
+            $email = trim($this->request->getPost('email'));
+            $baseUsername = explode('@', $email)[0];
+            $username = $baseUsername;
+            $counter = 1;
+            
+            // Ensure username is unique
+            while ($userModel->where('username', $username)->first()) {
+                $username = $baseUsername . $counter;
+                $counter++;
+            }
 
             $data = [
-                'username' => trim($this->request->getPost('username')),
-                'email' => trim($this->request->getPost('email')),
+                'username' => $username,
+                'email' => $email,
                 'password' => $this->request->getPost('password'),
                 'first_name' => trim($this->request->getPost('first_name')),
                 'last_name' => trim($this->request->getPost('last_name')),
+                'date_of_birth' => $this->request->getPost('date_of_birth'),
                 'role' => 'user',
                 'status' => 'active',
             ];
@@ -138,10 +147,10 @@ class Auth extends BaseController
                         'logged_in' => true
                     ]);
 
-                    log_message('info', 'Session set, redirecting to dashboard');
+                    log_message('info', 'Session set, redirecting to list creation');
                     
-                    return redirect()->to('/dashboard')
-                        ->with('success', 'Welcome to Lijstje.nl, ' . $data['first_name'] . '! Your account has been created successfully.');
+                    return redirect()->to('/dashboard/list/create')
+                        ->with('success', 'Welcome to Lijstje.nl, ' . $data['first_name'] . '! Now create your first list.');
                 }
 
                 // If insert failed, get model errors

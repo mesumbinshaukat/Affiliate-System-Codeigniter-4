@@ -3,19 +3,19 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
-    <h1 class="mb-4">Search Lists</h1>
+    <h1 class="mb-4">Lijsten Zoeken</h1>
 
     <form method="get" action="<?= base_url('index.php/search') ?>" class="mb-4">
         <div class="input-group input-group-lg">
-            <input type="text" name="q" class="form-control" placeholder="Search for lists..." value="<?= esc($query ?? '') ?>">
+            <input type="text" name="q" class="form-control" placeholder="Zoeken naar lijsten..." value="<?= esc($query ?? '') ?>">
             <button class="btn btn-primary" type="submit">
-                <i class="fas fa-search"></i> Search
+                <i class="fas fa-search"></i> Zoeken
             </button>
         </div>
     </form>
 
     <?php if (isset($query) && $query): ?>
-        <h3 class="mb-3">Results for "<?= esc($query) ?>"</h3>
+        <h3 class="mb-3">Resultaten voor "<?= esc($query) ?>"</h3>
 
         <div class="row">
             <?php if (!empty($lists)): ?>
@@ -31,7 +31,7 @@
                                 <p class="card-text text-muted"><?= esc(character_limiter($list['description'], 100)) ?></p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
-                                        <i class="fas fa-user"></i> <?= esc($list['username'] ?? 'Unknown') ?>
+                                        <i class="fas fa-user"></i> <?= esc($list['username'] ?? 'Onbekend') ?>
                                     </small>
                                     <small class="text-muted">
                                         <i class="fas fa-eye"></i> <?= number_format($list['views']) ?>
@@ -44,7 +44,7 @@
             <?php else: ?>
                 <div class="col-12">
                     <div class="alert alert-info">
-                        No lists found matching your search.
+                        Geen lijsten gevonden die aan uw zoekopdracht voldoen.
                     </div>
                 </div>
             <?php endif; ?>

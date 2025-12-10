@@ -22,7 +22,7 @@
                 </div>
                 <div class="me-4">
                     <i class="fas fa-eye text-muted"></i>
-                    <span class="text-muted"><?= number_format($list['views']) ?> views</span>
+                    <span class="text-muted"><?= number_format($list['views']) ?> weergaven</span>
                 </div>
                 <?php if ($list['category_name']): ?>
                     <div>
@@ -35,24 +35,24 @@
             
             <!-- Share Buttons -->
             <div class="mb-4">
-                <h6 class="mb-3"><i class="fas fa-share-alt"></i> Share this list</h6>
+                <h6 class="mb-3"><i class="fas fa-share-alt"></i> Deel deze lijst</h6>
                 <div class="btn-group" role="group">
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode(current_url()) ?>" 
                        target="_blank" 
                        class="btn btn-outline-primary" 
-                       title="Share on Facebook">
+                       title="Deel op Facebook">
                         <i class="fab fa-facebook"></i> Facebook
                     </a>
                     <a href="https://wa.me/?text=<?= urlencode($list['title'] . ' - ' . current_url()) ?>" 
                        target="_blank" 
                        class="btn btn-outline-success" 
-                       title="Share on WhatsApp">
+                       title="Deel op WhatsApp">
                         <i class="fab fa-whatsapp"></i> WhatsApp
                     </a>
                     <button class="btn btn-outline-secondary" 
                             onclick="copyToClipboard('<?= current_url() ?>')" 
-                            title="Copy list link to clipboard">
-                        <i class="fas fa-copy"></i> Copy Link
+                            title="Kopieer lijklink naar klembord">
+                        <i class="fas fa-copy"></i> Link Kopiëren
                     </button>
                 </div>
             </div>
@@ -61,7 +61,7 @@
 
     <!-- Products Section -->
     <div class="mb-5">
-        <h3 class="mb-4"><i class="fas fa-gift"></i> Products in this list</h3>
+        <h3 class="mb-4"><i class="fas fa-gift"></i> Producten in deze lijst</h3>
         
         <div class="row">
             <?php if (!empty($products)): ?>
@@ -117,13 +117,13 @@
                                     <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>" 
                                        class="btn btn-primary btn-sm" 
                                        target="_blank"
-                                       title="View product on store">
-                                        <i class="fas fa-external-link-alt"></i> View Product
+                                       title="Bekijk product in winkel">
+                                        <i class="fas fa-external-link-alt"></i> Product Bekijken
                                     </a>
                                     <button class="btn btn-outline-secondary btn-sm" 
                                             onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>')"
-                                            title="Copy affiliate link to share">
-                                        <i class="fas fa-share-alt"></i> Share Link
+                                            title="Kopieer affiliate link om te delen">
+                                        <i class="fas fa-share-alt"></i> Link Delen
                                     </button>
                                 </div>
                             </div>
@@ -134,8 +134,8 @@
                 <div class="col-12">
                     <div class="alert alert-info text-center py-5">
                         <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
-                        <h5>No products in this list yet</h5>
-                        <p class="text-muted mb-0">The list owner hasn't added any products yet.</p>
+                        <h5>Nog geen producten in deze lijst</h5>
+                        <p class="text-muted mb-0">De lijsteigenaar heeft nog geen producten toegevoegd.</p>
                     </div>
                 </div>
             <?php endif; ?>
@@ -149,9 +149,9 @@
 <script>
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(function() {
-        showToast('List link copied to clipboard!', 'success');
+        showToast('Lijklink gekopieerd naar klembord!', 'success');
     }, function(err) {
-        showToast('Failed to copy link. Please try again.', 'error');
+        showToast('Kan link niet kopiëren. Probeer het opnieuw.', 'error');
         console.error('Could not copy text: ', err);
     });
 }
@@ -162,14 +162,14 @@ function copyAffiliateLink(url) {
         const toast = document.createElement('div');
         toast.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3';
         toast.style.zIndex = '9999';
-        toast.innerHTML = '<i class="fas fa-check"></i> Affiliate link copied! Share it to earn commissions.';
+        toast.innerHTML = '<i class="fas fa-check"></i> Affiliate link gekopieerd! Deel het om commissies te verdienen.';
         document.body.appendChild(toast);
         
         setTimeout(() => {
             toast.remove();
         }, 3000);
     }, function(err) {
-        alert('Failed to copy link. Please try again.');
+        alert('Kan link niet kopiëren. Probeer het opnieuw.');
         console.error('Could not copy text: ', err);
     });
 }

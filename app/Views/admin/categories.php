@@ -5,11 +5,11 @@
 <div class="container my-5">
     <div class="row mb-4">
         <div class="col">
-            <h1>Manage Categories</h1>
+            <h1>Categorieën Beheren</h1>
         </div>
         <div class="col-auto">
             <a href="<?= base_url('index.php/admin/category/create') ?>" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Create Category
+                <i class="fas fa-plus"></i> Categorie Maken
             </a>
         </div>
     </div>
@@ -21,12 +21,12 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Name</th>
+                            <th>Naam</th>
                             <th>Slug</th>
-                            <th>Icon</th>
+                            <th>Pictogram</th>
                             <th>Status</th>
-                            <th>Lists</th>
-                            <th>Actions</th>
+                            <th>Lijsten</th>
+                            <th>Acties</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,7 +49,7 @@
                                         </a>
                                         <a href="<?= base_url('index.php/admin/category/delete/' . $category['id']) ?>" 
                                            class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('Are you sure you want to delete this category?')">
+                                           onclick="return confirm('Weet u zeker dat u deze categorie wilt verwijderen?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

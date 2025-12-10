@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
-    <h1 class="mb-4">Affiliate Sources</h1>
+    <h1 class="mb-4">Affiliate Bronnen</h1>
 
     <div class="card">
         <div class="card-body">
@@ -11,11 +11,11 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Naam</th>
                             <th>Slug</th>
-                            <th>API Endpoint</th>
+                            <th>API Eindpunt</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th>Acties</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -30,8 +30,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="<?= base_url('admin/affiliate-source/toggle/' . $source['id']) ?>" class="btn btn-sm btn-outline-primary">
-                                        Toggle Status
+                                    <a href="<?= base_url('index.php/admin/affiliate-source/toggle/' . $source['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                        Status Omschakelen
                                     </a>
                                 </td>
                             </tr>

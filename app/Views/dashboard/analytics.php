@@ -3,27 +3,27 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
-    <h1 class="mb-4">Analytics</h1>
+    <h1 class="mb-4">Analytica</h1>
 
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="stats-card">
                 <h3><?= $totalClicks ?></h3>
-                <p class="mb-0">Total Clicks</p>
+                <p class="mb-0">Totale Klikken</p>
             </div>
         </div>
     </div>
 
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Recent Clicks</h5>
+            <h5 class="card-title">Recente Klikken</h5>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
                             <th>Product</th>
-                            <th>List</th>
-                            <th>Date</th>
+                            <th>Lijst</th>
+                            <th>Datum</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,7 +37,7 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="3" class="text-center text-muted">No clicks yet</td>
+                                <td colspan="3" class="text-center text-muted">Nog geen klikken</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
