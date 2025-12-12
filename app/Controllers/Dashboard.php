@@ -77,7 +77,13 @@ class Dashboard extends BaseController
 
             if ($listModel->insert($data)) {
                 $listId = $listModel->getInsertID();
-                return redirect()->to('/dashboard/list/edit/' . $listId)->with('success', 'List created successfully');
+                // If first_list flag is set, redirect to products tab
+                $isFirstList = $this->request->getGet('first_list') === 'true';
+                $redirectUrl = '/dashboard/list/edit/' . $listId;
+                if ($isFirstList) {
+                    $redirectUrl .= '?tab=products';
+                }
+                return redirect()->to($redirectUrl)->with('success', 'List created successfully');
             }
 
             $errors = $listModel->errors();
@@ -106,7 +112,7 @@ class Dashboard extends BaseController
         $this->data['categories'] = $categoryModel->getActiveCategories();
         $this->data['products'] = $listProductModel->getListProducts($listId);
         
-        // Get example lists based on category and user age
+        // Get user age for filtering
         $userAge = null;
         $user = $this->session->get('user_id');
         if ($user) {
@@ -119,17 +125,56 @@ class Dashboard extends BaseController
             }
         }
         
-        // Get example lists from same category (excluding current list)
-        $exampleLists = $listModel->select('lists.*, users.username')
-            ->join('users', 'users.id = lists.user_id')
-            ->where('lists.category_id', $list['category_id'])
-            ->where('lists.id !=', $listId)
-            ->where('lists.status', 'published')
-            ->orderBy('lists.views', 'DESC')
-            ->limit(5)
-            ->findAll();
+        // Get products from other lists in the same category (excluding products already in current list)
+        $productModel = new \App\Models\ProductModel();
+        $listProductModel = new ListProductModel();
         
-        $this->data['exampleLists'] = $exampleLists;
+        // Get IDs of products already in current list
+        $currentListProducts = $listProductModel->where('list_id', $listId)->findAll();
+        $currentProductIds = array_column($currentListProducts, 'product_id');
+        
+        // Get products from other lists in same category
+        $suggestedProducts = [];
+        if ($list['category_id']) {
+            // Get category info including age restrictions
+            $category = $categoryModel->find($list['category_id']);
+            
+            $otherLists = $listModel->select('lists.id')
+                ->where('lists.category_id', $list['category_id'])
+                ->where('lists.id !=', $listId)
+                ->where('lists.status', 'published')
+                ->orderBy('lists.views', 'DESC')
+                ->limit(10)
+                ->findAll();
+            
+            $otherListIds = array_column($otherLists, 'id');
+            
+            if (!empty($otherListIds)) {
+                $suggestedProducts = $listProductModel->select('products.*')
+                    ->join('products', 'products.id = list_products.product_id')
+                    ->whereIn('list_products.list_id', $otherListIds)
+                    ->groupBy('products.id')
+                    ->orderBy('COUNT(list_products.id)', 'DESC')
+                    ->limit(12)
+                    ->findAll();
+                
+                // Filter out products already in current list
+                $suggestedProducts = array_filter($suggestedProducts, function($product) use ($currentProductIds) {
+                    return !in_array($product['id'], $currentProductIds);
+                });
+                
+                // Filter by user age if category has age restrictions
+                if ($userAge !== null && $category) {
+                    $suggestedProducts = array_filter($suggestedProducts, function($product) use ($userAge, $category) {
+                        $meetsMinAge = $category['min_age'] === null || $userAge >= $category['min_age'];
+                        $meetsMaxAge = $category['max_age'] === null || $userAge <= $category['max_age'];
+                        return $meetsMinAge && $meetsMaxAge;
+                    });
+                }
+            }
+        }
+        
+        $this->data['suggestedProducts'] = $suggestedProducts;
         $this->data['userAge'] = $userAge;
 
         if (strtolower($this->request->getMethod()) === 'post') {
@@ -218,15 +263,20 @@ class Dashboard extends BaseController
 
     public function addProduct()
     {
-        $redirect = $this->requireLogin();
-        if ($redirect) return $redirect;
+        if (!$this->isLoggedIn()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please login to continue',
+            ]);
+        }
 
         if (strtolower($this->request->getMethod()) === 'post') {
             $listId = $this->request->getPost('list_id');
+            $productId = $this->request->getPost('product_id');
             $productData = $this->request->getPost('product');
 
             // Validate required fields
-            if (empty($listId) || empty($productData)) {
+            if (empty($listId) || (empty($productId) && empty($productData))) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Missing required fields',
@@ -244,28 +294,41 @@ class Dashboard extends BaseController
                 ]);
             }
 
-            // Check if product exists
             $productModel = new ProductModel();
-            $product = null;
-
-            if (!empty($productData['external_id'])) {
-                $product = $productModel->findByExternalId($productData['external_id'], $productData['source']);
-            }
-
-            // Create product if not exists
-            if (!$product) {
-                // Validate product data
-                if (empty($productData['title']) || empty($productData['affiliate_url'])) {
+            
+            // If product_id is provided directly, use it (for suggested products)
+            if (!empty($productId)) {
+                // Verify product exists
+                $product = $productModel->find($productId);
+                if (!$product) {
                     return $this->response->setJSON([
                         'success' => false,
-                        'message' => 'Product title and affiliate URL are required',
+                        'message' => 'Product not found',
                     ]);
                 }
-                
-                $productModel->insert($productData);
-                $productId = $productModel->getInsertID();
             } else {
-                $productId = $product['id'];
+                // Handle new product from search
+                $product = null;
+
+                if (!empty($productData['external_id'])) {
+                    $product = $productModel->findByExternalId($productData['external_id'], $productData['source']);
+                }
+
+                // Create product if not exists
+                if (!$product) {
+                    // Validate product data
+                    if (empty($productData['title']) || empty($productData['affiliate_url'])) {
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => 'Product title and affiliate URL are required',
+                        ]);
+                    }
+                    
+                    $productModel->insert($productData);
+                    $productId = $productModel->getInsertID();
+                } else {
+                    $productId = $product['id'];
+                }
             }
 
             // Check if product is already in this list (prevent duplicates)
@@ -305,8 +368,12 @@ class Dashboard extends BaseController
 
     public function getListProducts($listId)
     {
-        $redirect = $this->requireLogin();
-        if ($redirect) return $redirect;
+        if (!$this->isLoggedIn()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please login to continue',
+            ]);
+        }
 
         // Verify list ownership
         $listModel = new ListModel();
@@ -331,8 +398,12 @@ class Dashboard extends BaseController
 
     public function removeProduct()
     {
-        $redirect = $this->requireLogin();
-        if ($redirect) return $redirect;
+        if (!$this->isLoggedIn()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please login to continue',
+            ]);
+        }
 
         if (strtolower($this->request->getMethod()) === 'post') {
             $listId = $this->request->getPost('list_id');
@@ -366,8 +437,12 @@ class Dashboard extends BaseController
 
     public function updateProductPositions()
     {
-        $redirect = $this->requireLogin();
-        if ($redirect) return $redirect;
+        if (!$this->isLoggedIn()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please login to continue',
+            ]);
+        }
 
         if (strtolower($this->request->getMethod()) === 'post') {
             $listId = $this->request->getPost('list_id');

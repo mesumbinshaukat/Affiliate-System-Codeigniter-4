@@ -11,11 +11,16 @@ class Home extends BaseController
     {
         // Homepage is now just informational - no public lists
         $userModel = new \App\Models\UserModel();
+        $listModel = new ListModel();
         
         // Get stats for display
         $this->data['totalUsers'] = $userModel->countAll();
-        $this->data['totalPresents'] = 0; // Can be calculated from products
-        $this->data['birthdaysThisMonth'] = 0; // Can be calculated from user birthdays
+        $this->data['totalLists'] = $listModel->countAll();
+        
+        // Get total views from all lists using raw query
+        $db = \Config\Database::connect();
+        $result = $db->query('SELECT SUM(views) as total_views FROM lists')->getRow();
+        $this->data['totalViews'] = $result->total_views ?? 0;
         
         return view('home/index', $this->data);
     }

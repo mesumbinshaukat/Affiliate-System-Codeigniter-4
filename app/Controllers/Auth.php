@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use App\Models\ListModel;
+use App\Models\CategoryModel;
 
 class Auth extends BaseController
 {
@@ -147,10 +149,42 @@ class Auth extends BaseController
                         'logged_in' => true
                     ]);
 
-                    log_message('info', 'Session set, redirecting to list creation');
+                    // Create default list for new user
+                    $listModel = new ListModel();
+                    $defaultListTitle = $data['first_name'] . ' - Default List';
+                    $slug = url_title($defaultListTitle, '-', true);
                     
-                    return redirect()->to('/dashboard/list/create')
-                        ->with('success', 'Welcome to Lijstje.nl, ' . $data['first_name'] . '! Now create your first list.');
+                    // Check if slug exists and make it unique
+                    $existingSlug = $listModel->where('slug', $slug)->first();
+                    if ($existingSlug) {
+                        $slug = $slug . '-' . time();
+                    }
+                    
+                    // Get first available category or use NULL
+                    $categoryModel = new CategoryModel();
+                    $firstCategory = $categoryModel->first();
+                    $categoryId = $firstCategory ? $firstCategory['id'] : null;
+                    
+                    $listData = [
+                        'user_id' => $userId,
+                        'category_id' => $categoryId,
+                        'title' => $defaultListTitle,
+                        'slug' => $slug,
+                        'description' => '',
+                        'status' => 'published',
+                    ];
+                    
+                    if ($listModel->insert($listData)) {
+                        $listId = $listModel->getInsertID();
+                        log_message('info', 'Default list created for user ' . $userId . ' with list ID: ' . $listId);
+                        
+                        return redirect()->to('/dashboard/list/edit/' . $listId . '?tab=products')
+                            ->with('success', 'Welkom bij Lijstje.nl, ' . $data['first_name'] . '! Maak nu uw eerste lijst.');
+                    } else {
+                        log_message('error', 'Failed to create default list for user ' . $userId . '. Errors: ' . json_encode($listModel->errors()));
+                        return redirect()->to('/dashboard')
+                            ->with('success', 'Welkom bij Lijstje.nl, ' . $data['first_name'] . '! Maak nu uw eerste lijst.');
+                    }
                 }
 
                 // If insert failed, get model errors

@@ -1,0 +1,432 @@
+================================================================================
+                    DRAWING EVENTS FEATURE - PROJECT REPORT
+================================================================================
+
+PROJECT OVERVIEW
+================================================================================
+This project implements a complete "Drawing Events" (Loten Trekken) feature that 
+allows users to create drawing events, invite participants, and manage invitation 
+acceptance/rejection. Admins can view and manage all drawing events with detailed 
+statistics.
+
+================================================================================
+WHAT IS A DRAWING EVENT?
+================================================================================
+A Drawing Event is a lottery-style feature where:
+- A user creates a drawing event and invites other users
+- Each invited user receives an invitation to participate
+- Users can accept or decline the invitation
+- Once all participants accept, the drawing can be executed
+- The system randomly assigns each participant to another participant
+- Each participant then needs to buy a gift for their assigned person
+
+================================================================================
+KEY FEATURES IMPLEMENTED
+================================================================================
+
+1. DRAWING EVENT CREATION
+   - Users can create a new drawing event with title, description, and event date
+   - Creator becomes the owner of the drawing event
+   - Event is stored in the "drawings" table
+
+2. PARTICIPANT INVITATION SYSTEM
+   - Creator can invite other users by searching and adding them
+   - Each invitation has a status: pending, accepted, or declined
+   - Invited users see pending invitations in their dashboard
+   - Users can accept or decline invitations with one click
+
+3. INVITATION ACCEPTANCE WORKFLOW
+   - Pending invitations appear in "Invitations in Awaiting" section
+   - Users click "Accepteren" (Accept) or "Weigeren" (Decline)
+   - Status updates in database from "pending" to "accepted" or "declined"
+   - Accepted invitations move to "Deelnemingen" (Participations) section
+   - Accept/Decline buttons disappear after status is updated
+
+4. DRAWING EXECUTION
+   - Creator can only execute drawing when ALL participants have accepted
+   - System randomly assigns each participant to another participant
+   - Prevents self-assignment (no one draws themselves)
+   - Results are stored in the database
+
+5. INVITATION LINK SHARING
+   - Creator can generate and share invitation links
+   - Links can be copied to clipboard with one click
+   - Links can be shared via WhatsApp with pre-filled message
+   - Links are publicly accessible (no login required)
+
+6. ADMIN DASHBOARD FOR DRAWINGS
+   - Admins can view all drawing events in the system
+   - See creator information (name, username)
+   - View creation date and event date
+   - See participant statistics:
+     * Total participants invited
+     * How many accepted
+     * How many declined
+     * How many still pending
+   - View detailed participant list with their status
+   - Delete drawing events if needed
+
+================================================================================
+USER WORKFLOWS
+================================================================================
+
+WORKFLOW 1: CREATE A DRAWING EVENT
+-----------------------------------
+1. User logs in and goes to Drawings section
+2. Clicks "Create Drawing" button
+3. Fills in:
+   - Drawing title (required)
+   - Description (optional)
+   - Event date (optional)
+4. Submits the form
+5. Drawing is created and user is redirected to edit page
+6. User can now add participants
+
+WORKFLOW 2: INVITE PARTICIPANTS
+--------------------------------
+1. User is on the drawing edit page
+2. In "Add Participants" section, searches for users by name/email
+3. Selects a user from the search results
+4. Clicks "Add Participant" button
+5. User is added with status "pending"
+6. Participant receives invitation notification
+7. User can add multiple participants
+
+WORKFLOW 3: ACCEPT/DECLINE INVITATION
+--------------------------------------
+1. Invited user logs in and goes to Drawings section
+2. Sees "Invitations in Awaiting" section with pending invitations
+3. Reads the drawing title and event date
+4. Clicks "Accepteren" (Accept) to accept invitation
+   OR
+   Clicks "Weigeren" (Decline) to decline invitation
+5. Status updates immediately in database
+6. Page refreshes and shows success message in Dutch
+7. Accepted invitations move to "Deelnemingen" section
+8. Declined invitations disappear from pending list
+
+WORKFLOW 4: SHARE INVITATION LINK
+----------------------------------
+1. Creator is on the drawing edit page
+2. In "Invitation Link" section, sees the generated link
+3. Can copy link to clipboard with "Copy" button
+4. Can share via WhatsApp with pre-filled message
+5. Invited users can click link to view drawing details
+6. Link works without login (public access)
+
+WORKFLOW 5: EXECUTE DRAWING
+----------------------------
+1. Creator is on drawing edit page
+2. Waits until ALL participants have accepted
+3. "Execute Drawing" button becomes enabled
+4. Clicks button to run the drawing
+5. System randomly assigns each participant to another
+6. Results are saved in database
+7. Each participant sees who they are assigned to
+8. Participants can view the wishlist of their assigned person
+
+================================================================================
+ADMIN WORKFLOWS
+================================================================================
+
+WORKFLOW 1: VIEW ALL DRAWING EVENTS
+------------------------------------
+1. Admin logs in and goes to Admin Dashboard
+2. Clicks "Loten Beheren" (Manage Drawings) card
+3. Sees table with all drawing events showing:
+   - Drawing title
+   - Creator name and username
+   - Creation date
+   - Event date
+   - Total participants count
+   - Accepted/Pending/Declined breakdown
+   - Drawing status (Pending/In Progress/Completed)
+4. Can sort and search through the list
+
+WORKFLOW 2: VIEW DRAWING DETAILS
+---------------------------------
+1. Admin clicks "Details" button on a drawing
+2. Sees comprehensive drawing information:
+   - Full drawing title and description
+   - Creator information (name, username)
+   - Creation date and time
+   - Event date
+   - Detailed participant list showing:
+     * Each participant's name and username
+     * Their invitation status (Accepted/Pending/Declined)
+     * Who they are assigned to (if drawing executed)
+     * Their wishlist (if available)
+3. Sees visual statistics with progress bars:
+   - Total participants
+   - Percentage accepted (green bar)
+   - Percentage pending (yellow bar)
+   - Percentage declined (red bar)
+
+WORKFLOW 3: DELETE DRAWING EVENT
+---------------------------------
+1. Admin is viewing drawing details or list
+2. Clicks "Delete" button
+3. Confirms deletion (cannot be undone)
+4. Drawing event is deleted
+5. All participant records for that drawing are deleted
+6. System returns to drawings list with success message
+
+================================================================================
+DATABASE CHANGES
+================================================================================
+
+NEW TABLES CREATED:
+-------------------
+1. drawings
+   - Stores drawing event information
+   - Fields: id, creator_id, title, description, event_date, status, created_at, updated_at
+
+2. drawing_participants
+   - Stores participant information for each drawing
+   - Fields: id, drawing_id, user_id, assigned_to_user_id, list_id, status, created_at, updated_at
+   - Status values: pending, accepted, declined
+
+COLUMN ADDED:
+-------------
+1. drawing_participants.status (ENUM)
+   - Values: pending, accepted, declined
+   - Default: pending
+   - Purpose: Track invitation acceptance status
+
+================================================================================
+FILES MODIFIED/CREATED
+================================================================================
+
+MODELS:
+-------
+✓ DrawingModel.php (NEW)
+  - getAllDrawingsWithStats() - Fetch all drawings with participant statistics
+  - getDrawingStats() - Fetch single drawing with statistics
+  - getDrawingParticipants() - Fetch all participants for a drawing
+  - getUserDrawings() - Fetch drawings created by a user
+  - getDrawingWithParticipants() - Fetch drawing with creator info
+
+✓ DrawingParticipantModel.php (NEW)
+  - acceptParticipation() - Update status to accepted
+  - declineParticipation() - Update status to declined
+  - getPendingInvitations() - Get pending invitations for a user
+  - getAcceptedParticipants() - Get accepted participants for a drawing
+  - getUserParticipations() - Get all participations for a user
+  - getParticipantsByDrawing() - Get participants for a drawing
+
+CONTROLLERS:
+------------
+✓ Drawings.php (NEW)
+  - index() - Show user's drawings and invitations
+  - create() - Create new drawing
+  - edit() - Edit drawing and manage participants
+  - view() - View drawing details (public access)
+  - addParticipant() - Add participant to drawing
+  - removeParticipant() - Remove participant from drawing
+  - draw() - Execute the drawing lottery
+  - acceptInvitation() - Accept invitation
+  - declineInvitation() - Decline invitation
+
+✓ Admin.php (MODIFIED)
+  - drawings() - List all drawings with statistics
+  - drawingDetails() - View drawing details
+  - deleteDrawing() - Delete drawing and participants
+
+VIEWS:
+------
+✓ drawings/index.php (NEW)
+  - Shows user's created drawings
+  - Shows pending invitations with accept/decline buttons
+  - Shows accepted participations
+
+✓ drawings/create.php (NEW)
+  - Form to create new drawing event
+
+✓ drawings/edit.php (NEW)
+  - Edit drawing details
+  - Add/remove participants
+  - Show participant list with status badges
+  - Generate and share invitation links
+  - Show invitation acceptance progress
+
+✓ drawings/view.php (NEW)
+  - Public view of drawing details
+  - Shows participant information
+  - Accessible via invitation link
+
+✓ admin/drawings.php (NEW)
+  - Admin list of all drawing events
+  - Shows creator, dates, and participant statistics
+  - Links to details and delete actions
+
+✓ admin/drawing_details.php (NEW)
+  - Admin view of drawing details
+  - Shows creator information
+  - Shows participant list with status
+  - Shows visual statistics with progress bars
+  - Delete button
+
+✓ admin/index.php (MODIFIED)
+  - Added "Loten Beheren" card to quick links
+
+ROUTES:
+-------
+✓ Routes.php (MODIFIED)
+  - Added drawing routes (create, edit, view, add participant, etc.)
+  - Added admin drawing routes (list, details, delete)
+  - Made drawing view publicly accessible for invitation links
+
+MIGRATIONS:
+-----------
+✓ 2024-01-01-000011_CreateDrawingsTable.php (NEW)
+  - Creates drawings table
+
+✓ 2024-01-01-000012_CreateDrawingParticipantsTable.php (NEW)
+  - Creates drawing_participants table
+
+✓ 2024-01-01-000013_AddStatusToDrawingParticipantsTable.php (NEW)
+  - Adds status column to drawing_participants table
+
+MIGRATION RUNNERS:
+------------------
+✓ public/run_migration_drawings.php (NEW)
+  - Standalone script to run drawings migration
+
+✓ public/run_migration_drawings_status.php (NEW)
+  - Standalone script to add status column
+
+✓ public/add_status_column.php (NEW)
+  - Checks if status column exists before adding
+  - User-friendly interface with step-by-step progress
+
+================================================================================
+TECHNICAL IMPLEMENTATION DETAILS
+================================================================================
+
+INVITATION STATUS TRACKING:
+---------------------------
+- When participant is added: status = 'pending'
+- When user accepts: status = 'accepted'
+- When user declines: status = 'declined'
+- View filters show different sections based on status
+
+AUTHORIZATION CHECKS:
+---------------------
+- Only logged-in users can create drawings
+- Only drawing creator can edit drawing
+- Only invited users can accept/decline invitations
+- Only admins can view admin dashboard
+- Only admins can delete drawings
+
+URL STRUCTURE:
+--------------
+- All frontend URLs use index.php prefix for consistency
+- Examples:
+  * /index.php/drawings - User drawings list
+  * /index.php/drawings/create - Create drawing
+  * /index.php/drawings/edit/1 - Edit drawing
+  * /index.php/admin/drawings - Admin drawings list
+  * /index.php/admin/drawing/details/1 - Admin drawing details
+
+INVITATION LINKS:
+-----------------
+- Format: /index.php/drawings/view/{drawing_id}
+- Publicly accessible (no login required)
+- Shows drawing details and participants
+- Can be shared via WhatsApp with pre-filled message
+
+PARTICIPANT STATISTICS:
+-----------------------
+- Total participants: COUNT of all participants
+- Accepted: COUNT where status = 'accepted'
+- Pending: COUNT where status = 'pending'
+- Declined: COUNT where status = 'declined'
+- Calculated using SQL SUM and CASE statements
+
+================================================================================
+ERROR HANDLING & EDGE CASES
+================================================================================
+
+1. STATUS COLUMN MIGRATION
+   - System checks if status column exists before using it
+   - Works before and after migration is run
+   - Migration runner provides user-friendly interface
+
+2. SELF-ASSIGNMENT PREVENTION
+   - Drawing execution prevents assigning user to themselves
+   - Retries assignment if conflict detected
+
+3. AUTHORIZATION CHECKS
+   - Prevents unauthorized users from accepting other's invitations
+   - Prevents non-admins from accessing admin dashboard
+   - Prevents non-creators from editing drawings
+
+4. VALIDATION
+   - Drawing title is required
+   - Participant must exist in system
+   - Cannot add same participant twice
+   - Cannot remove non-existent participant
+
+================================================================================
+LANGUAGE & LOCALIZATION
+================================================================================
+
+All user-facing text is in Dutch:
+- "Loten Trekken" = Drawing Events
+- "Uitnodiging" = Invitation
+- "Accepteren" = Accept
+- "Weigeren" = Decline
+- "Deelnemingen" = Participations
+- "Uitnodigingen in Afwachting" = Invitations in Awaiting
+- "U hebt de uitnodiging geaccepteerd!" = You have accepted the invitation!
+- "U hebt de uitnodiging geweigerd" = You have declined the invitation
+
+================================================================================
+TESTING CHECKLIST
+================================================================================
+
+USER FEATURES:
+☑ Create drawing event
+☑ Add participants to drawing
+☑ Remove participants from drawing
+☑ View pending invitations
+☑ Accept invitation
+☑ Decline invitation
+☑ View accepted participations
+☑ Copy invitation link
+☑ Share via WhatsApp
+☑ View drawing details via public link
+☑ Execute drawing (when all accepted)
+
+ADMIN FEATURES:
+☑ View all drawing events
+☑ See creator information
+☑ See participant statistics
+☑ View drawing details
+☑ View participant list with status
+☑ Delete drawing event
+☑ Cascade delete participants
+
+================================================================================
+SUMMARY
+================================================================================
+
+This Drawing Events feature provides a complete lottery system where users can:
+1. Create drawing events and invite others
+2. Accept or decline invitations
+3. Share invitations via link or WhatsApp
+4. Execute drawings to randomly assign participants
+5. View results and wishlist information
+
+Admins can:
+1. View all drawing events in the system
+2. See detailed statistics about participant acceptance
+3. View all participants and their status
+4. Delete drawing events if needed
+
+All features are fully integrated, properly authorized, and use consistent URL 
+formatting with index.php prefix throughout the application.
+
+================================================================================
+END OF REPORT
+================================================================================

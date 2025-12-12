@@ -12,7 +12,7 @@ class CategoryModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
-    protected $allowedFields = ['name', 'slug', 'description', 'icon', 'status'];
+    protected $allowedFields = ['name', 'slug', 'description', 'icon', 'status', 'min_age', 'max_age'];
 
     protected bool $allowEmptyInserts = false;
 

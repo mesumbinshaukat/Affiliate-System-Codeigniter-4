@@ -534,6 +534,11 @@
                                 <i class="fas fa-tachometer-alt"></i> Dashboard
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('index.php/drawings') ?>">
+                                <i class="fas fa-dice"></i> Loten Trekken
+                            </a>
+                        </li>
                         <?php if ($user && $user['role'] === 'admin'): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="<?= base_url('index.php/admin') ?>">
@@ -591,7 +596,7 @@
                     <ul class="footer-links">
                         <li><a href="#">Frequently Asked Questions</a></li>
                         <li><a href="#">Contact</a></li>
-                        <li><a href="#">Drawing lots</a></li>
+                        <li><a href="<?= base_url('index.php/drawings') ?>">Loten Trekken</a></li>
                         <li><a href="#">Shops</a></li>
                         <li><a href="#">About Lijstje.nl</a></li>
                     </ul>

@@ -103,7 +103,7 @@ function copyAffiliateLink(url) {
         const toast = document.createElement('div');
         toast.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3';
         toast.style.zIndex = '9999';
-        toast.innerHTML = '<i class="fas fa-check"></i> Affiliate link copied! Share it to earn commissions.';
+        toast.innerHTML = '<i class="fas fa-check"></i> Product link copied! Share it to help others discover this product.';
         document.body.appendChild(toast);
         
         setTimeout(() => {

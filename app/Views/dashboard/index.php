@@ -56,18 +56,18 @@
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/drawings') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
-                    <i class="fas fa-chart-line fa-3x text-warning mb-3"></i>
-                    <h5>Analytica</h5>
+                    <i class="fas fa-dice fa-3x text-warning mb-3"></i>
+                    <h5>Loten Trekken</h5>
                 </div>
             </a>
         </div>
         <div class="col-md-3">
-            <a href="<?= base_url('index.php') ?>" class="card text-center text-decoration-none">
+            <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
-                    <i class="fas fa-home fa-3x text-info mb-3"></i>
-                    <h5>Home</h5>
+                    <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                    <h5>Analytica</h5>
                 </div>
             </a>
         </div>

@@ -9,6 +9,8 @@ use App\Models\ProductModel;
 use App\Models\ClickModel;
 use App\Models\AffiliateSourceModel;
 use App\Models\SettingModel;
+use App\Models\DrawingModel;
+use App\Models\DrawingParticipantModel;
 
 class Admin extends BaseController
 {
@@ -362,5 +364,62 @@ class Admin extends BaseController
         $this->data['settings'] = $settingModel->getAllSettings();
 
         return view('admin/settings', $this->data);
+    }
+
+    // Drawing Management
+    public function drawings()
+    {
+        $redirect = $this->requireAdmin();
+        if ($redirect) return $redirect;
+
+        $drawingModel = new DrawingModel();
+        $this->data['drawings'] = $drawingModel->getAllDrawingsWithStats();
+
+        return view('admin/drawings', $this->data);
+    }
+
+    public function drawingDetails($drawingId)
+    {
+        $redirect = $this->requireAdmin();
+        if ($redirect) return $redirect;
+
+        $drawingModel = new DrawingModel();
+        $drawing = $drawingModel->getDrawingStats($drawingId);
+
+        if (!$drawing) {
+            return redirect()->to('admin/drawings')->with('error', 'Drawing not found');
+        }
+
+        $participants = $drawingModel->getDrawingParticipants($drawingId);
+
+        $this->data['drawing'] = $drawing;
+        $this->data['participants'] = $participants;
+
+        return view('admin/drawing_details', $this->data);
+    }
+
+    public function deleteDrawing($drawingId)
+    {
+        $redirect = $this->requireAdmin();
+        if ($redirect) return $redirect;
+
+        $drawingModel = new DrawingModel();
+        $participantModel = new DrawingParticipantModel();
+
+        $drawing = $drawingModel->find($drawingId);
+
+        if (!$drawing) {
+            return redirect()->to('admin/drawings')->with('error', 'Drawing not found');
+        }
+
+        // Delete all participants first
+        $participantModel->where('drawing_id', $drawingId)->delete();
+
+        // Delete the drawing
+        if ($drawingModel->delete($drawingId)) {
+            return redirect()->to('admin/drawings')->with('success', 'Drawing deleted successfully');
+        }
+
+        return redirect()->back()->with('error', 'Failed to delete drawing');
     }
 }

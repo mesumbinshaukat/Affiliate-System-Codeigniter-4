@@ -23,6 +23,25 @@ $routes->get('/logout', 'Auth::logout');
 $routes->get('/list/(:segment)', 'Lists::view/$1');
 $routes->get('/list/(:segment)/share', 'Lists::share/$1');
 
+// Drawings Routes (Loten Trekken)
+$routes->group('drawings', ['filter' => 'auth'], function($routes) {
+    $routes->get('/', 'Drawings::index');
+    $routes->get('create', 'Drawings::create');
+    $routes->post('create', 'Drawings::create');
+    $routes->get('edit/(:num)', 'Drawings::edit/$1');
+    $routes->post('edit/(:num)', 'Drawings::edit/$1');
+    $routes->get('view/(:num)', 'Drawings::view/$1');
+    $routes->post('add-participant/(:num)', 'Drawings::addParticipant/$1');
+    $routes->get('remove-participant/(:num)/(:num)', 'Drawings::removeParticipant/$1/$2');
+    $routes->get('draw/(:num)', 'Drawings::draw/$1');
+    $routes->get('accept-invitation/(:num)', 'Drawings::acceptInvitation/$1');
+    $routes->get('decline-invitation/(:num)', 'Drawings::declineInvitation/$1');
+});
+
+// Public Drawings View (without auth) - for invitation links
+$routes->get('/drawings/view/(:num)', 'Drawings::view/$1');
+$routes->get('drawings/view/(:num)', 'Drawings::view/$1');
+
 // Affiliate Tracking
 $routes->get('/out/(:num)', 'Tracker::redirect/$1');
 
@@ -80,4 +99,9 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
     // Settings
     $routes->get('settings', 'Admin::settings');
     $routes->post('settings', 'Admin::settings');
+    
+    // Drawing Management
+    $routes->get('drawings', 'Admin::drawings');
+    $routes->get('drawing/details/(:num)', 'Admin::drawingDetails/$1');
+    $routes->get('drawing/delete/(:num)', 'Admin::deleteDrawing/$1');
 });

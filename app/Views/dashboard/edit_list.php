@@ -7,12 +7,12 @@
 
     <ul class="nav nav-tabs mb-4" id="listTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button">
+            <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button">
                 <i class="fas fa-info-circle"></i> Details
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button">
+            <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button">
                 <i class="fas fa-box"></i> Producten
             </button>
         </li>
@@ -20,7 +20,7 @@
 
     <div class="tab-content" id="listTabsContent">
         <!-- Details Tab -->
-        <div class="tab-pane fade show active" id="details" role="tabpanel">
+        <div class="tab-pane fade" id="details" role="tabpanel">
             <div class="row">
                 <div class="col-lg-8">
                     <div class="card">
@@ -65,37 +65,59 @@
         </div>
 
         <!-- Products Tab -->
-        <div class="tab-pane fade" id="products" role="tabpanel">
+        <div class="tab-pane fade show active" id="products" role="tabpanel">
             <div class="row">
                 <div class="col-lg-8">
-                    <!-- Example Lists -->
-                    <?php if (!empty($exampleLists)): ?>
+                    <!-- Suggested Products from Category -->
+                    <?php if (!empty($suggestedProducts)): ?>
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <i class="fas fa-lightbulb"></i> Vergelijkbare Lijsten in deze Categorie
+                                <i class="fas fa-lightbulb"></i> Aanbevolen Producten in deze Categorie
                                 <?php if ($userAge): ?>
                                     <small class="text-muted">(voor leeftijd <?= $userAge ?>)</small>
                                 <?php endif; ?>
                             </h5>
-                            <p class="text-muted small">Laat u inspireren door andere lijsten in dezelfde categorie</p>
+                            <p class="text-muted small">Populaire producten uit andere lijsten in dezelfde categorie</p>
                             <div class="row">
-                                <?php foreach ($exampleLists as $exampleList): ?>
+                                <?php foreach ($suggestedProducts as $product): ?>
                                     <div class="col-md-6 mb-3">
-                                        <div class="card border-light">
-                                            <div class="card-body">
-                                                <h6 class="card-title"><?= esc(character_limiter($exampleList['title'], 40)) ?></h6>
-                                                <p class="card-text small text-muted"><?= esc(character_limiter($exampleList['description'], 60)) ?></p>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <small class="text-muted">door <?= esc($exampleList['username']) ?></small>
-                                                    <a href="<?= base_url('index.php/list/' . $exampleList['slug']) ?>" class="btn btn-sm btn-outline-primary" target="_blank">
-                                                        <i class="fas fa-eye"></i> Bekijken
-                                                    </a>
-                                                </div>
+                                        <div class="card border-light h-100">
+                                            <div class="card-body d-flex flex-column">
+                                                <?php if ($product['image_url']): ?>
+                                                    <img src="<?= esc($product['image_url']) ?>" class="card-img-top mb-2" alt="<?= esc($product['title']) ?>" style="max-height: 150px; object-fit: cover;">
+                                                <?php endif; ?>
+                                                <h6 class="card-title"><?= esc(character_limiter($product['title'], 50)) ?></h6>
+                                                <p class="card-text small text-muted flex-grow-1"><?= esc(character_limiter($product['description'], 80)) ?></p>
+                                                <?php if ($product['price']): ?>
+                                                    <p class="text-primary mb-2"><strong>€<?= number_format($product['price'], 2) ?></strong></p>
+                                                <?php endif; ?>
+                                                <button class="btn btn-sm btn-success" onclick="addSingleProduct(<?= htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8') ?>)">
+                                                    <i class="fas fa-plus"></i> Toevoegen
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php else: ?>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-lightbulb"></i> Aanbevolen Producten in deze Categorie
+                                <?php if ($userAge): ?>
+                                    <small class="text-muted">(voor leeftijd <?= $userAge ?>)</small>
+                                <?php endif; ?>
+                            </h5>
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle"></i> 
+                                <?php if ($userAge): ?>
+                                    Geen producten gevonden die passen bij uw leeftijd in deze categorie. U kunt producten handmatig toevoegen via de zoekopdracht hieronder.
+                                <?php else: ?>
+                                    Geen aanbevolen producten beschikbaar. Voeg producten handmatig toe via de zoekopdracht hieronder.
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -438,13 +460,24 @@ function addSelectedProducts() {
                 'product[ean]': product.ean || ''
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                addedCount++;
-            } else {
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(text => {
+            try {
+                const data = JSON.parse(text);
+                if (data.success) {
+                    addedCount++;
+                } else {
+                    failedCount++;
+                    console.log(`Failed to add product: ${product.title} - ${data.message}`);
+                }
+            } catch (e) {
+                console.error('Invalid JSON response:', text);
                 failedCount++;
-                console.log(`Failed to add product: ${product.title} - ${data.message}`);
             }
             // Add next product
             addNext(index + 1);
@@ -468,41 +501,66 @@ function addSingleProduct(product) {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
     
+    // For suggested products, we need to check if it's already in the database
+    // If product.id exists, it's already in the database
+    const params = {
+        list_id: listId,
+    };
+    
+    if (product.id) {
+        // Product already exists in database, just add it to the list
+        params['product_id'] = product.id;
+    } else {
+        // New product from search, add all details
+        params['product[external_id]'] = product.external_id || '';
+        params['product[title]'] = product.title;
+        params['product[description]'] = product.description || '';
+        params['product[image_url]'] = product.image_url || '';
+        params['product[price]'] = product.price || 0;
+        params['product[affiliate_url]'] = product.affiliate_url || '';
+        params['product[source]'] = product.source || 'bol-com';
+        params['product[ean]'] = product.ean || '';
+    }
+    
     fetch('<?= base_url('index.php/dashboard/product/add') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({
-            list_id: listId,
-            'product[external_id]': product.external_id,
-            'product[title]': product.title,
-            'product[description]': product.description || '',
-            'product[image_url]': product.image_url || '',
-            'product[price]': product.price || 0,
-            'product[affiliate_url]': product.affiliate_url,
-            'product[source]': product.source,
-            'product[ean]': product.ean || ''
-        })
+        body: new URLSearchParams(params)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            btn.innerHTML = '<i class="fas fa-check"></i> Added';
-            btn.classList.remove('btn-outline-primary');
-            btn.classList.add('btn-success');
-            showToast(`Added "${product.title}"`, 'success');
-            // Refresh product list without page reload
-            refreshProductList();
-        } else {
-            showToast('Error: ' + data.message, 'error');
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(text => {
+        try {
+            const data = JSON.parse(text);
+            if (data.success) {
+                btn.innerHTML = '<i class="fas fa-check"></i> Toegevoegd';
+                btn.classList.remove('btn-success', 'btn-outline-primary');
+                btn.classList.add('btn-success');
+                btn.disabled = true;
+                showToast(`"${product.title}" toegevoegd!`, 'success');
+                // Refresh product list without page reload
+                refreshProductList();
+            } else {
+                showToast('Fout: ' + data.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        } catch (e) {
+            console.error('Invalid JSON response:', text);
+            showToast('Fout bij toevoegen product', 'error');
             btn.disabled = false;
             btn.innerHTML = originalHtml;
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('Error adding product', 'error');
+        showToast('Fout bij toevoegen product', 'error');
         btn.disabled = false;
         btn.innerHTML = originalHtml;
     });
@@ -780,6 +838,26 @@ function updateProductListUI(products) {
 // Initialize sortable on page load
 document.addEventListener('DOMContentLoaded', function() {
     initializeSortable();
+    
+    // Handle tab parameter from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    
+    if (tabParam === 'details') {
+        // Show details tab
+        const detailsTab = document.getElementById('details-tab');
+        const detailsPane = document.getElementById('details');
+        const productsTab = document.getElementById('products-tab');
+        const productsPane = document.getElementById('products');
+        
+        if (detailsTab && detailsPane) {
+            detailsTab.classList.add('active');
+            detailsPane.classList.add('show', 'active');
+            
+            productsTab.classList.remove('active');
+            productsPane.classList.remove('show', 'active');
+        }
+    }
 });
 </script>
 

@@ -12,11 +12,6 @@
                 
                 <div class="action-card">
                     <a href="<?= base_url('index.php/register') ?>" class="btn btn-make-list">Maak een lijst</a>
-                    <div class="divider-text">OF</div>
-                    <div class="find-list-wrapper">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="form-control find-list-input" placeholder="Vind een lijst" id="findListInput">
-                    </div>
                 </div>
                 
                 <div class="how-it-works">
@@ -37,7 +32,7 @@
                 
                 <div class="sinterklaas-section">
                     <p class="sinterklaas-title">Of voor Sinterklaas of Kerstmis:</p>
-                    <a href="<?= base_url('index.php/register') ?>" class="btn btn-drawing-lots">Begin met loten trekken</a>
+                    <a href="<?= base_url('index.php/drawings') ?>" class="btn btn-drawing-lots">Begin met loten trekken</a>
                 </div>
             </div>
             <div class="col-lg-6 text-center">
@@ -57,41 +52,26 @@
             <div class="col-md-4">
                 <div class="stat-item">
                     <i class="fas fa-users stat-icon"></i>
-                    <h3 class="stat-number"><?= number_format($totalUsers ?? 7074477) ?></h3>
+                    <h3 class="stat-number"><?= number_format($totalUsers ?? 0) ?></h3>
                     <p class="stat-label">Gebruikers</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stat-item">
-                    <i class="fas fa-gift stat-icon"></i>
-                    <h3 class="stat-number"><?= number_format($totalPresents ?? 116740576) ?></h3>
-                    <p class="stat-label">Cadeaus</p>
+                    <i class="fas fa-list stat-icon"></i>
+                    <h3 class="stat-number"><?= number_format($totalLists ?? 0) ?></h3>
+                    <p class="stat-label">Lijsten</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stat-item">
-                    <i class="fas fa-birthday-cake stat-icon"></i>
-                    <h3 class="stat-number"><?= number_format($birthdaysThisMonth ?? 16225) ?></h3>
-                    <p class="stat-label">Verjaardagen deze maand</p>
+                    <i class="fas fa-eye stat-icon"></i>
+                    <h3 class="stat-number"><?= number_format($totalViews ?? 0) ?></h3>
+                    <p class="stat-label">Totale weergaven</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<?= $this->endSection() ?>
-
-<?= $this->section('scripts') ?>
-<script>
-// Find a list functionality
-document.getElementById('findListInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        const username = this.value.trim();
-        if (username) {
-            // Redirect to user's list page
-            window.location.href = '<?= base_url('index.php/find/') ?>' + encodeURIComponent(username);
-        }
-    }
-});
-</script>
 <?= $this->endSection() ?>

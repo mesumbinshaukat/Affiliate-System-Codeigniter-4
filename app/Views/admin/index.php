@@ -52,6 +52,14 @@
             </a>
         </div>
         <div class="col-md-3">
+            <a href="<?= base_url('index.php/admin/drawings') ?>" class="card text-center text-decoration-none">
+                <div class="card-body">
+                    <i class="fas fa-dice fa-3x text-danger mb-3"></i>
+                    <h5>Loten Beheren</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
             <a href="<?= base_url('index.php/admin/categories') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-folder fa-3x text-warning mb-3"></i>
