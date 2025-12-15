@@ -13,7 +13,7 @@ class ClickModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'product_id', 'list_id', 'user_id', 'ip_address', 'user_agent', 'referer'
+        'product_id', 'list_id', 'user_id', 'sub_id', 'ip_address', 'user_agent', 'referer'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -33,7 +33,7 @@ class ClickModel extends Model
     protected $skipValidation = false;
     protected $cleanValidationRules = true;
 
-    public function logClick($productId, $listId = null, $userId = null)
+    public function logClick($productId, $listId = null, $userId = null, $subId = null)
     {
         $request = \Config\Services::request();
         
@@ -45,6 +45,7 @@ class ClickModel extends Model
             'product_id' => $productId,
             'list_id' => $listId,
             'user_id' => $userId,
+            'sub_id' => $subId,
             'ip_address' => $anonymizedIp,
             'user_agent' => $request->getUserAgent()->getAgentString(),
             'referer' => $request->getServer('HTTP_REFERER'),

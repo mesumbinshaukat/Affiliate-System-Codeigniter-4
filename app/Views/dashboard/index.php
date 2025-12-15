@@ -17,22 +17,28 @@
 
     <!-- Stats -->
     <div class="row mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="stats-card">
                 <h3><?= $totalLists ?></h3>
                 <p class="mb-0">Totale Lijsten</p>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="stats-card" style="background: linear-gradient(135deg, #10b981, #059669);">
                 <h3><?= $totalClicks ?></h3>
                 <p class="mb-0">Totale Klikken</p>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
                 <h3><?= count($lists) ?></h3>
                 <p class="mb-0">Actieve Lijsten</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                <h3>€<?= number_format($salesStats['total_commission'] ?? 0, 2) ?></h3>
+                <p class="mb-0">Commissies (Goedgekeurd)</p>
             </div>
         </div>
     </div>

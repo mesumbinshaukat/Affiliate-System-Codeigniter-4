@@ -11,6 +11,7 @@ use App\Models\AffiliateSourceModel;
 use App\Models\SettingModel;
 use App\Models\DrawingModel;
 use App\Models\DrawingParticipantModel;
+use App\Models\SalesModel;
 
 class Admin extends BaseController
 {
@@ -300,6 +301,7 @@ class Admin extends BaseController
         $clickModel = new ClickModel();
         $productModel = new ProductModel();
         $listModel = new ListModel();
+        $salesModel = new SalesModel();
 
         $this->data['clickStats'] = $clickModel->getClickStats();
         $this->data['topProducts'] = $productModel->getTopProducts(10);
@@ -310,6 +312,11 @@ class Admin extends BaseController
             ->groupBy('lists.id')
             ->orderBy('click_count', 'DESC')
             ->findAll(10);
+
+        // Add sales analytics
+        $this->data['salesStats'] = $salesModel->getGlobalStatistics();
+        $this->data['salesByUser'] = $salesModel->getSalesByUser();
+        $this->data['allSales'] = $salesModel->getAllSalesWithDetails();
 
         return view('admin/analytics', $this->data);
     }

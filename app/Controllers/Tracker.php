@@ -9,10 +9,11 @@ class Tracker extends BaseController
     public function redirect($productId)
     {
         $listId = $this->request->getGet('list');
+        $subId = $this->request->getGet('subId');
 
         try {
             $tracker = new AffiliateTracker();
-            $affiliateUrl = $tracker->trackAndRedirect($productId, $listId);
+            $affiliateUrl = $tracker->trackAndRedirect($productId, $listId, $subId);
 
             return redirect()->to($affiliateUrl);
         } catch (\Exception $e) {

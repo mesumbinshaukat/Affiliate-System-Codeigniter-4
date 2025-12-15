@@ -18,8 +18,13 @@ class AffiliateTracker
 
     /**
      * Track a click and redirect to affiliate URL
+     * 
+     * @param int $productId Product ID
+     * @param int $listId List ID (optional)
+     * @param string $subId Tracking subId for commission attribution (optional)
+     * @return string Affiliate URL for redirect
      */
-    public function trackAndRedirect($productId, $listId = null)
+    public function trackAndRedirect($productId, $listId = null, $subId = null)
     {
         // Get product
         $product = $this->productModel->find($productId);
@@ -38,11 +43,16 @@ class AffiliateTracker
             }
         }
 
-        // Log the click
-        $this->clickModel->logClick($productId, $listId, $userId);
+        // Generate subId if not provided (format: user_id_list_id)
+        if (empty($subId) && $userId && $listId) {
+            $subId = $userId . '_' . $listId;
+        }
 
-        // Return affiliate URL for redirect
-        return $product['affiliate_url'];
+        // Log the click with subId
+        $this->clickModel->logClick($productId, $listId, $userId, $subId);
+
+        // Return affiliate URL for redirect (with subId appended)
+        return $product['affiliate_url'] . (strpos($product['affiliate_url'], '?') !== false ? '&' : '?') . 'subId=' . urlencode($subId);
     }
 
     /**

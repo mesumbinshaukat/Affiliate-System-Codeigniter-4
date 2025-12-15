@@ -7,6 +7,7 @@ use App\Models\CategoryModel;
 use App\Models\ProductModel;
 use App\Models\ListProductModel;
 use App\Models\ClickModel;
+use App\Models\SalesModel;
 use App\Libraries\BolComAPI;
 
 class Dashboard extends BaseController
@@ -23,12 +24,16 @@ class Dashboard extends BaseController
 
         $listModel = new ListModel();
         $clickModel = new ClickModel();
+        $salesModel = new SalesModel();
 
         $userId = $this->session->get('user_id');
 
         $this->data['lists'] = $listModel->getUserLists($userId, true);
         $this->data['totalLists'] = count($this->data['lists']);
         $this->data['totalClicks'] = $clickModel->where('user_id', $userId)->countAllResults();
+        
+        // Add sales statistics
+        $this->data['salesStats'] = $salesModel->getUserStatistics($userId);
 
         return view('dashboard/index', $this->data);
     }
@@ -480,10 +485,15 @@ class Dashboard extends BaseController
         if ($redirect) return $redirect;
 
         $clickModel = new ClickModel();
+        $salesModel = new SalesModel();
         $userId = $this->session->get('user_id');
 
         $this->data['clicks'] = $clickModel->getUserClicks($userId);
         $this->data['totalClicks'] = count($this->data['clicks']);
+        
+        // Add sales data
+        $this->data['sales'] = $salesModel->getUserSales($userId);
+        $this->data['salesStats'] = $salesModel->getUserStatistics($userId);
 
         return view('dashboard/analytics', $this->data);
     }

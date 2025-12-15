@@ -8,6 +8,7 @@ class BolComAPI
     private $clientSecret;
     private $affiliateId;
     private $apiEndpoint = 'https://api.bol.com/marketing/catalog/v1';
+    private $reportingApiEndpoint = 'https://api.bol.com/marketing/affiliate/reports/v2';
     private $accessToken;
     private $tokenExpiry;
 
@@ -295,9 +296,14 @@ class BolComAPI
 
     /**
      * Generate affiliate URL using Bol.com Partner Platform format
-     * Format: https://partner.bol.com/click/click?p=1&t=url&s={AFFILIATE_ID}&url={PRODUCT_URL}&f=TXL&name={NAME}
+     * Format: https://partner.bol.com/click/click?p=1&t=url&s={AFFILIATE_ID}&url={PRODUCT_URL}&f=TXL&name={NAME}&subId={SUBID}
+     * 
+     * @param string $productId Bol.com product ID
+     * @param string $productUrl Product URL (optional)
+     * @param string $subId Tracking subId for commission attribution (optional)
+     * @return string Affiliate URL with optional subId
      */
-    public function generateAffiliateUrl($productId, $productUrl = '')
+    public function generateAffiliateUrl($productId, $productUrl = '', $subId = '')
     {
         // If no product URL provided, construct it
         if (empty($productUrl)) {
@@ -309,14 +315,247 @@ class BolComAPI
             return $productUrl;
         }
 
-        // Generate proper affiliate tracking URL
-        return "https://partner.bol.com/click/click?" . http_build_query([
+        // Build query parameters
+        $params = [
             'p' => 1,
             't' => 'url',
             's' => $this->affiliateId,
             'url' => $productUrl,
             'f' => 'TXL',
             'name' => 'affiliate_link'
-        ]);
+        ];
+        
+        // Add subId if provided
+        if (!empty($subId)) {
+            $params['subId'] = $subId;
+        }
+
+        // Generate proper affiliate tracking URL
+        return "https://partner.bol.com/click/click?" . http_build_query($params);
+    }
+
+    /**
+     * Get promotion report from Bol.com Affiliate Reporting API v2
+     * 
+     * @param string $startDate Start date (YYYY-MM-DD)
+     * @param string $endDate End date (YYYY-MM-DD)
+     * @return array Report data or error
+     */
+    public function getPromotionReport($startDate, $endDate)
+    {
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            return [
+                'success' => false,
+                'message' => 'Bol.com API credentials not configured',
+                'data' => []
+            ];
+        }
+
+        try {
+            $token = $this->getAccessToken();
+
+            $url = $this->reportingApiEndpoint . '/promotion-report?' . http_build_query([
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+            ]);
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                return [
+                    'success' => true,
+                    'data' => $data,
+                ];
+            }
+
+            $errorMsg = "Promotion report request failed (HTTP $httpCode)";
+            if ($httpCode === 401) {
+                $errorMsg = 'Unauthorized - Check API credentials';
+            } elseif ($httpCode === 400) {
+                $errorMsg = 'Bad Request - Check date format (YYYY-MM-DD)';
+            }
+
+            if ($curlError) {
+                $errorMsg .= ": $curlError";
+            }
+
+            return [
+                'success' => false,
+                'message' => $errorMsg,
+                'data' => [],
+                'http_code' => $httpCode
+            ];
+        } catch (\Exception $e) {
+            if (function_exists('log_message')) {
+                log_message('error', 'Bol.com Reporting API Error: ' . $e->getMessage());
+            }
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ];
+        }
+    }
+
+    /**
+     * Get order report from Bol.com Affiliate Reporting API v2
+     * 
+     * @param string $startDate Start date (YYYY-MM-DD)
+     * @param string $endDate End date (YYYY-MM-DD)
+     * @return array Report data or error
+     */
+    public function getOrderReport($startDate, $endDate)
+    {
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            return [
+                'success' => false,
+                'message' => 'Bol.com API credentials not configured',
+                'data' => []
+            ];
+        }
+
+        try {
+            $token = $this->getAccessToken();
+
+            $url = $this->reportingApiEndpoint . '/order-report?' . http_build_query([
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+            ]);
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                return [
+                    'success' => true,
+                    'data' => $data,
+                ];
+            }
+
+            $errorMsg = "Order report request failed (HTTP $httpCode)";
+            if ($httpCode === 401) {
+                $errorMsg = 'Unauthorized - Check API credentials';
+            } elseif ($httpCode === 400) {
+                $errorMsg = 'Bad Request - Check date format (YYYY-MM-DD)';
+            }
+
+            if ($curlError) {
+                $errorMsg .= ": $curlError";
+            }
+
+            return [
+                'success' => false,
+                'message' => $errorMsg,
+                'data' => [],
+                'http_code' => $httpCode
+            ];
+        } catch (\Exception $e) {
+            if (function_exists('log_message')) {
+                log_message('error', 'Bol.com Reporting API Error: ' . $e->getMessage());
+            }
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ];
+        }
+    }
+
+    /**
+     * Get commission report from Bol.com Affiliate Reporting API v2
+     * 
+     * @param string $startDate Start date (YYYY-MM-DD)
+     * @param string $endDate End date (YYYY-MM-DD)
+     * @return array Report data or error
+     */
+    public function getCommissionReport($startDate, $endDate)
+    {
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            return [
+                'success' => false,
+                'message' => 'Bol.com API credentials not configured',
+                'data' => []
+            ];
+        }
+
+        try {
+            $token = $this->getAccessToken();
+
+            $url = $this->reportingApiEndpoint . '/commission-report?' . http_build_query([
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+            ]);
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                return [
+                    'success' => true,
+                    'data' => $data,
+                ];
+            }
+
+            $errorMsg = "Commission report request failed (HTTP $httpCode)";
+            if ($httpCode === 401) {
+                $errorMsg = 'Unauthorized - Check API credentials';
+            } elseif ($httpCode === 400) {
+                $errorMsg = 'Bad Request - Check date format (YYYY-MM-DD)';
+            }
+
+            if ($curlError) {
+                $errorMsg .= ": $curlError";
+            }
+
+            return [
+                'success' => false,
+                'message' => $errorMsg,
+                'data' => [],
+                'http_code' => $httpCode
+            ];
+        } catch (\Exception $e) {
+            if (function_exists('log_message')) {
+                log_message('error', 'Bol.com Reporting API Error: ' . $e->getMessage());
+            }
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'data' => []
+            ];
+        }
     }
 }
