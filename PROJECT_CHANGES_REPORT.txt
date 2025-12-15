@@ -1,17 +1,5 @@
-================================================================================
-                    DRAWING EVENTS FEATURE - PROJECT REPORT
-================================================================================
-
-PROJECT OVERVIEW
-================================================================================
-This project implements a complete "Drawing Events" (Loten Trekken) feature that 
-allows users to create drawing events, invite participants, and manage invitation 
-acceptance/rejection. Admins can view and manage all drawing events with detailed 
-statistics.
-
-================================================================================
 WHAT IS A DRAWING EVENT?
-================================================================================
+
 A Drawing Event is a lottery-style feature where:
 - A user creates a drawing event and invites other users
 - Each invited user receives an invitation to participate
@@ -20,9 +8,7 @@ A Drawing Event is a lottery-style feature where:
 - The system randomly assigns each participant to another participant
 - Each participant then needs to buy a gift for their assigned person
 
-================================================================================
 KEY FEATURES IMPLEMENTED
-================================================================================
 
 1. DRAWING EVENT CREATION
    - Users can create a new drawing event with title, description, and event date
@@ -66,9 +52,7 @@ KEY FEATURES IMPLEMENTED
    - View detailed participant list with their status
    - Delete drawing events if needed
 
-================================================================================
 USER WORKFLOWS
-================================================================================
 
 WORKFLOW 1: CREATE A DRAWING EVENT
 -----------------------------------
@@ -125,9 +109,7 @@ WORKFLOW 5: EXECUTE DRAWING
 7. Each participant sees who they are assigned to
 8. Participants can view the wishlist of their assigned person
 
-================================================================================
 ADMIN WORKFLOWS
-================================================================================
 
 WORKFLOW 1: VIEW ALL DRAWING EVENTS
 ------------------------------------
@@ -170,138 +152,10 @@ WORKFLOW 3: DELETE DRAWING EVENT
 4. Drawing event is deleted
 5. All participant records for that drawing are deleted
 6. System returns to drawings list with success message
-
-================================================================================
-DATABASE CHANGES
-================================================================================
-
-NEW TABLES CREATED:
--------------------
-1. drawings
-   - Stores drawing event information
-   - Fields: id, creator_id, title, description, event_date, status, created_at, updated_at
-
-2. drawing_participants
-   - Stores participant information for each drawing
-   - Fields: id, drawing_id, user_id, assigned_to_user_id, list_id, status, created_at, updated_at
-   - Status values: pending, accepted, declined
-
-COLUMN ADDED:
--------------
-1. drawing_participants.status (ENUM)
-   - Values: pending, accepted, declined
-   - Default: pending
-   - Purpose: Track invitation acceptance status
-
-================================================================================
-FILES MODIFIED/CREATED
-================================================================================
-
-MODELS:
--------
-✓ DrawingModel.php (NEW)
-  - getAllDrawingsWithStats() - Fetch all drawings with participant statistics
-  - getDrawingStats() - Fetch single drawing with statistics
-  - getDrawingParticipants() - Fetch all participants for a drawing
-  - getUserDrawings() - Fetch drawings created by a user
-  - getDrawingWithParticipants() - Fetch drawing with creator info
-
-✓ DrawingParticipantModel.php (NEW)
-  - acceptParticipation() - Update status to accepted
-  - declineParticipation() - Update status to declined
-  - getPendingInvitations() - Get pending invitations for a user
-  - getAcceptedParticipants() - Get accepted participants for a drawing
-  - getUserParticipations() - Get all participations for a user
-  - getParticipantsByDrawing() - Get participants for a drawing
-
-CONTROLLERS:
-------------
-✓ Drawings.php (NEW)
-  - index() - Show user's drawings and invitations
-  - create() - Create new drawing
-  - edit() - Edit drawing and manage participants
-  - view() - View drawing details (public access)
-  - addParticipant() - Add participant to drawing
-  - removeParticipant() - Remove participant from drawing
-  - draw() - Execute the drawing lottery
-  - acceptInvitation() - Accept invitation
-  - declineInvitation() - Decline invitation
-
-✓ Admin.php (MODIFIED)
-  - drawings() - List all drawings with statistics
-  - drawingDetails() - View drawing details
-  - deleteDrawing() - Delete drawing and participants
-
-VIEWS:
-------
-✓ drawings/index.php (NEW)
-  - Shows user's created drawings
-  - Shows pending invitations with accept/decline buttons
-  - Shows accepted participations
-
-✓ drawings/create.php (NEW)
-  - Form to create new drawing event
-
-✓ drawings/edit.php (NEW)
-  - Edit drawing details
-  - Add/remove participants
-  - Show participant list with status badges
-  - Generate and share invitation links
-  - Show invitation acceptance progress
-
-✓ drawings/view.php (NEW)
-  - Public view of drawing details
-  - Shows participant information
-  - Accessible via invitation link
-
-✓ admin/drawings.php (NEW)
-  - Admin list of all drawing events
-  - Shows creator, dates, and participant statistics
-  - Links to details and delete actions
-
-✓ admin/drawing_details.php (NEW)
-  - Admin view of drawing details
-  - Shows creator information
-  - Shows participant list with status
-  - Shows visual statistics with progress bars
-  - Delete button
-
-✓ admin/index.php (MODIFIED)
-  - Added "Loten Beheren" card to quick links
-
-ROUTES:
--------
-✓ Routes.php (MODIFIED)
-  - Added drawing routes (create, edit, view, add participant, etc.)
-  - Added admin drawing routes (list, details, delete)
-  - Made drawing view publicly accessible for invitation links
-
-MIGRATIONS:
------------
-✓ 2024-01-01-000011_CreateDrawingsTable.php (NEW)
-  - Creates drawings table
-
-✓ 2024-01-01-000012_CreateDrawingParticipantsTable.php (NEW)
-  - Creates drawing_participants table
-
-✓ 2024-01-01-000013_AddStatusToDrawingParticipantsTable.php (NEW)
-  - Adds status column to drawing_participants table
-
-MIGRATION RUNNERS:
-------------------
-✓ public/run_migration_drawings.php (NEW)
-  - Standalone script to run drawings migration
-
-✓ public/run_migration_drawings_status.php (NEW)
-  - Standalone script to add status column
-
-✓ public/add_status_column.php (NEW)
   - Checks if status column exists before adding
   - User-friendly interface with step-by-step progress
 
-================================================================================
 TECHNICAL IMPLEMENTATION DETAILS
-================================================================================
 
 INVITATION STATUS TRACKING:
 ---------------------------
@@ -343,33 +197,7 @@ PARTICIPANT STATISTICS:
 - Declined: COUNT where status = 'declined'
 - Calculated using SQL SUM and CASE statements
 
-================================================================================
-ERROR HANDLING & EDGE CASES
-================================================================================
-
-1. STATUS COLUMN MIGRATION
-   - System checks if status column exists before using it
-   - Works before and after migration is run
-   - Migration runner provides user-friendly interface
-
-2. SELF-ASSIGNMENT PREVENTION
-   - Drawing execution prevents assigning user to themselves
-   - Retries assignment if conflict detected
-
-3. AUTHORIZATION CHECKS
-   - Prevents unauthorized users from accepting other's invitations
-   - Prevents non-admins from accessing admin dashboard
-   - Prevents non-creators from editing drawings
-
-4. VALIDATION
-   - Drawing title is required
-   - Participant must exist in system
-   - Cannot add same participant twice
-   - Cannot remove non-existent participant
-
-================================================================================
 LANGUAGE & LOCALIZATION
-================================================================================
 
 All user-facing text is in Dutch:
 - "Loten Trekken" = Drawing Events
@@ -381,9 +209,7 @@ All user-facing text is in Dutch:
 - "U hebt de uitnodiging geaccepteerd!" = You have accepted the invitation!
 - "U hebt de uitnodiging geweigerd" = You have declined the invitation
 
-================================================================================
 TESTING CHECKLIST
-================================================================================
 
 USER FEATURES:
 ☑ Create drawing event
@@ -407,9 +233,7 @@ ADMIN FEATURES:
 ☑ Delete drawing event
 ☑ Cascade delete participants
 
-================================================================================
 SUMMARY
-================================================================================
 
 This Drawing Events feature provides a complete lottery system where users can:
 1. Create drawing events and invite others
@@ -426,7 +250,3 @@ Admins can:
 
 All features are fully integrated, properly authorized, and use consistent URL 
 formatting with index.php prefix throughout the application.
-
-================================================================================
-END OF REPORT
-================================================================================
