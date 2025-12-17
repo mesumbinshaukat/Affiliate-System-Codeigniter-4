@@ -2,111 +2,120 @@
 
 <?= $this->section('content') ?>
 <style>
-    .personalized-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-        gap: 18px;
+    .personalized-list,
+    .search-results-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
     }
 
-    .personalized-card {
-        background: #fff;
-        border-radius: 18px;
+    .personalized-item,
+    .search-result-item {
         border: 1px solid #e6e9ef;
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-        overflow: hidden;
-        position: relative;
+        border-radius: 18px;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        background: #fff;
+        padding: 16px 20px;
+        display: flex;
+        gap: 18px;
+        align-items: center;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
-        min-height: 320px;
-        padding-bottom: 50px;
     }
 
-    .personalized-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 14px 24px rgba(15, 23, 42, 0.12);
+    .personalized-item:hover,
+    .search-result-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
     }
 
-    .personalized-card__media {
+    .personalized-item__image,
+    .search-result-item__image {
+        width: 140px;
+        height: 140px;
+        border-radius: 16px;
         background: linear-gradient(135deg, #f5f8ff, #eef2ff);
-        min-height: 150px;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        overflow: hidden;
     }
 
-    .personalized-card__media img {
-        max-height: 140px;
+    .personalized-item__image img,
+    .search-result-item__image img {
         width: 100%;
+        height: 100%;
         object-fit: contain;
     }
 
-    .personalized-card__body {
-        padding: 16px 18px 20px;
-        display: flex;
-        flex-direction: column;
-        height: calc(100% - 150px);
+    .personalized-item__body,
+    .search-result-item__body {
+        flex: 1;
     }
 
-    .personalized-card__title {
+    .personalized-item__title,
+    .search-result-item__title {
         font-weight: 600;
-        font-size: 0.95rem;
-        color: #1e293b;
-        margin-bottom: 8px;
-        min-height: 48px;
-    }
-
-    .personalized-card__description {
-        font-size: 0.85rem;
-        color: #64748b;
-        flex-grow: 1;
-        margin-bottom: 12px;
-    }
-
-    .personalized-card__price {
-        font-weight: 700;
-        color: #0ea5e9;
         font-size: 1rem;
-        margin-bottom: 12px;
+        color: #0f172a;
+        margin-bottom: 6px;
     }
 
-    .personalized-card__actions {
+    .personalized-item__description,
+    .search-result-item__description {
+        font-size: 0.9rem;
+        color: #475569;
+        margin-bottom: 8px;
+    }
+
+    .personalized-item__meta,
+    .search-result-item__meta {
         display: flex;
-        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
         align-items: center;
     }
 
-    .personalized-card__add {
-        border: none;
-        border-radius: 12px;
-        padding: 8px 14px;
-        background: #0ea5e9;
-        color: #fff;
-        font-size: 0.85rem;
-        font-weight: 600;
-        transition: background 0.2s ease;
+    .personalized-item__actions,
+    .search-result-item__actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 160px;
     }
 
-    .personalized-card__add:hover {
-        background: #0284c7;
-        color: #fff;
-    }
-
-    .personalized-card__pill {
+    .personalized-pill {
         font-size: 0.75rem;
         padding: 4px 10px;
         border-radius: 999px;
         background: #ecfeff;
         color: #0369a1;
         border: 1px solid #bae6fd;
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        font-weight: 600;
+    }
+
+    .search-result-item__checkbox {
+        margin-right: 10px;
     }
 
     @media (max-width: 768px) {
-        .personalized-card {
-            min-height: auto;
+        .personalized-item,
+        .search-result-item {
+            flex-direction: column;
+            align-items: flex-start;
         }
 
-        .personalized-card__title {
-            min-height: auto;
+        .personalized-item__image,
+        .search-result-item__image {
+            width: 100%;
+            height: 200px;
+        }
+
+        .personalized-item__actions,
+        .search-result-item__actions {
+            width: 100%;
         }
     }
 </style>
@@ -277,33 +286,42 @@
                             </p>
                             
                             <?php if (!empty($personalizedSuggestions)): ?>
-                                <div class="personalized-grid">
+                                <div class="personalized-list">
                                     <?php foreach (array_slice($personalizedSuggestions, 0, 8) as $product): ?>
-                                        <div class="personalized-card">
-                                            <div class="personalized-card__media">
+                                        <div class="personalized-item">
+                                            <div class="personalized-item__image">
                                                 <?php if (!empty($product['image'])): ?>
                                                     <img src="<?= esc($product['image']) ?>" alt="<?= esc($product['title']) ?>">
                                                 <?php else: ?>
-                                                    <div class="text-muted small">Geen afbeelding</div>
+                                                    <div class="text-muted text-center">
+                                                        <i class="fas fa-image fa-2x"></i>
+                                                        <p class="small mt-2 mb-0">Geen afbeelding</p>
+                                                    </div>
                                                 <?php endif; ?>
                                             </div>
-                                            <div class="personalized-card__body">
-                                                <span class="personalized-card__pill">
-                                                    <?= esc($product['category'] ?? 'Trending selectie') ?>
-                                                </span>
-                                                <h6 class="personalized-card__title mt-2"><?= esc(character_limiter($product['title'], 60)) ?></h6>
-                                                <p class="personalized-card__description"><?= esc(character_limiter($product['description'] ?? 'Aanbevolen voor jouw leeftijdsgroep.', 95)) ?></p>
-                                                <?php if (!empty($product['price'])): ?>
-                                                    <div class="personalized-card__price">€<?= number_format($product['price'], 2) ?></div>
-                                                <?php endif; ?>
-                                                <div class="personalized-card__actions">
-                                                    <button class="personalized-card__add" onclick="addSingleProduct(<?= htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8') ?>)">
-                                                        <i class="fas fa-plus"></i> Toevoegen
-                                                    </button>
-                                                    <a href="<?= esc($product['url'] ?? '#') ?>" target="_blank" rel="noopener" class="text-muted small">
-                                                        Bekijk
-                                                    </a>
+                                            <div class="personalized-item__body">
+                            <span class="personalized-pill">
+                                <i class="fas fa-heart text-danger"></i>
+                                <?= esc($product['category'] ?? 'Trending selectie') ?>
+                            </span>
+                                                <h6 class="personalized-item__title mt-2"><?= esc(character_limiter($product['title'], 60)) ?></h6>
+                                                <p class="personalized-item__description"><?= esc(character_limiter($product['description'] ?? 'Aanbevolen voor jouw leeftijdsgroep.', 95)) ?></p>
+                                                <div class="personalized-item__meta">
+                                                    <?php if (!empty($product['price'])): ?>
+                                                        <span class="badge bg-primary-subtle text-primary fw-semibold">€<?= number_format($product['price'], 2) ?></span>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($product['source'])): ?>
+                                                        <span class="badge bg-light text-muted"><i class="fas fa-store"></i> <?= esc($product['source']) ?></span>
+                                                    <?php endif; ?>
                                                 </div>
+                                            </div>
+                                            <div class="personalized-item__actions">
+                                                <button class="btn btn-primary btn-sm" onclick="addSingleProduct(<?= htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8') ?>)">
+                                                    <i class="fas fa-plus"></i> Toevoegen
+                                                </button>
+                                                <a href="<?= esc($product['url'] ?? '#') ?>" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+                                                    Bekijk
+                                                </a>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
@@ -543,44 +561,44 @@ function updateCategoryFilter(categories) {
 
 // Render search results with checkboxes
 function renderSearchResults(products) {
-    let html = '<div class="list-group">';
+    let html = '<div class="search-results-list">';
     
     products.forEach(product => {
         const isSelected = selectedProducts.has(product.external_id);
         const checkboxId = `product-${product.external_id}`;
+        const ratingBadge = product.rating ? `<span class="badge bg-warning text-dark"><i class="fas fa-star"></i> ${product.rating}</span>` : '';
+        const eanBadge = product.ean ? `<span class="badge bg-light text-muted">EAN: ${escapeHtml(product.ean)}</span>` : '';
         
         html += `
-            <div class="list-group-item" id="result-${product.external_id}">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <div class="form-check">
-                            <input class="form-check-input product-checkbox" type="checkbox" 
-                                   id="${checkboxId}" 
-                                   ${isSelected ? 'checked' : ''}
-                                   onchange="toggleProductSelection('${product.external_id}', this.checked)">
-                            <label class="form-check-label" for="${checkboxId}"></label>
-                        </div>
+            <div class="search-result-item" id="result-${product.external_id}">
+                <div class="search-result-item__checkbox">
+                    <div class="form-check">
+                        <input class="form-check-input product-checkbox" type="checkbox"
+                               id="${checkboxId}"
+                               ${isSelected ? 'checked' : ''}
+                               onchange="toggleProductSelection('${product.external_id}', this.checked)">
+                        <label class="form-check-label" for="${checkboxId}"></label>
                     </div>
-                    <div class="col-md-2">
-                        ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" class="img-fluid rounded" alt="${escapeHtml(product.title)}" style="max-height: 80px; object-fit: contain;">` : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px;"><i class="fas fa-image text-muted"></i></div>'}
+                </div>
+                <div class="search-result-item__image">
+                    ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.title)}">` : '<div class="text-muted text-center w-100"><i class="fas fa-image fa-2x"></i><p class="small mb-0 mt-2">Geen afbeelding</p></div>'}
+                </div>
+                <div class="search-result-item__body">
+                    <div class="search-result-item__title">${escapeHtml(product.title)}</div>
+                    ${product.description ? `<p class="search-result-item__description">${escapeHtml(product.description.substring(0, 110))}${product.description.length > 110 ? '...' : ''}</p>` : '<p class="search-result-item__description text-muted mb-2">Geen beschrijving beschikbaar.</p>'}
+                    <div class="search-result-item__meta">
+                        ${product.price ? `<span class="badge bg-primary-subtle text-primary fw-semibold">€${parseFloat(product.price).toFixed(2)}</span>` : ''}
+                        ${ratingBadge}
+                        ${eanBadge}
                     </div>
-                    <div class="col-md-7">
-                        <h6 class="mb-1">${escapeHtml(product.title)}</h6>
-                        ${product.description ? `<p class="text-muted small mb-1">${escapeHtml(product.description.substring(0, 120))}${product.description.length > 120 ? '...' : ''}</p>` : ''}
-                        <div class="d-flex align-items-center gap-3">
-                            ${product.price ? `<strong class="text-primary">€${parseFloat(product.price).toFixed(2)}</strong>` : ''}
-                            ${product.rating ? `<span class="badge bg-warning text-dark"><i class="fas fa-star"></i> ${product.rating}</span>` : ''}
-                            ${product.ean ? `<small class="text-muted">EAN: ${escapeHtml(product.ean)}</small>` : ''}
-                        </div>
-                    </div>
-                    <div class="col-md-2 text-end">
-                        <button class="btn btn-sm btn-outline-primary"
-                                data-product="${encodeURIComponent(JSON.stringify(product))}"
-                                onclick="addSingleProductFromButton(this)"
-                                title="Add this product">
-                            <i class="fas fa-plus"></i> Voeg nu toe
-                        </button>
-                    </div>
+                </div>
+                <div class="search-result-item__actions">
+                    <button class="btn btn-outline-primary btn-sm"
+                            data-product="${encodeURIComponent(JSON.stringify(product))}"
+                            onclick="addSingleProductFromButton(this)"
+                            title="Voeg dit product toe">
+                        <i class="fas fa-plus"></i> Voeg nu toe
+                    </button>
                 </div>
             </div>
         `;
