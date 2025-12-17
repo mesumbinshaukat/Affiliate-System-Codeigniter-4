@@ -85,6 +85,7 @@ class Auth extends BaseController
                 'first_name' => 'required|min_length[2]|max_length[100]',
                 'last_name' => 'required|min_length[2]|max_length[100]',
                 'date_of_birth' => 'required|valid_date',
+                'gender' => 'permit_empty|in_list[male,female,other]',
                 'email' => 'required|valid_email|is_unique[users.email]',
                 'password' => 'required|min_length[8]',
                 'password_confirm' => 'required|matches[password]'
@@ -121,6 +122,7 @@ class Auth extends BaseController
                 $counter++;
             }
 
+            $gender = $this->request->getPost('gender');
             $data = [
                 'username' => $username,
                 'email' => $email,
@@ -128,6 +130,7 @@ class Auth extends BaseController
                 'first_name' => trim($this->request->getPost('first_name')),
                 'last_name' => trim($this->request->getPost('last_name')),
                 'date_of_birth' => $this->request->getPost('date_of_birth'),
+                'gender' => !empty($gender) ? $gender : null,
                 'role' => 'user',
                 'status' => 'active',
             ];

@@ -48,12 +48,25 @@
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <input type="date" class="form-control <?= session('errors.date_of_birth') ? 'is-invalid' : '' ?>" id="date_of_birth" name="date_of_birth" value="<?= old('date_of_birth') ?>" required>
-                                <small class="text-muted">Geboortedatum</small>
-                                <?php if (session('errors.date_of_birth')): ?>
-                                    <div class="invalid-feedback"><?= session('errors.date_of_birth') ?></div>
-                                <?php endif; ?>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <input type="date" class="form-control <?= session('errors.date_of_birth') ? 'is-invalid' : '' ?>" id="date_of_birth" name="date_of_birth" value="<?= old('date_of_birth') ?>" required>
+                                    <small class="text-muted">Geboortedatum</small>
+                                    <?php if (session('errors.date_of_birth')): ?>
+                                        <div class="invalid-feedback"><?= session('errors.date_of_birth') ?></div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <select class="form-select <?= session('errors.gender') ? 'is-invalid' : '' ?>" id="gender" name="gender">
+                                        <option value="">Geslacht (optioneel)</option>
+                                        <option value="male" <?= old('gender') === 'male' ? 'selected' : '' ?>>Man</option>
+                                        <option value="female" <?= old('gender') === 'female' ? 'selected' : '' ?>>Vrouw</option>
+                                        <option value="other" <?= old('gender') === 'other' ? 'selected' : '' ?>>Anders</option>
+                                    </select>
+                                    <?php if (session('errors.gender')): ?>
+                                        <div class="invalid-feedback"><?= session('errors.gender') ?></div>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <input type="email" class="form-control <?= session('errors.email') ? 'is-invalid' : '' ?>" id="email" name="email" value="<?= old('email') ?>" required placeholder="Uw e-mailadres">
                             <?php if (session('errors.email')): ?>

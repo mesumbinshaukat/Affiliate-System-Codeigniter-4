@@ -68,65 +68,12 @@
         <div class="tab-pane fade show active" id="products" role="tabpanel">
             <div class="row">
                 <div class="col-lg-8">
-                    <!-- Suggested Products from Category -->
-                    <?php if (!empty($suggestedProducts)): ?>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-lightbulb"></i> Aanbevolen Producten in deze Categorie
-                                <?php if ($userAge): ?>
-                                    <small class="text-muted">(voor leeftijd <?= $userAge ?>)</small>
-                                <?php endif; ?>
-                            </h5>
-                            <p class="text-muted small">Populaire producten uit andere lijsten in dezelfde categorie</p>
-                            <div class="row">
-                                <?php foreach ($suggestedProducts as $product): ?>
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card border-light h-100">
-                                            <div class="card-body d-flex flex-column">
-                                                <?php if ($product['image_url']): ?>
-                                                    <img src="<?= esc($product['image_url']) ?>" class="card-img-top mb-2" alt="<?= esc($product['title']) ?>" style="max-height: 150px; object-fit: cover;">
-                                                <?php endif; ?>
-                                                <h6 class="card-title"><?= esc(character_limiter($product['title'], 50)) ?></h6>
-                                                <p class="card-text small text-muted flex-grow-1"><?= esc(character_limiter($product['description'], 80)) ?></p>
-                                                <?php if ($product['price']): ?>
-                                                    <p class="text-primary mb-2"><strong>€<?= number_format($product['price'], 2) ?></strong></p>
-                                                <?php endif; ?>
-                                                <button class="btn btn-sm btn-success" onclick="addSingleProduct(<?= htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8') ?>)">
-                                                    <i class="fas fa-plus"></i> Toevoegen
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <?php else: ?>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-lightbulb"></i> Aanbevolen Producten in deze Categorie
-                                <?php if ($userAge): ?>
-                                    <small class="text-muted">(voor leeftijd <?= $userAge ?>)</small>
-                                <?php endif; ?>
-                            </h5>
-                            <div class="alert alert-info mb-0">
-                                <i class="fas fa-info-circle"></i> 
-                                <?php if ($userAge): ?>
-                                    Geen producten gevonden die passen bij uw leeftijd in deze categorie. U kunt producten handmatig toevoegen via de zoekopdracht hieronder.
-                                <?php else: ?>
-                                    Geen aanbevolen producten beschikbaar. Voeg producten handmatig toe via de zoekopdracht hieronder.
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <!-- Search Products -->
+                    <!-- Search Products with Filters (MOVED TO TOP) -->
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Producten Toevoegen van Bol.com</h5>
+                            
+                            <!-- Search Input -->
                             <div class="row g-2 mb-3">
                                 <div class="col">
                                     <div class="input-group">
@@ -134,6 +81,38 @@
                                         <button class="btn btn-primary" type="button" onclick="searchProducts(1)" id="searchBtn">
                                             <i class="fas fa-search"></i> Zoeken
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Filters Section (Hidden by default, shown after search) -->
+                            <div class="card card-light mb-3 d-none" id="filtersContainer">
+                                <div class="card-body">
+                                    <h6 class="card-title mb-3"><i class="fas fa-filter"></i> Geavanceerde Filters</h6>
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Sorteren</label>
+                                            <select class="form-select form-select-sm" id="sortSelect" onchange="applyFilters()">
+                                                <option value="RELEVANCE">Relevantie</option>
+                                                <option value="PRICE_ASC">Prijs: Laag naar Hoog</option>
+                                                <option value="PRICE_DESC">Prijs: Hoog naar Laag</option>
+                                                <option value="POPULARITY">Populariteit</option>
+                                                <option value="RATING_DESC">Rating: Hoog naar Laag</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label small fw-bold">Min €</label>
+                                            <input type="number" class="form-control form-control-sm" id="minPrice" placeholder="0" min="0" onchange="applyFilters()">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label small fw-bold">Max €</label>
+                                            <input type="number" class="form-control form-control-sm" id="maxPrice" placeholder="9999" min="0" onchange="applyFilters()">
+                                        </div>
+                                        <div class="col-md-4 d-flex align-items-end">
+                                            <button class="btn btn-sm btn-outline-secondary w-100" onclick="resetFilters()">
+                                                <i class="fas fa-redo"></i> Reset Filters
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -162,6 +141,64 @@
                                     <ul class="pagination justify-content-center" id="pagination"></ul>
                                 </nav>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Personalized Suggestions Section (Age-Based) -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-sparkles"></i> 
+                                <?php if ($userAge && $userGender): ?>
+                                    Persoonlijke Suggesties voor jouw Leeftijd (<?= $userAge ?>) en Geslacht
+                                <?php elseif ($userAge): ?>
+                                    Persoonlijke Suggesties voor jouw Leeftijd (<?= $userAge ?>)
+                                <?php else: ?>
+                                    Populaire Producten
+                                <?php endif; ?>
+                            </h5>
+                            <p class="text-muted small">
+                                <?php if ($userAge && $userGender): ?>
+                                    Producten speciaal geselecteerd op basis van jouw leeftijd en geslacht
+                                <?php elseif ($userAge): ?>
+                                    Producten speciaal geselecteerd op basis van jouw leeftijd
+                                <?php else: ?>
+                                    Populaire producten van Bol.com
+                                <?php endif; ?>
+                            </p>
+                            
+                            <?php if (!empty($personalizedSuggestions)): ?>
+                                <div class="row">
+                                    <?php foreach (array_slice($personalizedSuggestions, 0, 6) as $product): ?>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card border-success h-100">
+                                                <div class="card-body d-flex flex-column">
+                                                    <?php if (!empty($product['image'])): ?>
+                                                        <img src="<?= esc($product['image']) ?>" class="card-img-top mb-2" alt="<?= esc($product['title']) ?>" style="max-height: 150px; object-fit: cover;">
+                                                    <?php endif; ?>
+                                                    <h6 class="card-title"><?= esc(character_limiter($product['title'], 50)) ?></h6>
+                                                    <p class="card-text small text-muted flex-grow-1"><?= esc(character_limiter($product['description'] ?? '', 80)) ?></p>
+                                                    <?php if (!empty($product['price'])): ?>
+                                                        <p class="text-success mb-2"><strong>€<?= number_format($product['price'], 2) ?></strong></p>
+                                                    <?php endif; ?>
+                                                    <button class="btn btn-sm btn-success" onclick="addSingleProduct(<?= htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8') ?>)">
+                                                        <i class="fas fa-plus"></i> Toevoegen
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle"></i> 
+                                    <?php if ($userAge || $userGender): ?>
+                                        Geen persoonlijke suggesties beschikbaar op dit moment. Probeer producten handmatig toe te voegen via de zoekopdracht hierboven.
+                                    <?php else: ?>
+                                        Vul je profiel in (leeftijd en geslacht) voor persoonlijke suggesties. Je kunt ook producten handmatig toevoegen via de zoekopdracht hierboven.
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -221,8 +258,80 @@ let currentSearchQuery = '';
 let currentPage = 1;
 let totalResults = 0;
 const resultsPerPage = 10;
+let priceRefinementId = null;
+let allFetchedProducts = []; // Store all fetched products for client-side filtering
 
-// Search products with pagination
+// Apply filters to already-fetched products
+function applyFilters() {
+    if (allFetchedProducts.length === 0) {
+        showToast('Voer eerst een zoekopdracht uit', 'warning');
+        return;
+    }
+    
+    // Reset to page 1 when filters change
+    currentPage = 1;
+    renderFilteredProducts();
+}
+
+// Reset all filters
+function resetFilters() {
+    document.getElementById('sortSelect').value = 'RELEVANCE';
+    document.getElementById('minPrice').value = '';
+    document.getElementById('maxPrice').value = '';
+    currentPage = 1;
+    renderFilteredProducts();
+}
+
+// Filter products based on current filter values
+function getFilteredProducts() {
+    let filtered = [...allFetchedProducts];
+    
+    const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+    const maxPrice = parseFloat(document.getElementById('maxPrice').value) || 99999;
+    const sort = document.getElementById('sortSelect').value || 'RELEVANCE';
+    
+    // Apply price filter
+    filtered = filtered.filter(product => {
+        const price = parseFloat(product.price) || 0;
+        return price >= minPrice && price <= maxPrice;
+    });
+    
+    // Apply sort
+    if (sort === 'PRICE_ASC') {
+        filtered.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
+    } else if (sort === 'PRICE_DESC') {
+        filtered.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+    } else if (sort === 'RATING_DESC') {
+        filtered.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
+    }
+    // RELEVANCE and POPULARITY keep original order
+    
+    return filtered;
+}
+
+// Render filtered products with pagination
+function renderFilteredProducts() {
+    const filtered = getFilteredProducts();
+    totalResults = filtered.length;
+    
+    const start = (currentPage - 1) * resultsPerPage;
+    const end = start + resultsPerPage;
+    const pageProducts = filtered.slice(start, end);
+    
+    if (pageProducts.length > 0) {
+        renderSearchResults(pageProducts);
+        renderPagination();
+    } else {
+        document.getElementById('searchResults').innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-info-circle"></i> Geen producten gevonden met de huidige filters.
+            </div>
+        `;
+        document.getElementById('paginationContainer').classList.add('d-none');
+    }
+}
+
+// Search products with pagination and filters
 function searchProducts(page = 1) {
     const query = document.getElementById('productSearch').value.trim();
     if (!query) {
@@ -232,7 +341,7 @@ function searchProducts(page = 1) {
 
     currentSearchQuery = query;
     currentPage = page;
-    const offset = (page - 1) * resultsPerPage;
+    const limit = 50; // Fetch more products for client-side filtering
 
     // Show loading
     const searchBtn = document.getElementById('searchBtn');
@@ -241,17 +350,33 @@ function searchProducts(page = 1) {
     
     document.getElementById('searchResults').innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Laden...</span></div><p class="mt-2 text-muted">Bol.com doorzoeken...</p></div>';
 
-    fetch(`<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(query)}&limit=${resultsPerPage}&offset=${offset}`)
+    // Build URL without filters - fetch all results for client-side filtering
+    let url = `<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(query)}&limit=${limit}&page=1`;
+
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             searchBtn.disabled = false;
             searchBtn.innerHTML = '<i class="fas fa-search"></i> Zoeken';
             
+            // Show filters container after first successful search
+            document.getElementById('filtersContainer').classList.remove('d-none');
+            
             if (data.success && data.products && data.products.length > 0) {
-                totalResults = data.total || data.products.length;
-                renderSearchResults(data.products);
-                renderPagination();
+                // Store all fetched products for client-side filtering
+                allFetchedProducts = data.products;
+                totalResults = data.products.length;
+                
+                // Reset filters to default
+                document.getElementById('sortSelect').value = 'RELEVANCE';
+                document.getElementById('minPrice').value = '';
+                document.getElementById('maxPrice').value = '';
+                currentPage = 1;
+                
+                // Render filtered products
+                renderFilteredProducts();
             } else {
+                allFetchedProducts = [];
                 document.getElementById('searchResults').innerHTML = `
                     <div class="alert alert-warning">
                         <i class="fas fa-info-circle"></i> Geen producten gevonden voor "<strong>${escapeHtml(query)}</strong>".
@@ -271,6 +396,30 @@ function searchProducts(page = 1) {
                 </div>
             `;
         });
+}
+
+// Update category filter dropdown from API response
+function updateCategoryFilter(categories) {
+    const select = document.getElementById('categorySelect');
+    const currentValue = select.value;
+    
+    // Clear existing options except the first one
+    while (select.options.length > 1) {
+        select.remove(1);
+    }
+    
+    // Add categories from API response
+    categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.categoryId;
+        option.textContent = `${cat.categoryName} (${cat.productCount})`;
+        select.appendChild(option);
+    });
+    
+    // Restore previous selection if it still exists
+    if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
+        select.value = currentValue;
+    }
 }
 
 // Render search results with checkboxes
@@ -336,20 +485,12 @@ function renderSearchResults(products) {
 // Toggle product selection
 function toggleProductSelection(productId, isSelected) {
     if (isSelected) {
-        // Find product data from current results
-        const checkbox = document.getElementById(`product-${productId}`);
-        const resultDiv = document.getElementById(`result-${productId}`);
-        
-        // Extract product data from the result div
-        fetch(`<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(currentSearchQuery)}&limit=${resultsPerPage}&offset=${(currentPage - 1) * resultsPerPage}`)
-            .then(response => response.json())
-            .then(data => {
-                const product = data.products.find(p => p.external_id === productId);
-                if (product) {
-                    selectedProducts.set(productId, product);
-                    updateSelectedCounter();
-                }
-            });
+        // Find product from all fetched products
+        const product = allFetchedProducts.find(p => p.external_id === productId);
+        if (product) {
+            selectedProducts.set(productId, product);
+            updateSelectedCounter();
+        }
     } else {
         selectedProducts.delete(productId);
         updateSelectedCounter();
@@ -361,20 +502,20 @@ function toggleSelectAll(isSelected) {
     const checkboxes = document.querySelectorAll('.product-checkbox');
     
     if (isSelected) {
-        // Get all products from current search results and add them instantly
-        fetch(`<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(currentSearchQuery)}&limit=${resultsPerPage}&offset=${(currentPage - 1) * resultsPerPage}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.products) {
-                    // Add all products to selectedProducts map instantly
-                    data.products.forEach(product => {
-                        selectedProducts.set(product.external_id, product);
-                    });
-                    // Check all checkboxes
-                    checkboxes.forEach(checkbox => checkbox.checked = true);
-                    updateSelectedCounter();
-                }
-            });
+        // Get filtered products for current page
+        const filtered = getFilteredProducts();
+        const start = (currentPage - 1) * resultsPerPage;
+        const end = start + resultsPerPage;
+        const pageProducts = filtered.slice(start, end);
+        
+        // Add all products on this page to selectedProducts
+        pageProducts.forEach(product => {
+            selectedProducts.set(product.external_id, product);
+        });
+        
+        // Check all checkboxes
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+        updateSelectedCounter();
     } else {
         // Uncheck all and clear selection
         checkboxes.forEach(checkbox => checkbox.checked = false);
@@ -501,26 +642,29 @@ function addSingleProduct(product) {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
     
-    // For suggested products, we need to check if it's already in the database
-    // If product.id exists, it's already in the database
-    const params = {
-        list_id: listId,
+    // Normalize product data - handle both age-based and search result formats
+    const normalizedProduct = {
+        external_id: product.external_id || product.id || '',
+        title: product.title || '',
+        description: product.description || '',
+        image_url: product.image_url || product.image || '',
+        price: product.price || 0,
+        affiliate_url: product.affiliate_url || product.url || '',
+        source: product.source || 'bol.com',
+        ean: product.ean || '',
     };
     
-    if (product.id) {
-        // Product already exists in database, just add it to the list
-        params['product_id'] = product.id;
-    } else {
-        // New product from search, add all details
-        params['product[external_id]'] = product.external_id || '';
-        params['product[title]'] = product.title;
-        params['product[description]'] = product.description || '';
-        params['product[image_url]'] = product.image_url || '';
-        params['product[price]'] = product.price || 0;
-        params['product[affiliate_url]'] = product.affiliate_url || '';
-        params['product[source]'] = product.source || 'bol-com';
-        params['product[ean]'] = product.ean || '';
-    }
+    const params = {
+        list_id: listId,
+        'product[external_id]': normalizedProduct.external_id,
+        'product[title]': normalizedProduct.title,
+        'product[description]': normalizedProduct.description,
+        'product[image_url]': normalizedProduct.image_url,
+        'product[price]': normalizedProduct.price,
+        'product[affiliate_url]': normalizedProduct.affiliate_url,
+        'product[source]': normalizedProduct.source,
+        'product[ean]': normalizedProduct.ean,
+    };
     
     fetch('<?= base_url('index.php/dashboard/product/add') ?>', {
         method: 'POST',
@@ -582,7 +726,7 @@ function renderPagination() {
     // Previous button
     html += `
         <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="searchProducts(${currentPage - 1}); return false;">
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">
                 <i class="fas fa-chevron-left"></i>
             </a>
         </li>
@@ -598,7 +742,7 @@ function renderPagination() {
     }
     
     if (startPage > 1) {
-        html += `<li class="page-item"><a class="page-link" href="#" onclick="searchProducts(1); return false;">1</a></li>`;
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(1); return false;">1</a></li>`;
         if (startPage > 2) {
             html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
         }
@@ -607,7 +751,7 @@ function renderPagination() {
     for (let i = startPage; i <= endPage; i++) {
         html += `
             <li class="page-item ${i === currentPage ? 'active' : ''}">
-                <a class="page-link" href="#" onclick="searchProducts(${i}); return false;">${i}</a>
+                <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
             </li>
         `;
     }
@@ -616,19 +760,25 @@ function renderPagination() {
         if (endPage < totalPages - 1) {
             html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
         }
-        html += `<li class="page-item"><a class="page-link" href="#" onclick="searchProducts(${totalPages}); return false;">${totalPages}</a></li>`;
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">${totalPages}</a></li>`;
     }
     
     // Next button
     html += `
         <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="searchProducts(${currentPage + 1}); return false;">
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">
                 <i class="fas fa-chevron-right"></i>
             </a>
         </li>
     `;
     
     document.getElementById('pagination').innerHTML = html;
+}
+
+// Change page for filtered results
+function changePage(page) {
+    currentPage = page;
+    renderFilteredProducts();
 }
 
 // Escape HTML to prevent XSS

@@ -183,6 +183,255 @@ class BolComAPI
     }
 
     /**
+     * Get personalized product suggestions based on user age and gender
+     * Falls back to popular products if age/gender not provided
+     * 
+     * @param int $age User age (optional)
+     * @param string $gender User gender: male, female, other (optional)
+     * @param int $limit Number of results (default 20)
+     * @param string $countryCode Country code (NL or BE)
+     * @return array
+     */
+    public function getPersonalizedSuggestions($age = null, $gender = null, $limit = 20, $countryCode = 'NL')
+    {
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            return [
+                'success' => false,
+                'message' => 'Bol.com API credentials not configured',
+                'products' => [],
+                'is_fallback' => true
+            ];
+        }
+
+        try {
+            $token = $this->getAccessToken();
+            $pageSize = min($limit, 50);
+
+            // If age and gender provided, create personalized search term in Dutch
+            if (!empty($age) && !empty($gender)) {
+                // Build Dutch search term for personalized suggestions
+                $genderText = '';
+                if ($gender === 'male') {
+                    $genderText = 'man';
+                } elseif ($gender === 'female') {
+                    $genderText = 'vrouw';
+                } else {
+                    $genderText = 'persoon';
+                }
+                
+                $searchTerm = "cadeaus voor {$age} jarige {$genderText}";
+                $isFallback = false;
+            } else {
+                // Fallback to popular products
+                $params = [
+                    'country-code' => $countryCode,
+                    'page-size' => $pageSize,
+                    'page' => 1,
+                    'include-offer' => 'true',
+                    'include-image' => 'true',
+                    'include-rating' => 'true',
+                ];
+                
+                $url = $this->apiEndpoint . '/products/lists/popular?' . http_build_query($params);
+                $isFallback = true;
+            }
+
+            // If not fallback, use search endpoint with personalized term
+            if (!$isFallback) {
+                $params = [
+                    'search-term' => $searchTerm,
+                    'country-code' => $countryCode,
+                    'page-size' => $pageSize,
+                    'page' => 1,
+                    'include-offer' => 'true',
+                    'include-image' => 'true',
+                    'include-rating' => 'true',
+                    'sort' => 'RELEVANCE',
+                    'include-relevant-categories' => 'true',
+                    'include-relevant-refinements' => 'true',
+                ];
+                
+                $url = $this->apiEndpoint . '/products/search?' . http_build_query($params);
+            }
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+                'Accept-Language: nl',
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                
+                // Handle both search results and popular products response
+                $results = $data['results'] ?? $data['products'] ?? [];
+                $totalResults = $data['totalResults'] ?? count($results);
+                
+                return [
+                    'success' => true,
+                    'products' => $this->formatProducts($results),
+                    'total' => $totalResults,
+                    'is_fallback' => $isFallback,
+                    'search_term' => $searchTerm ?? 'Populaire producten',
+                ];
+            }
+
+            // Fallback on error
+            return [
+                'success' => false,
+                'message' => "Personalized suggestions unavailable (HTTP $httpCode)",
+                'products' => [],
+                'is_fallback' => true,
+                'http_code' => $httpCode
+            ];
+        } catch (\Exception $e) {
+            if (function_exists('log_message')) {
+                log_message('error', 'Bol.com Personalized Suggestions Error: ' . $e->getMessage());
+            }
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'products' => [],
+                'is_fallback' => true
+            ];
+        }
+    }
+
+    /**
+     * Enhanced search with filters (price range, sort, category)
+     * 
+     * @param string $query Search term
+     * @param array $filters Filters: ['min_price' => int, 'max_price' => int, 'sort' => string, 'category_id' => int, 'range_refinement' => string]
+     * @param int $limit Number of results per page (max 50)
+     * @param int $page Page number (default 1)
+     * @param string $countryCode Country code (NL or BE)
+     * @return array
+     */
+    public function searchProductsWithFilters($query, $filters = [], $limit = 20, $page = 1, $countryCode = 'NL')
+    {
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            return [
+                'success' => false,
+                'message' => 'Bol.com API credentials not configured',
+                'products' => []
+            ];
+        }
+
+        try {
+            $token = $this->getAccessToken();
+            $pageSize = min($limit, 50);
+
+            $params = [
+                'search-term' => $query,
+                'country-code' => $countryCode,
+                'page-size' => $pageSize,
+                'page' => $page,
+                'include-offer' => 'true',
+                'include-image' => 'true',
+                'include-rating' => 'true',
+                'include-relevant-categories' => 'true',
+                'include-relevant-refinements' => 'true',
+                'sort' => $filters['sort'] ?? 'RELEVANCE',
+            ];
+
+            // Add category filter if provided
+            if (!empty($filters['category_id'])) {
+                $params['category-id'] = $filters['category_id'];
+            }
+
+            // Add price range refinement if provided
+            if (!empty($filters['range_refinement'])) {
+                $params['range-refinement'] = $filters['range_refinement'];
+            }
+
+            $url = $this->apiEndpoint . '/products/search?' . http_build_query($params);
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+                'Accept-Language: nl',
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                
+                $results = $data['results'] ?? [];
+                $totalResults = $data['totalResults'] ?? 0;
+                
+                // Extract categories and refinements for filter UI
+                $categories = [];
+                $priceRefinements = [];
+                
+                if (!empty($data['allRelevantCategories'])) {
+                    $categories = $data['allRelevantCategories'];
+                }
+                
+                if (!empty($data['allRelevantRefinements'])) {
+                    foreach ($data['allRelevantRefinements'] as $refinement) {
+                        if ($refinement['type'] === 'RANGE_REFINEMENT' && stripos($refinement['name'], 'prijs') !== false) {
+                            $priceRefinements = $refinement;
+                            break;
+                        }
+                    }
+                }
+                
+                return [
+                    'success' => true,
+                    'products' => $this->formatProducts($results),
+                    'total' => $totalResults,
+                    'page' => $page,
+                    'page_size' => $pageSize,
+                    'categories' => $categories,
+                    'price_refinements' => $priceRefinements,
+                ];
+            }
+
+            $errorMsg = "Search with filters failed (HTTP $httpCode)";
+            if ($httpCode === 401) {
+                $errorMsg = 'Unauthorized - Check API credentials';
+            } elseif ($httpCode === 400) {
+                $errorMsg = 'Bad Request - Check filter parameters';
+            }
+
+            if ($curlError) {
+                $errorMsg .= ": $curlError";
+            }
+
+            return [
+                'success' => false,
+                'message' => $errorMsg,
+                'products' => [],
+                'http_code' => $httpCode
+            ];
+        } catch (\Exception $e) {
+            if (function_exists('log_message')) {
+                log_message('error', 'Bol.com Search with Filters Error: ' . $e->getMessage());
+            }
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'products' => []
+            ];
+        }
+    }
+
+    /**
      * Get product details
      */
     public function getProduct($productId)

@@ -13,7 +13,7 @@ class UserModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'username', 'email', 'password', 'first_name', 'last_name', 'date_of_birth',
+        'username', 'email', 'password', 'first_name', 'last_name', 'date_of_birth', 'gender',
         'role', 'status', 'avatar', 'bio'
     ];
 
@@ -74,5 +74,30 @@ class UserModel extends Model
         return $this->where('status', 'active')
             ->orderBy('created_at', 'DESC')
             ->findAll($limit);
+    }
+
+    /**
+     * Calculate user age from date_of_birth
+     * 
+     * @param int $userId User ID
+     * @return int|null Age in years, or null if date_of_birth not set or invalid
+     */
+    public function getAge($userId)
+    {
+        $user = $this->find($userId);
+        
+        if (!$user || empty($user['date_of_birth'])) {
+            return null;
+        }
+
+        try {
+            $birthDate = new \DateTime($user['date_of_birth']);
+            $today = new \DateTime();
+            $age = $today->diff($birthDate)->y;
+            
+            return $age >= 0 ? $age : null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

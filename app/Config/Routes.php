@@ -45,6 +45,12 @@ $routes->get('drawings/view/(:num)', 'Drawings::view/$1');
 // Affiliate Tracking
 $routes->get('/out/(:num)', 'Tracker::redirect/$1');
 
+// User Profile Routes
+$routes->group('user', ['filter' => 'auth'], function($routes) {
+    $routes->get('profile', 'User::profile');
+    $routes->post('updateProfile', 'User::updateProfile');
+});
+
 // Dashboard Routes (User)
 $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Dashboard::index');

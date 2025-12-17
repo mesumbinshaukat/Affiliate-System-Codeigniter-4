@@ -117,16 +117,33 @@ class Dashboard extends BaseController
         $this->data['categories'] = $categoryModel->getActiveCategories();
         $this->data['products'] = $listProductModel->getListProducts($listId);
         
-        // Get user age for filtering
+        // Get user age and gender for personalized suggestions
         $userAge = null;
+        $userGender = null;
         $user = $this->session->get('user_id');
         if ($user) {
             $userModel = new \App\Models\UserModel();
             $userData = $userModel->find($user);
-            if ($userData && $userData['date_of_birth']) {
-                $birthDate = new \DateTime($userData['date_of_birth']);
-                $today = new \DateTime();
-                $userAge = $today->diff($birthDate)->y;
+            if ($userData) {
+                $userAge = $userModel->getAge($user);
+                $userGender = $userData['gender'] ?? null;
+            }
+        }
+        
+        // Get personalized suggestions from age-based products JSON
+        $personalizedSuggestions = [];
+        $ageBasedProducts = new \App\Libraries\AgeBasedProducts();
+        
+        if ($ageBasedProducts->hasProducts()) {
+            // Get random products for user's age range
+            $personalizedSuggestions = $ageBasedProducts->getProductsForAge($userAge, 6);
+        } else {
+            // Fallback to API if JSON file doesn't exist
+            $bolApi = new \App\Libraries\BolComAPI();
+            $personalizedResult = $bolApi->getPersonalizedSuggestions($userAge, $userGender, 6);
+            
+            if ($personalizedResult['success']) {
+                $personalizedSuggestions = $personalizedResult['products'] ?? [];
             }
         }
         
@@ -180,7 +197,9 @@ class Dashboard extends BaseController
         }
         
         $this->data['suggestedProducts'] = $suggestedProducts;
+        $this->data['personalizedSuggestions'] = $personalizedSuggestions;
         $this->data['userAge'] = $userAge;
+        $this->data['userGender'] = $userGender;
 
         if (strtolower($this->request->getMethod()) === 'post') {
             $title = $this->request->getPost('title');
@@ -238,17 +257,31 @@ class Dashboard extends BaseController
 
         $query = $this->request->getGet('q');
         $limit = (int)($this->request->getGet('limit') ?? 10);
-        $offset = (int)($this->request->getGet('offset') ?? 0);
+        $page = (int)($this->request->getGet('page') ?? 1);
+        $sort = $this->request->getGet('sort') ?? 'RELEVANCE';
+        $categoryId = $this->request->getGet('category_id');
+        $rangeRefinement = $this->request->getGet('range_refinement');
         
         // Validate and sanitize parameters
         $limit = max(1, min($limit, 50)); // Between 1 and 50
-        $offset = max(0, $offset);
+        $page = max(1, $page);
+        
+        // Validate sort parameter
+        $validSorts = ['RELEVANCE', 'PRICE_ASC', 'PRICE_DESC', 'POPULARITY', 'RATING_DESC'];
+        if (!in_array($sort, $validSorts)) {
+            $sort = 'RELEVANCE';
+        }
         
         $results = [];
         $total = 0;
+        $categories = [];
+        $priceRefinements = [];
 
         if ($query) {
             $bolApi = new BolComAPI();
+            
+            // Use basic search - simple and reliable
+            $offset = ($page - 1) * $limit;
             $response = $bolApi->searchProducts($query, $limit, $offset);
             
             if ($response['success']) {
@@ -262,7 +295,9 @@ class Dashboard extends BaseController
             'products' => $results,
             'total' => $total,
             'limit' => $limit,
-            'offset' => $offset,
+            'page' => $page,
+            'categories' => $categories,
+            'price_refinements' => $priceRefinements,
         ]);
     }
 
