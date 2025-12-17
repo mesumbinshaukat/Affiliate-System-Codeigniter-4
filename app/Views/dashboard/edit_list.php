@@ -1,6 +1,115 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<style>
+    .personalized-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 18px;
+    }
+
+    .personalized-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid #e6e9ef;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+        position: relative;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        min-height: 320px;
+        padding-bottom: 50px;
+    }
+
+    .personalized-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .personalized-card__media {
+        background: linear-gradient(135deg, #f5f8ff, #eef2ff);
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .personalized-card__media img {
+        max-height: 140px;
+        width: 100%;
+        object-fit: contain;
+    }
+
+    .personalized-card__body {
+        padding: 16px 18px 20px;
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 150px);
+    }
+
+    .personalized-card__title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #1e293b;
+        margin-bottom: 8px;
+        min-height: 48px;
+    }
+
+    .personalized-card__description {
+        font-size: 0.85rem;
+        color: #64748b;
+        flex-grow: 1;
+        margin-bottom: 12px;
+    }
+
+    .personalized-card__price {
+        font-weight: 700;
+        color: #0ea5e9;
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .personalized-card__actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .personalized-card__add {
+        border: none;
+        border-radius: 12px;
+        padding: 8px 14px;
+        background: #0ea5e9;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: background 0.2s ease;
+    }
+
+    .personalized-card__add:hover {
+        background: #0284c7;
+        color: #fff;
+    }
+
+    .personalized-card__pill {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #ecfeff;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
+    }
+
+    @media (max-width: 768px) {
+        .personalized-card {
+            min-height: auto;
+        }
+
+        .personalized-card__title {
+            min-height: auto;
+        }
+    }
+</style>
 
 <div class="container my-5">
     <h1 class="mb-4">Lijst Bewerken: <?= esc($list['title']) ?></h1>
@@ -168,22 +277,32 @@
                             </p>
                             
                             <?php if (!empty($personalizedSuggestions)): ?>
-                                <div class="row">
-                                    <?php foreach (array_slice($personalizedSuggestions, 0, 6) as $product): ?>
-                                        <div class="col-md-6 mb-3">
-                                            <div class="card border-success h-100">
-                                                <div class="card-body d-flex flex-column">
-                                                    <?php if (!empty($product['image'])): ?>
-                                                        <img src="<?= esc($product['image']) ?>" class="card-img-top mb-2" alt="<?= esc($product['title']) ?>" style="max-height: 150px; object-fit: cover;">
-                                                    <?php endif; ?>
-                                                    <h6 class="card-title"><?= esc(character_limiter($product['title'], 50)) ?></h6>
-                                                    <p class="card-text small text-muted flex-grow-1"><?= esc(character_limiter($product['description'] ?? '', 80)) ?></p>
-                                                    <?php if (!empty($product['price'])): ?>
-                                                        <p class="text-success mb-2"><strong>€<?= number_format($product['price'], 2) ?></strong></p>
-                                                    <?php endif; ?>
-                                                    <button class="btn btn-sm btn-success" onclick="addSingleProduct(<?= htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8') ?>)">
+                                <div class="personalized-grid">
+                                    <?php foreach (array_slice($personalizedSuggestions, 0, 8) as $product): ?>
+                                        <div class="personalized-card">
+                                            <div class="personalized-card__media">
+                                                <?php if (!empty($product['image'])): ?>
+                                                    <img src="<?= esc($product['image']) ?>" alt="<?= esc($product['title']) ?>">
+                                                <?php else: ?>
+                                                    <div class="text-muted small">Geen afbeelding</div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="personalized-card__body">
+                                                <span class="personalized-card__pill">
+                                                    <?= esc($product['category'] ?? 'Trending selectie') ?>
+                                                </span>
+                                                <h6 class="personalized-card__title mt-2"><?= esc(character_limiter($product['title'], 60)) ?></h6>
+                                                <p class="personalized-card__description"><?= esc(character_limiter($product['description'] ?? 'Aanbevolen voor jouw leeftijdsgroep.', 95)) ?></p>
+                                                <?php if (!empty($product['price'])): ?>
+                                                    <div class="personalized-card__price">€<?= number_format($product['price'], 2) ?></div>
+                                                <?php endif; ?>
+                                                <div class="personalized-card__actions">
+                                                    <button class="personalized-card__add" onclick="addSingleProduct(<?= htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8') ?>)">
                                                         <i class="fas fa-plus"></i> Toevoegen
                                                     </button>
+                                                    <a href="<?= esc($product['url'] ?? '#') ?>" target="_blank" rel="noopener" class="text-muted small">
+                                                        Bekijk
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -455,8 +574,11 @@ function renderSearchResults(products) {
                         </div>
                     </div>
                     <div class="col-md-2 text-end">
-                        <button class="btn btn-sm btn-outline-primary" onclick='addSingleProduct(${JSON.stringify(product)})' title="Add this product">
-                            <i class="fas fa-plus"></i> Add Now
+                        <button class="btn btn-sm btn-outline-primary"
+                                data-product="${encodeURIComponent(JSON.stringify(product))}"
+                                onclick="addSingleProductFromButton(this)"
+                                title="Add this product">
+                            <i class="fas fa-plus"></i> Voeg nu toe
                         </button>
                     </div>
                 </div>
@@ -635,12 +757,31 @@ function addSelectedProducts() {
     addNext(0);
 }
 
+// Handle add button clicks safely
+function addSingleProductFromButton(button) {
+    const encoded = button.getAttribute('data-product');
+    if (!encoded) {
+        showToast('Productgegevens ontbreken', 'error');
+        return;
+    }
+
+    try {
+        const product = JSON.parse(decodeURIComponent(encoded));
+        addSingleProduct(product, button);
+    } catch (e) {
+        console.error('Unable to parse product data', e);
+        showToast('Ongeldige productgegevens', 'error');
+    }
+}
+
 // Add single product immediately
-function addSingleProduct(product) {
-    const btn = event.target.closest('button');
-    const originalHtml = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+function addSingleProduct(product, triggerBtn = null) {
+    const btn = triggerBtn || (event?.target ? event.target.closest('button') : null);
+    const originalHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    }
     
     // Normalize product data - handle both age-based and search result formats
     const normalizedProduct = {
@@ -683,30 +824,38 @@ function addSingleProduct(product) {
         try {
             const data = JSON.parse(text);
             if (data.success) {
-                btn.innerHTML = '<i class="fas fa-check"></i> Toegevoegd';
-                btn.classList.remove('btn-success', 'btn-outline-primary');
-                btn.classList.add('btn-success');
-                btn.disabled = true;
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Toegevoegd';
+                    btn.classList.remove('btn-success', 'btn-outline-primary');
+                    btn.classList.add('btn-success');
+                    btn.disabled = true;
+                }
                 showToast(`"${product.title}" toegevoegd!`, 'success');
                 // Refresh product list without page reload
                 refreshProductList();
             } else {
                 showToast('Fout: ' + data.message, 'error');
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
             }
         } catch (e) {
             console.error('Invalid JSON response:', text);
             showToast('Fout bij toevoegen product', 'error');
-            btn.disabled = false;
-            btn.innerHTML = originalHtml;
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
         }
     })
     .catch(error => {
         console.error('Error:', error);
         showToast('Fout bij toevoegen product', 'error');
-        btn.disabled = false;
-        btn.innerHTML = originalHtml;
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
     });
 }
 

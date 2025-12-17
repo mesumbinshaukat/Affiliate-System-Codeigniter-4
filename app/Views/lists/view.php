@@ -1,5 +1,131 @@
 <?= $this->extend('layouts/main') ?>
 
+<?= $this->section('styles') ?>
+<style>
+    .list-hero {
+        background: linear-gradient(135deg, #fdf2f8, #e0f2fe);
+        border-radius: 24px;
+        padding: 32px;
+        border: 1px solid #f0f4ff;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    .list-product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 24px;
+    }
+
+    .list-product-card {
+        border: none;
+        border-radius: 22px;
+        box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+        overflow: hidden;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 380px;
+        position: relative;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .list-product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 26px 45px rgba(15, 23, 42, 0.18);
+    }
+
+    .list-product-card__media {
+        background: linear-gradient(135deg, #eff6ff, #eef2ff);
+        min-height: 190px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+    }
+
+    .list-product-card__media img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 14px;
+    }
+
+    .list-product-card__body {
+        padding: 20px 22px 24px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .list-product-card__pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        border-radius: 999px;
+        background: #ecfeff;
+        color: #0369a1;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .list-product-card__title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-top: 14px;
+        margin-bottom: 10px;
+        min-height: 48px;
+    }
+
+    .list-product-card__desc {
+        font-size: 0.9rem;
+        color: #475569;
+        flex: 1;
+    }
+
+    .list-product-card__price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0ea5e9;
+        margin: 14px 0;
+    }
+
+    .list-product-card__note {
+        background: #fef9c3;
+        border: 1px dashed #fbbf24;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        color: #92400e;
+        margin-bottom: 12px;
+    }
+
+    .list-product-card__actions .btn {
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .list-product-card__actions .btn-primary {
+        background: linear-gradient(135deg, #2563eb, #0ea5e9);
+        border: none;
+    }
+
+    .list-product-card__actions .btn-outline-secondary {
+        border-color: #d0d7eb;
+        color: #475569;
+    }
+
+    @media (max-width: 767px) {
+        .list-hero {
+            padding: 24px;
+        }
+    }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 
 <div class="container my-5">
@@ -63,69 +189,57 @@
     <div class="mb-5">
         <h3 class="mb-4"><i class="fas fa-gift"></i> Producten in deze lijst</h3>
         
-        <div class="row">
+        <div class="list-product-grid">
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
-                    <div class="col-md-4 mb-4">
-                        <div class="card product-card h-100 shadow-sm">
-                            <!-- Product Image -->
-                            <div class="position-relative overflow-hidden" style="height: 220px;">
-                                <?php if ($product['image_url']): ?>
-                                    <img src="<?= esc($product['image_url']) ?>" 
-                                         class="card-img-top w-100 h-100" 
-                                         style="object-fit: cover;" 
-                                         alt="<?= esc($product['title']) ?>">
-                                <?php else: ?>
-                                    <div class="bg-light d-flex align-items-center justify-content-center h-100">
-                                        <i class="fas fa-image fa-3x text-muted"></i>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <div class="card-body d-flex flex-column">
-                                <!-- Product Title -->
-                                <h5 class="card-title text-truncate" title="<?= esc($product['title']) ?>">
-                                    <?= esc(character_limiter($product['title'], 50)) ?>
-                                </h5>
-                                
-                                <!-- Product Description -->
-                                <p class="card-text text-muted small flex-grow-1">
-                                    <?= esc(character_limiter($product['description'], 80)) ?>
-                                </p>
-                                
-                                <!-- Price -->
-                                <?php if ($product['price']): ?>
-                                    <div class="mb-3">
-                                        <span class="h5 text-primary fw-bold">€<?= number_format($product['price'], 2) ?></span>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <!-- Custom Note -->
-                                <?php if ($product['custom_note']): ?>
-                                    <div class="alert alert-info alert-sm mb-3" style="font-size: 0.85rem;">
-                                        <i class="fas fa-sticky-note"></i> <?= esc($product['custom_note']) ?>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <!-- Store Source -->
-                                <small class="text-muted d-block mb-3">
-                                    <i class="fas fa-store"></i> <?= esc($product['source']) ?>
-                                </small>
-                                
-                                <!-- Action Buttons -->
-                                <div class="d-grid gap-2">
-                                    <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>" 
-                                       class="btn btn-primary btn-sm" 
-                                       target="_blank"
-                                       title="Bekijk product in winkel">
-                                        <i class="fas fa-external-link-alt"></i> Product Bekijken
-                                    </a>
-                                    <button class="btn btn-outline-secondary btn-sm" 
-                                            onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>')"
-                                            title="Kopieer affiliate link om te delen">
-                                        <i class="fas fa-share-alt"></i> Link Delen
-                                    </button>
+                    <div class="list-product-card">
+                        <div class="list-product-card__media">
+                            <?php if ($product['image_url']): ?>
+                                <img src="<?= esc($product['image_url']) ?>" alt="<?= esc($product['title']) ?>">
+                            <?php else: ?>
+                                <div class="text-muted text-center">
+                                    <i class="fas fa-image fa-2x"></i>
+                                    <p class="small mt-2 mb-0">Geen afbeelding</p>
                                 </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="list-product-card__body">
+                            <span class="list-product-card__pill">
+                                <i class="fas fa-heart text-danger"></i>
+                                Favoriet
+                            </span>
+                            <h5 class="list-product-card__title">
+                                <?= esc(character_limiter($product['title'], 60)) ?>
+                            </h5>
+                            <p class="list-product-card__desc">
+                                <?= esc(character_limiter($product['description'], 90)) ?>
+                            </p>
+                            <?php if ($product['price']): ?>
+                                <div class="list-product-card__price">
+                                    €<?= number_format($product['price'], 2) ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($product['custom_note']): ?>
+                                <div class="list-product-card__note">
+                                    <i class="fas fa-sticky-note me-1"></i>
+                                    <?= esc($product['custom_note']) ?>
+                                </div>
+                            <?php endif; ?>
+                            <small class="text-muted mb-3 d-block">
+                                <i class="fas fa-store me-1"></i> <?= esc($product['source']) ?>
+                            </small>
+                            <div class="list-product-card__actions d-grid gap-2">
+                                <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>" 
+                                   class="btn btn-primary btn-sm" 
+                                   target="_blank"
+                                   title="Bekijk product in winkel">
+                                    <i class="fas fa-external-link-alt"></i> Product Bekijken
+                                </a>
+                                <button class="btn btn-outline-secondary btn-sm"
+                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>')"
+                                        title="Kopieer affiliate link om te delen">
+                                    <i class="fas fa-share-alt"></i> Link Delen
+                                </button>
                             </div>
                         </div>
                     </div>
