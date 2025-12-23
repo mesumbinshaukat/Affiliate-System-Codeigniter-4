@@ -9,6 +9,7 @@ use App\Models\ListProductModel;
 use App\Models\ClickModel;
 use App\Models\SalesModel;
 use App\Libraries\BolComAPI;
+use Config\Services;
 
 class Dashboard extends BaseController
 {
@@ -404,6 +405,130 @@ class Dashboard extends BaseController
             'success' => false,
             'message' => 'Invalid request method',
         ]);
+    }
+
+    public function scrapeProduct()
+    {
+        $redirect = $this->requireLogin();
+        if ($redirect) return $redirect;
+
+        $url = trim($this->request->getPost('url') ?? '');
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Voer een geldige product-URL in',
+            ])->setStatusCode(400);
+        }
+
+        $apiBase = rtrim(getenv('SCRAPER_API_BASE') ?: '', '/');
+        $apiKey = getenv('SCRAPER_API_KEY') ?: '';
+
+        if (empty($apiBase) || empty($apiKey)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Scraper configuratie ontbreekt. Neem contact op met de beheerder.',
+            ])->setStatusCode(500);
+        }
+
+        $client = Services::curlrequest([
+            'timeout' => 20,
+            'http_errors' => false,
+        ]);
+
+        $endpoint = $apiBase . '/scrape?url=' . urlencode($url);
+        $maxAttempts = 3;
+        $lastErrorMessage = 'Scrapen mislukt. Controleer de URL en probeer opnieuw.';
+        $lastStatusCode = 500;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                $response = $client->get($endpoint, [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $apiKey,
+                        'Accept' => 'application/json',
+                    ],
+                ]);
+
+                $status = $response->getStatusCode();
+                $body = json_decode($response->getBody(), true);
+
+                if ($status === 200 && !empty($body) && !empty($body['data'])) {
+                    $scrapedData = $body['data'];
+                    $product = $this->normalizeScrapedProduct($url, $scrapedData);
+
+                    if (empty($product['title'])) {
+                        $lastErrorMessage = 'Kon geen productgegevens extraheren. Controleer of de pagina openbaar toegankelijk is.';
+                        $lastStatusCode = 422;
+                    } else {
+                        return $this->response->setJSON([
+                            'success' => true,
+                            'product' => $product,
+                        ]);
+                    }
+                } else {
+                    $lastErrorMessage = $body['error']['message'] ?? 'Scraper gaf een lege reactie terug.';
+                    $lastStatusCode = $status >= 400 ? $status : 500;
+                }
+            } catch (\Throwable $e) {
+                log_message('warning', 'Scrape attempt ' . $attempt . ' failed: ' . $e->getMessage());
+                $lastErrorMessage = 'Onverwachte fout tijdens het scrapen.';
+                $lastStatusCode = 500;
+            }
+
+            if ($attempt < $maxAttempts) {
+                usleep($attempt * 300000); // incremental backoff (0.3s, 0.6s, ...)
+            }
+        }
+
+        log_message('error', 'ScrapeProduct exhausted retries for URL: ' . $url . '. Last error: ' . $lastErrorMessage);
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => $lastErrorMessage,
+        ])->setStatusCode($lastStatusCode);
+    }
+
+    private function normalizeScrapedProduct(string $url, array $data): array
+    {
+        $title = trim($data['title'] ?? $data['meta']['title'] ?? '');
+        $description = trim($data['description'] ?? substr($data['mainContent'] ?? '', 0, 240));
+        $image = $data['image'] ?? ($data['images'][0] ?? '');
+
+        $price = $data['price'] ?? null;
+        if (!$price && !empty($data['mainContent'])) {
+            $price = $this->extractPriceFromText($data['mainContent']);
+        }
+        if (!$price && !empty($description)) {
+            $price = $this->extractPriceFromText($description);
+        }
+        $priceValue = $price ? $this->normalizePrice($price) : 0;
+
+        return [
+            'external_id' => 'scrape_' . md5($url),
+            'title' => $title,
+            'description' => $description,
+            'image_url' => $image,
+            'price' => $priceValue,
+            'affiliate_url' => $url,
+            'source' => parse_url($url, PHP_URL_HOST) ?? 'scraper',
+            'ean' => '',
+            'rating' => null,
+        ];
+    }
+
+    private function extractPriceFromText(string $text): ?string
+    {
+        if (preg_match('/(?:€|\$)?\s?(\d{1,4}(?:[\.,]\d{2})?)/u', $text, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
+
+    private function normalizePrice(string $price): float
+    {
+        $normalized = str_replace(['€', '$', ' '], '', $price);
+        $normalized = str_replace(',', '.', $normalized);
+        return (float) $normalized;
     }
 
     public function getListProducts($listId)

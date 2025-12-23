@@ -1,0 +1,5 @@
+*.php
+*.md
+*.txt
+!./Feature
+!./Unit

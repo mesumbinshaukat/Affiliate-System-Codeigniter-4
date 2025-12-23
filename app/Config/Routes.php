@@ -67,6 +67,7 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     $routes->post('product/add', 'Dashboard::addProduct');
     $routes->post('product/remove', 'Dashboard::removeProduct');
     $routes->post('product/positions', 'Dashboard::updateProductPositions');
+    $routes->post('product/scrape', 'Dashboard::scrapeProduct');
     
     // Analytics
     $routes->get('analytics', 'Dashboard::analytics');

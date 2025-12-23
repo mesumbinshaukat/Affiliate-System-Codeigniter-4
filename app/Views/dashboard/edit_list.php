@@ -203,6 +203,23 @@
                                 </div>
                             </div>
                             
+                            <!-- Manual Scrape Toggle -->
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="scrapeToggle" onchange="toggleScrapeMode(this.checked)">
+                                <label class="form-check-label" for="scrapeToggle">
+                                    Product handmatig toevoegen via URL
+                                </label>
+                            </div>
+                            
+                            <div class="input-group mb-3 d-none" id="scrapeUrlGroup">
+                                <input type="url" class="form-control" id="scrapeUrl" placeholder="Plak hier de volledige product-URL (bijv. https://winkel.nl/product)">
+                                <button class="btn btn-outline-secondary" type="button" onclick="scrapeProductViaUrl()" id="scrapeBtn">
+                                    <i class="fas fa-magic"></i> Product scrapen
+                                </button>
+                            </div>
+                            
+                            <div id="scrapeResult" class="mb-3"></div>
+                            
                             <!-- Filters Section (Hidden by default, shown after search) -->
                             <div class="card card-light mb-3 d-none" id="filtersContainer">
                                 <div class="card-body">
@@ -397,6 +414,8 @@ let totalResults = 0;
 const resultsPerPage = 10;
 let priceRefinementId = null;
 let allFetchedProducts = []; // Store all fetched products for client-side filtering
+let manualScrapeMode = false;
+let scrapedProductData = null;
 
 // Apply filters to already-fetched products
 function applyFilters() {
@@ -466,10 +485,15 @@ function renderFilteredProducts() {
         `;
         document.getElementById('paginationContainer').classList.add('d-none');
     }
+    renderPagination();
 }
 
 // Search products with pagination and filters
 function searchProducts(page = 1) {
+    if (manualScrapeMode) {
+        showToast('Schakel de URL-modus uit om weer te zoeken in Bol.com.', 'warning');
+        return;
+    }
     const query = document.getElementById('productSearch').value.trim();
     if (!query) {
         showToast('Voer een zoekterm in', 'warning');
@@ -622,6 +646,118 @@ function renderSearchResults(products) {
     document.getElementById('searchResults').innerHTML = selectAllHtml + html;
 }
 
+// Toggle manual scrape mode
+function toggleScrapeMode(isEnabled) {
+    manualScrapeMode = isEnabled;
+    const group = document.getElementById('scrapeUrlGroup');
+    group.classList.toggle('d-none', !isEnabled);
+    const searchInput = document.getElementById('productSearch');
+    const searchBtn = document.getElementById('searchBtn');
+    searchInput.disabled = isEnabled;
+    searchBtn.disabled = isEnabled;
+    scrapedProductData = null;
+    document.getElementById('scrapeResult').innerHTML = '';
+    if (!isEnabled) {
+        document.getElementById('scrapeUrl').value = '';
+    } else {
+        showToast('URL-modus ingeschakeld. Plak een productlink om te scrapen.', 'info');
+    }
+}
+
+function scrapeProductViaUrl() {
+    if (!manualScrapeMode) {
+        showToast('Schakel de URL-modus in om een product te scrapen.', 'warning');
+        return;
+    }
+    const urlInput = document.getElementById('scrapeUrl');
+    const productUrl = urlInput.value.trim();
+    if (!productUrl) {
+        showToast('Voer eerst een geldige product-URL in.', 'warning');
+        return;
+    }
+    const scrapeBtn = document.getElementById('scrapeBtn');
+    scrapeBtn.disabled = true;
+    const originalHtml = scrapeBtn.innerHTML;
+    scrapeBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Scrapen...';
+    document.getElementById('scrapeResult').innerHTML = `
+        <div class="alert alert-info">
+            <i class="fas fa-circle-notch fa-spin"></i> Productpagina uitlezen...
+        </div>
+    `;
+
+    fetch('<?= base_url('index.php/dashboard/product/scrape') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ url: productUrl })
+    })
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+    .then(({ status, body }) => {
+        scrapeBtn.disabled = false;
+        scrapeBtn.innerHTML = originalHtml;
+
+        if (!body.success) {
+            document.getElementById('scrapeResult').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-triangle-exclamation"></i> ${escapeHtml(body.message || 'Scrapen mislukt.')}
+                </div>
+            `;
+            scrapedProductData = null;
+            return;
+        }
+
+        scrapedProductData = body.product;
+        renderScrapeResult(body.product);
+    })
+    .catch(error => {
+        console.error(error);
+        scrapeBtn.disabled = false;
+        scrapeBtn.innerHTML = originalHtml;
+        document.getElementById('scrapeResult').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-triangle-exclamation"></i> Onverwachte fout bij het scrapen. Probeer het opnieuw.
+            </div>
+        `;
+        scrapedProductData = null;
+    });
+}
+
+function renderScrapeResult(product) {
+    const description = product.description ? escapeHtml(product.description) : 'Geen beschrijving beschikbaar.';
+    document.getElementById('scrapeResult').innerHTML = `
+        <div class="search-result-item border border-success">
+            <div class="search-result-item__image">
+                ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.title)}">`
+                : '<div class="text-muted text-center w-100"><i class="fas fa-image fa-2x"></i><p class="small mb-0 mt-2">Geen afbeelding</p></div>'}
+            </div>
+            <div class="search-result-item__body">
+                <div class="search-result-item__title">${escapeHtml(product.title)}</div>
+                <p class="search-result-item__description">${description}</p>
+                <div class="search-result-item__meta">
+                    ${product.price ? `<span class="badge bg-primary-subtle text-primary fw-semibold">€${parseFloat(product.price).toFixed(2)}</span>` : ''}
+                    <span class="badge bg-light text-muted"><i class="fas fa-globe"></i> ${escapeHtml(product.source || 'Extern')}</span>
+                </div>
+            </div>
+            <div class="search-result-item__actions">
+                <button class="btn btn-primary btn-sm" onclick="addScrapedProduct(this)">
+                    <i class="fas fa-plus"></i> Toevoegen
+                </button>
+                <a href="${escapeHtml(product.affiliate_url)}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                    Bekijk bron
+                </a>
+            </div>
+        </div>
+    `;
+}
+
+function addScrapedProduct(button) {
+    if (!scrapedProductData) {
+        showToast('Er is geen gescrapet product om toe te voegen.', 'warning');
+        return;
+    }
+    addSingleProduct(scrapedProductData, button);
+}
 // Toggle product selection
 function toggleProductSelection(productId, isSelected) {
     if (isSelected) {
@@ -809,7 +945,7 @@ function addSingleProduct(product, triggerBtn = null) {
         image_url: product.image_url || product.image || '',
         price: product.price || 0,
         affiliate_url: product.affiliate_url || product.url || '',
-        source: product.source || 'bol.com',
+        source: product.source || (product.affiliate_url ? new URL(product.affiliate_url).hostname : 'extern'),
         ean: product.ean || '',
     };
     
