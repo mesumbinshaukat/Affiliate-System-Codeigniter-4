@@ -3,11 +3,12 @@
 namespace App\Controllers;
 
 use App\Models\ListModel;
-use App\Models\CategoryModel;
-use App\Models\ProductModel;
 use App\Models\ListProductModel;
+use App\Models\ProductModel;
+use App\Models\CategoryModel;
 use App\Models\ClickModel;
 use App\Models\SalesModel;
+use App\Libraries\ProductScraper;
 use App\Libraries\BolComAPI;
 use Config\Services;
 
@@ -420,6 +421,24 @@ class Dashboard extends BaseController
             ])->setStatusCode(400);
         }
 
+        $host = strtolower(parse_url($url, PHP_URL_HOST) ?? '');
+        if (str_contains($host, 'bol.com')) {
+            $bolResult = $this->handleBolProductScrape($url);
+
+            if ($bolResult['success']) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'product' => $bolResult['product'],
+                    'source' => 'bol_api',
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $bolResult['message'] ?? 'Bol.com product kon niet worden opgehaald.',
+            ])->setStatusCode($bolResult['status'] ?? 422);
+        }
+
         $apiBase = rtrim(getenv('SCRAPER_API_BASE') ?: '', '/');
         $apiKey = getenv('SCRAPER_API_KEY') ?: '';
 
@@ -431,12 +450,13 @@ class Dashboard extends BaseController
         }
 
         $client = Services::curlrequest([
-            'timeout' => 20,
+            'timeout' => 15,
+            'connect_timeout' => 8,
             'http_errors' => false,
         ]);
 
         $endpoint = $apiBase . '/scrape?url=' . urlencode($url);
-        $maxAttempts = 3;
+        $maxAttempts = 2;
         $lastErrorMessage = 'Scrapen mislukt. Controleer de URL en probeer opnieuw.';
         $lastStatusCode = 500;
 
@@ -463,6 +483,7 @@ class Dashboard extends BaseController
                         return $this->response->setJSON([
                             'success' => true,
                             'product' => $product,
+                            'source' => 'scraper_hub',
                         ]);
                     }
                 } else {
@@ -480,20 +501,52 @@ class Dashboard extends BaseController
             }
         }
 
-        log_message('error', 'ScrapeProduct exhausted retries for URL: ' . $url . '. Last error: ' . $lastErrorMessage);
+        // Primary scraper failed: attempt local fallback
+        $fallbackScraper = new ProductScraper();
+        $fallbackResult = $fallbackScraper->scrapeFallback($url);
+
+        if ($fallbackResult['success']) {
+            $fallbackData = [
+                'title' => $fallbackResult['data']['title'] ?? '',
+                'description' => $fallbackResult['data']['description'] ?? '',
+                'image' => $fallbackResult['data']['image'] ?? '',
+                'price' => $fallbackResult['data']['price'] ?? 0,
+            ];
+
+            $product = $this->normalizeScrapedProduct($url, $fallbackData);
+
+            if (!empty($product['title'])) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'product' => $product,
+                    'source' => 'fallback',
+                ]);
+            }
+        }
+
+        $fallbackReason = $fallbackResult['reason'] ?? 'Onbekende fout bij fallback scraper.';
+
+        log_message(
+            'error',
+            sprintf(
+                'ScrapeProduct failed for URL: %s. Primary error: %s. Fallback error: %s',
+                $url,
+                $lastErrorMessage,
+                $fallbackReason
+            )
+        );
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => $lastErrorMessage,
-        ])->setStatusCode($lastStatusCode);
+            'message' => 'Scrapen mislukt. Externe scraper: ' . $lastErrorMessage . ' | Fallback: ' . $fallbackReason,
+        ])->setStatusCode($fallbackResult['success'] ? 500 : $lastStatusCode);
     }
 
     private function normalizeScrapedProduct(string $url, array $data): array
     {
         $title = trim($data['title'] ?? $data['meta']['title'] ?? '');
         $description = trim($data['description'] ?? substr($data['mainContent'] ?? '', 0, 240));
-        $image = $data['image'] ?? ($data['images'][0] ?? '');
-
+        $image = $this->extractImageUrl($data);
         $price = $data['price'] ?? null;
         if (!$price && !empty($data['mainContent'])) {
             $price = $this->extractPriceFromText($data['mainContent']);
@@ -529,6 +582,107 @@ class Dashboard extends BaseController
         $normalized = str_replace(['€', '$', ' '], '', $price);
         $normalized = str_replace(',', '.', $normalized);
         return (float) $normalized;
+    }
+
+    private function extractImageUrl(array $data): string
+    {
+        $candidates = [];
+
+        if (isset($data['image'])) {
+            $candidates[] = $data['image'];
+        }
+        if (isset($data['images'])) {
+            $candidates[] = $data['images'];
+        }
+        if (isset($data['media']['images'])) {
+            $candidates[] = $data['media']['images'];
+        }
+
+        foreach ($candidates as $candidate) {
+            $url = $this->normalizeImageCandidate($candidate);
+            if (!empty($url)) {
+                return $url;
+            }
+        }
+
+        return '';
+    }
+
+    private function normalizeImageCandidate($candidate): string
+    {
+        if (is_string($candidate)) {
+            return trim($candidate);
+        }
+
+        if (is_object($candidate)) {
+            $candidate = (array) $candidate;
+        }
+
+        if (is_array($candidate)) {
+            if (isset($candidate['url'])) {
+                return trim($candidate['url']);
+            }
+            if (isset($candidate['src'])) {
+                return trim($candidate['src']);
+            }
+            if (isset($candidate[0])) {
+                return $this->normalizeImageCandidate($candidate[0]);
+            }
+        }
+
+        return '';
+    }
+
+    private function handleBolProductScrape(string $url): array
+    {
+        $bolApi = new BolComAPI();
+
+        $bolId = $this->extractBolProductId($url);
+        if ($bolId) {
+            $product = $bolApi->getProduct($bolId);
+            if ($product) {
+                return ['success' => true, 'product' => $product];
+            }
+        }
+
+        $searchTerm = $this->extractBolSearchTerm($url);
+        if ($searchTerm) {
+            $response = $bolApi->searchProducts($searchTerm, 1, 0);
+            if (!empty($response['products'][0])) {
+                return ['success' => true, 'product' => $response['products'][0]];
+            }
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Bol.com product werd niet gevonden. Controleer de link of probeer een andere.',
+            'status' => 404,
+        ];
+    }
+
+    private function extractBolProductId(string $url): ?string
+    {
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+        if (preg_match('/(\d{9,})/', $path, $matches)) {
+            return $matches[1];
+        }
+
+        parse_str(parse_url($url, PHP_URL_QUERY) ?? '', $query);
+        if (!empty($query['productId']) && preg_match('/^\d{9,}$/', $query['productId'])) {
+            return $query['productId'];
+        }
+
+        return null;
+    }
+
+    private function extractBolSearchTerm(string $url): ?string
+    {
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+        if (preg_match('#/p/([^/]+)/#', $path, $matches)) {
+            return str_replace(['-', '_'], ' ', urldecode($matches[1]));
+        }
+
+        return null;
     }
 
     public function getListProducts($listId)
