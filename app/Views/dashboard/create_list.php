@@ -32,6 +32,16 @@
                             <textarea class="form-control" id="description" name="description" rows="4"><?= old('description') ?></textarea>
                         </div>
 
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_crossable" name="is_crossable" value="1" <?= old('is_crossable', '1') == '1' ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="is_crossable">
+                                    <strong>Sta toe dat items als gekocht gemarkeerd worden</strong>
+                                    <small class="d-block text-muted">Bezoekers kunnen items afvinken nadat ze deze hebben gekocht (handig voor verlanglijstjes)</small>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Lijst Maken</button>
                             <a href="<?= base_url('index.php/dashboard/lists') ?>" class="btn btn-secondary">Annuleren</a>

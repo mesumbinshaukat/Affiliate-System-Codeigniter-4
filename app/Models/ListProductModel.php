@@ -12,7 +12,7 @@ class ListProductModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
-    protected $allowedFields = ['list_id', 'product_id', 'position', 'custom_note'];
+    protected $allowedFields = ['list_id', 'product_id', 'position', 'custom_note', 'claimed_at', 'claimed_by_subid'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -34,7 +34,7 @@ class ListProductModel extends Model
 
     public function getListProducts($listId)
     {
-        return $this->select('list_products.*, products.*')
+        return $this->select('list_products.id as list_product_id, list_products.*, products.*')
             ->join('products', 'products.id = list_products.product_id')
             ->where('list_products.list_id', $listId)
             ->orderBy('list_products.position', 'ASC')
@@ -68,5 +68,26 @@ class ListProductModel extends Model
                 ->update();
         }
         return true;
+    }
+
+    public function claimProduct($listProductId, $subId = null)
+    {
+        return $this->update($listProductId, [
+            'claimed_at' => date('Y-m-d H:i:s'),
+            'claimed_by_subid' => $subId,
+        ]);
+    }
+
+    public function unclaimProduct($listProductId)
+    {
+        return $this->update($listProductId, [
+            'claimed_at' => null,
+            'claimed_by_subid' => null,
+        ]);
+    }
+
+    public function findBySubId($subId)
+    {
+        return $this->where('claimed_by_subid', $subId)->first();
     }
 }

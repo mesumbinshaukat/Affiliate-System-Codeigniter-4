@@ -80,6 +80,7 @@ class Dashboard extends BaseController
                 'slug' => $slug,
                 'description' => $this->request->getPost('description'),
                 'status' => 'published',
+                'is_crossable' => $this->request->getPost('is_crossable') ? 1 : 0,
             ];
 
             if ($listModel->insert($data)) {
@@ -220,6 +221,7 @@ class Dashboard extends BaseController
                 'title' => $title,
                 'slug' => $slug,
                 'description' => $this->request->getPost('description'),
+                'is_crossable' => $this->request->getPost('is_crossable') ? 1 : 0,
             ];
 
             if ($listModel->update($listId, $data)) {

@@ -175,6 +175,50 @@
         color: #475569;
     }
 
+    .list-product-card--claimed {
+        opacity: 0.6;
+        position: relative;
+    }
+
+    .list-product-card--claimed::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(148, 163, 184, 0.1) 10px,
+            rgba(148, 163, 184, 0.1) 20px
+        );
+        pointer-events: none;
+        border-radius: 22px;
+    }
+
+    .claimed-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        z-index: 10;
+    }
+
+    .list-product-card__title--claimed {
+        text-decoration: line-through;
+        color: #94a3b8;
+    }
+
     @media (max-width: 767px) {
         .list-hero {
             padding: 24px;
@@ -280,7 +324,13 @@
         <div class="list-product-grid" id="productsContainer">
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
-                    <div class="list-product-card">
+                    <?php $isClaimed = !empty($product['claimed_at']); ?>
+                    <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>" data-list-product-id="<?= $product['list_product_id'] ?>">
+                        <?php if ($isClaimed): ?>
+                            <span class="claimed-badge">
+                                <i class="fas fa-check-circle"></i> Gekocht
+                            </span>
+                        <?php endif; ?>
                         <div class="list-product-card__media">
                             <?php if ($product['image_url']): ?>
                                 <img src="<?= esc($product['image_url']) ?>" alt="<?= esc($product['title']) ?>">
@@ -296,7 +346,7 @@
                                 <i class="fas fa-heart text-danger"></i>
                                 Favoriet
                             </span>
-                            <h5 class="list-product-card__title">
+                            <h5 class="list-product-card__title <?= $isClaimed ? 'list-product-card__title--claimed' : '' ?>">
                                 <?= esc(character_limiter($product['title'], 60)) ?>
                             </h5>
                             <p class="list-product-card__desc">
@@ -317,14 +367,27 @@
                                 <i class="fas fa-store me-1"></i> <?= esc($product['source']) ?>
                             </small>
                             <div class="list-product-card__actions d-grid gap-2">
-                                <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>" 
+                                <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
                                    class="btn btn-primary btn-sm" 
                                    target="_blank"
                                    title="Bekijk product in winkel">
                                     <i class="fas fa-external-link-alt"></i> Product Bekijken
                                 </a>
+                                <?php if (!empty($list['is_crossable'])): ?>
+                                    <?php if ($isClaimed): ?>
+                                        <button class="btn btn-outline-success btn-sm" disabled>
+                                            <i class="fas fa-check-circle"></i> Al Gekocht
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-warning btn-sm"
+                                                onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                title="Markeer als gekocht">
+                                            <i class="fas fa-shopping-cart"></i> Ik Kocht Dit
+                                        </button>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                                 <button class="btn btn-outline-secondary btn-sm"
-                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id']) ?>')"
+                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
                                         title="Kopieer affiliate link om te delen">
                                     <i class="fas fa-share-alt"></i> Link Delen
                                 </button>
@@ -401,5 +464,45 @@ document.addEventListener('DOMContentLoaded', function() {
         switchView('list');
     }
 });
+
+function markAsPurchased(listProductId, listId) {
+    if (!confirm('Weet je zeker dat je dit item als gekocht wilt markeren? Dit laat anderen weten dat dit cadeau al is gekocht.')) {
+        return;
+    }
+
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Markeren...';
+
+    fetch('<?= base_url('index.php/list/claim') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            list_product_id: listProductId,
+            list_id: listId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload page to show updated state
+            location.reload();
+        } else {
+            alert(data.message || 'Er is een fout opgetreden. Probeer het opnieuw.');
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Er is een fout opgetreden. Probeer het opnieuw.');
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    });
+}
 </script>
 <?= $this->endSection() ?>

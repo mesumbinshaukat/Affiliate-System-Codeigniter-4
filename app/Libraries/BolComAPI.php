@@ -734,6 +734,27 @@ class BolComAPI
     }
 
     /**
+     * Get order reports as array of orders (wrapper for getOrderReport)
+     * 
+     * @param string $startDate Start date (YYYY-MM-DD)
+     * @param string $endDate End date (YYYY-MM-DD)
+     * @return array Array of orders
+     */
+    public function getOrderReports($startDate, $endDate)
+    {
+        $result = $this->getOrderReport($startDate, $endDate);
+        
+        if (!$result['success']) {
+            return [];
+        }
+
+        // Extract orders from the report data
+        $orders = $result['data']['orders'] ?? $result['data']['orderLines'] ?? [];
+        
+        return is_array($orders) ? $orders : [];
+    }
+
+    /**
      * Get commission report from Bol.com Affiliate Reporting API v2
      * 
      * @param string $startDate Start date (YYYY-MM-DD)
