@@ -10,10 +10,67 @@
         box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
     }
 
+    .view-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .view-toggle .btn {
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-weight: 600;
+        border: 2px solid #e2e8f0;
+        background: #fff;
+        color: #64748b;
+        transition: all 0.2s ease;
+    }
+
+    .view-toggle .btn.active {
+        background: linear-gradient(135deg, #2563eb, #0ea5e9);
+        border-color: #2563eb;
+        color: #fff;
+    }
+
+    .view-toggle .btn:hover:not(.active) {
+        border-color: #cbd5e1;
+        background: #f8fafc;
+    }
+
     .list-product-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
+    }
+
+    .list-product-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .list-product-list .list-product-card {
+        flex-direction: row;
+        min-height: auto;
+    }
+
+    .list-product-list .list-product-card__media {
+        min-width: 200px;
+        max-width: 200px;
+        min-height: 200px;
+    }
+
+    .list-product-list .list-product-card__body {
+        flex: 1;
+    }
+
+    .list-product-list .list-product-card__actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .list-product-list .list-product-card__actions .btn {
+        flex: 1;
     }
 
     .list-product-card {
@@ -122,6 +179,27 @@
         .list-hero {
             padding: 24px;
         }
+
+        .view-toggle {
+            flex-direction: column;
+        }
+
+        .view-toggle .btn {
+            width: 100%;
+        }
+
+        .list-product-list .list-product-card {
+            flex-direction: column;
+        }
+
+        .list-product-list .list-product-card__media {
+            min-width: 100%;
+            max-width: 100%;
+        }
+
+        .list-product-list .list-product-card__actions {
+            flex-direction: column;
+        }
     }
 </style>
 <?= $this->endSection() ?>
@@ -187,9 +265,19 @@
 
     <!-- Products Section -->
     <div class="mb-5">
-        <h3 class="mb-4"><i class="fas fa-gift"></i> Producten in deze lijst</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0"><i class="fas fa-gift"></i> Producten in deze lijst</h3>
+            <div class="view-toggle">
+                <button class="btn active" onclick="switchView('grid')" id="gridViewBtn" title="Rasterweergave">
+                    <i class="fas fa-th"></i> Raster
+                </button>
+                <button class="btn" onclick="switchView('list')" id="listViewBtn" title="Lijstweergave">
+                    <i class="fas fa-list"></i> Lijst
+                </button>
+            </div>
+        </div>
         
-        <div class="list-product-grid">
+        <div class="list-product-grid" id="productsContainer">
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
                     <div class="list-product-card">
@@ -287,5 +375,31 @@ function copyAffiliateLink(url) {
         console.error('Could not copy text: ', err);
     });
 }
+
+function switchView(viewType) {
+    const container = document.getElementById('productsContainer');
+    const gridBtn = document.getElementById('gridViewBtn');
+    const listBtn = document.getElementById('listViewBtn');
+    
+    if (viewType === 'grid') {
+        container.className = 'list-product-grid';
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+        localStorage.setItem('listViewPreference', 'grid');
+    } else {
+        container.className = 'list-product-list';
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        localStorage.setItem('listViewPreference', 'list');
+    }
+}
+
+// Restore user's view preference on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const savedView = localStorage.getItem('listViewPreference') || 'grid';
+    if (savedView === 'list') {
+        switchView('list');
+    }
+});
 </script>
 <?= $this->endSection() ?>
