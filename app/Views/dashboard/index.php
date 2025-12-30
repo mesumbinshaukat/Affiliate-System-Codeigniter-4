@@ -45,7 +45,7 @@
 
     <!-- Quick Links -->
     <div class="row mb-4">
-        <div class="col-md-3">
+        <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/dashboard/lists') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-list fa-3x text-primary mb-3"></i>
@@ -53,7 +53,7 @@
                 </div>
             </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
@@ -61,7 +61,7 @@
                 </div>
             </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/drawings') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-dice fa-3x text-warning mb-3"></i>
@@ -69,11 +69,23 @@
                 </div>
             </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
                     <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
                     <h5>Analytica</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Second Row - New Tab -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-6 mb-3">
+            <a href="<?= base_url('index.php/dashboard/purchased') ?>" class="card text-center text-decoration-none">
+                <div class="card-body">
+                    <i class="fas fa-shopping-cart fa-3x mb-3" style="color: #10b981;"></i>
+                    <h5>Gekochte Producten</h5>
                 </div>
             </a>
         </div>

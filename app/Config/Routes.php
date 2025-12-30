@@ -22,6 +22,7 @@ $routes->get('/logout', 'Auth::logout');
 // List Routes
 $routes->get('/list/(:segment)', 'Lists::view/$1');
 $routes->get('/list/(:segment)/share', 'Lists::share/$1');
+$routes->post('/list/claim', 'Lists::claimProduct');
 
 // Drawings Routes (Loten Trekken)
 $routes->group('drawings', ['filter' => 'auth'], function($routes) {
@@ -71,6 +72,9 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     
     // Analytics
     $routes->get('analytics', 'Dashboard::analytics');
+    
+    // Purchased Products
+    $routes->get('purchased', 'Dashboard::purchasedProducts');
 });
 
 // Admin Routes

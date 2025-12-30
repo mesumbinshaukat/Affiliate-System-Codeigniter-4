@@ -813,4 +813,47 @@ class Dashboard extends BaseController
 
         return view('dashboard/analytics', $this->data);
     }
+
+    public function purchasedProducts()
+    {
+        $redirect = $this->requireLogin();
+        if ($redirect) return $redirect;
+
+        $userId = $this->session->get('user_id');
+        $listModel = new ListModel();
+        $listProductModel = new ListProductModel();
+
+        // Get all claimed products from user's lists
+        $db = \Config\Database::connect();
+        $builder = $db->table('list_products lp');
+        $builder->select('lp.id as list_product_id, lp.claimed_at, lp.claimed_by_subid, 
+                         p.title as product_title, p.image_url, p.price, p.source,
+                         l.id as list_id, l.title as list_title, l.slug as list_slug');
+        $builder->join('products p', 'p.id = lp.product_id', 'left');
+        $builder->join('lists l', 'l.id = lp.list_id', 'left');
+        $builder->where('l.user_id', $userId);
+        $builder->where('lp.claimed_at IS NOT NULL');
+        $builder->orderBy('lp.claimed_at', 'DESC');
+        
+        $this->data['purchasedProducts'] = $builder->get()->getResultArray();
+        
+        // Statistics
+        $this->data['totalPurchased'] = count($this->data['purchasedProducts']);
+        
+        // Count by list
+        $listCounts = [];
+        foreach ($this->data['purchasedProducts'] as $product) {
+            $listId = $product['list_id'];
+            if (!isset($listCounts[$listId])) {
+                $listCounts[$listId] = [
+                    'list_title' => $product['list_title'],
+                    'count' => 0
+                ];
+            }
+            $listCounts[$listId]['count']++;
+        }
+        $this->data['listCounts'] = $listCounts;
+
+        return view('dashboard/purchased_products', $this->data);
+    }
 }
