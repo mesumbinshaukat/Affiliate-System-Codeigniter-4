@@ -109,6 +109,7 @@ class Dashboard extends BaseController
         $listModel = new ListModel();
         $categoryModel = new CategoryModel();
         $listProductModel = new ListProductModel();
+        $listSectionModel = new \App\Models\ListSectionModel();
 
         $list = $listModel->find($listId);
 
@@ -119,6 +120,7 @@ class Dashboard extends BaseController
         $this->data['list'] = $list;
         $this->data['categories'] = $categoryModel->getActiveCategories();
         $this->data['products'] = $listProductModel->getListProducts($listId);
+        $this->data['sections'] = $listSectionModel->getListSectionsWithCounts($listId);
         
         // Get user age and gender for personalized suggestions
         $userAge = null;
@@ -318,6 +320,7 @@ class Dashboard extends BaseController
             $listId = $this->request->getPost('list_id');
             $productId = $this->request->getPost('product_id');
             $productData = $this->request->getPost('product');
+            $sectionId = $this->request->getPost('section_id');
 
             // Validate required fields
             if (empty($listId) || (empty($productId) && empty($productData))) {
@@ -388,14 +391,16 @@ class Dashboard extends BaseController
                 ]);
             }
 
-            // Get next position
-            $maxPosition = $listProductModel->where('list_id', $listId)
-                ->selectMax('position')
-                ->first();
+            // Get next position (within section if specified)
+            $positionQuery = $listProductModel->where('list_id', $listId);
+            if ($sectionId) {
+                $positionQuery->where('section_id', $sectionId);
+            }
+            $maxPosition = $positionQuery->selectMax('position')->first();
             $position = ($maxPosition['position'] ?? 0) + 1;
 
-            // Add to list
-            $listProductModel->addProductToList($listId, $productId, $position);
+            // Add to list with optional section
+            $listProductModel->addProductToList($listId, $productId, $position, null, $sectionId);
 
             return $this->response->setJSON([
                 'success' => true,
@@ -855,5 +860,240 @@ class Dashboard extends BaseController
         $this->data['listCounts'] = $listCounts;
 
         return view('dashboard/purchased_products', $this->data);
+    }
+
+    public function addSection()
+    {
+        if (!$this->isLoggedIn()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please login to continue',
+            ]);
+        }
+
+        if (strtolower($this->request->getMethod()) === 'post') {
+            $listId = $this->request->getPost('list_id');
+            $title = trim($this->request->getPost('title'));
+
+            if (empty($listId) || empty($title)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'List ID and title are required',
+                ]);
+            }
+
+            // Verify list ownership
+            $listModel = new ListModel();
+            $list = $listModel->find($listId);
+
+            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'List not found or access denied',
+                ]);
+            }
+
+            $listSectionModel = new \App\Models\ListSectionModel();
+            $sectionId = $listSectionModel->addSection($listId, $title);
+
+            if ($sectionId) {
+                $section = $listSectionModel->find($sectionId);
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Section added successfully',
+                    'section' => $section,
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to add section',
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Invalid request method',
+        ]);
+    }
+
+    public function updateSection()
+    {
+        if (!$this->isLoggedIn()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please login to continue',
+            ]);
+        }
+
+        if (strtolower($this->request->getMethod()) === 'post') {
+            $sectionId = $this->request->getPost('section_id');
+            $title = trim($this->request->getPost('title'));
+
+            if (empty($sectionId) || empty($title)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Section ID and title are required',
+                ]);
+            }
+
+            $listSectionModel = new \App\Models\ListSectionModel();
+            $section = $listSectionModel->find($sectionId);
+
+            if (!$section) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Section not found',
+                ]);
+            }
+
+            // Verify list ownership
+            $listModel = new ListModel();
+            $list = $listModel->find($section['list_id']);
+
+            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Access denied',
+                ]);
+            }
+
+            if ($listSectionModel->updateSectionTitle($sectionId, $title)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Section updated successfully',
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to update section',
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Invalid request method',
+        ]);
+    }
+
+    public function deleteSection()
+    {
+        if (!$this->isLoggedIn()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please login to continue',
+            ]);
+        }
+
+        if (strtolower($this->request->getMethod()) === 'post') {
+            $sectionId = $this->request->getPost('section_id');
+
+            if (empty($sectionId)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Section ID is required',
+                ]);
+            }
+
+            $listSectionModel = new \App\Models\ListSectionModel();
+            $section = $listSectionModel->find($sectionId);
+
+            if (!$section) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Section not found',
+                ]);
+            }
+
+            // Verify list ownership
+            $listModel = new ListModel();
+            $list = $listModel->find($section['list_id']);
+
+            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Access denied',
+                ]);
+            }
+
+            // Delete section (products will have section_id set to NULL via ON DELETE SET NULL)
+            if ($listSectionModel->deleteSection($sectionId)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Section deleted successfully',
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to delete section',
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Invalid request method',
+        ]);
+    }
+
+    public function moveProductToSection()
+    {
+        if (!$this->isLoggedIn()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Please login to continue',
+            ]);
+        }
+
+        if (strtolower($this->request->getMethod()) === 'post') {
+            $listProductId = $this->request->getPost('list_product_id');
+            $sectionId = $this->request->getPost('section_id'); // Can be null to remove from section
+
+            if (empty($listProductId)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'List product ID is required',
+                ]);
+            }
+
+            $listProductModel = new ListProductModel();
+            $listProduct = $listProductModel->find($listProductId);
+
+            if (!$listProduct) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Product not found in list',
+                ]);
+            }
+
+            // Verify list ownership
+            $listModel = new ListModel();
+            $list = $listModel->find($listProduct['list_id']);
+
+            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Access denied',
+                ]);
+            }
+
+            if ($listProductModel->moveProductToSection($listProductId, $sectionId)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Product moved successfully',
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to move product',
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Invalid request method',
+        ]);
     }
 }

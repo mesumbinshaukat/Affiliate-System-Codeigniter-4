@@ -11,6 +11,7 @@ class Lists extends BaseController
     {
         $listModel = new ListModel();
         $listProductModel = new ListProductModel();
+        $listSectionModel = new \App\Models\ListSectionModel();
 
         $list = $listModel->getListWithDetails($slug);
 
@@ -30,7 +31,8 @@ class Lists extends BaseController
         $listModel->incrementViews($list['id']);
 
         $this->data['list'] = $list;
-        $this->data['products'] = $listProductModel->getListProducts($list['id']);
+        $this->data['products'] = $listProductModel->getListProductsGroupedBySection($list['id']);
+        $this->data['sections'] = $listSectionModel->getListSections($list['id']);
 
         return view('lists/view', $this->data);
     }

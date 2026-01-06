@@ -70,6 +70,12 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     $routes->post('product/positions', 'Dashboard::updateProductPositions');
     $routes->post('product/scrape', 'Dashboard::scrapeProduct');
     
+    // Section Management
+    $routes->post('section/add', 'Dashboard::addSection');
+    $routes->post('section/update', 'Dashboard::updateSection');
+    $routes->post('section/delete', 'Dashboard::deleteSection');
+    $routes->post('product/move-to-section', 'Dashboard::moveProductToSection');
+    
     // Analytics
     $routes->get('analytics', 'Dashboard::analytics');
     

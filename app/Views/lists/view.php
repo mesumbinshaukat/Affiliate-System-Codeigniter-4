@@ -52,25 +52,45 @@
     .list-product-list .list-product-card {
         flex-direction: row;
         min-height: auto;
+        max-width: 100%;
+        width: 100%;
     }
 
     .list-product-list .list-product-card__media {
-        min-width: 200px;
-        max-width: 200px;
-        min-height: 200px;
+        min-width: 180px;
+        max-width: 180px;
+        min-height: 180px;
+        flex-shrink: 0;
     }
 
     .list-product-list .list-product-card__body {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
     }
 
     .list-product-list .list-product-card__actions {
         display: flex;
-        gap: 12px;
+        gap: 10px;
+        margin-top: auto;
     }
 
     .list-product-list .list-product-card__actions .btn {
-        flex: 1;
+        flex: 0 1 auto;
+        white-space: nowrap;
+    }
+
+    .list-product-list .list-product-card__desc {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .list-product-list .list-product-card__title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
     }
 
     .list-product-card {
@@ -219,6 +239,25 @@
         color: #94a3b8;
     }
 
+    .section-group {
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title i {
+        color: #3b82f6;
+    }
+
     @media (max-width: 767px) {
         .list-hero {
             padding: 24px;
@@ -239,10 +278,24 @@
         .list-product-list .list-product-card__media {
             min-width: 100%;
             max-width: 100%;
+            min-height: 200px;
+        }
+
+        .list-product-list .list-product-card__body {
+            padding: 16px;
         }
 
         .list-product-list .list-product-card__actions {
             flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-product-list .list-product-card__actions .btn {
+            width: 100%;
+        }
+
+        .list-product-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -321,11 +374,45 @@
             </div>
         </div>
         
-        <div class="list-product-grid" id="productsContainer">
+        <div id="productsContainer">
             <?php if (!empty($products)): ?>
-                <?php foreach ($products as $product): ?>
-                    <?php $isClaimed = !empty($product['claimed_at']); ?>
-                    <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>" data-list-product-id="<?= $product['list_product_id'] ?>">
+                <?php 
+                // Group products by section
+                $groupedProducts = [];
+                $noSectionProducts = [];
+                
+                foreach ($products as $product) {
+                    if (!empty($product['section_id'])) {
+                        $sectionId = $product['section_id'];
+                        if (!isset($groupedProducts[$sectionId])) {
+                            $groupedProducts[$sectionId] = [
+                                'title' => $product['section_title'],
+                                'position' => $product['section_position'],
+                                'products' => []
+                            ];
+                        }
+                        $groupedProducts[$sectionId]['products'][] = $product;
+                    } else {
+                        $noSectionProducts[] = $product;
+                    }
+                }
+                
+                // Sort sections by position
+                uasort($groupedProducts, function($a, $b) {
+                    return $a['position'] <=> $b['position'];
+                });
+                ?>
+                
+                <?php foreach ($groupedProducts as $sectionId => $section): ?>
+                    <div class="section-group mb-5">
+                        <h3 class="section-title">
+                            <i class="fas fa-folder-open me-2"></i>
+                            <?= esc($section['title']) ?>
+                        </h3>
+                        <div class="list-product-grid">
+                            <?php foreach ($section['products'] as $product): ?>
+                                <?php $isClaimed = !empty($product['claimed_at']); ?>
+                                <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>" data-list-product-id="<?= $product['list_product_id'] ?>">
                         <?php if ($isClaimed): ?>
                             <span class="claimed-badge">
                                 <i class="fas fa-check-circle"></i> Gekocht
@@ -394,7 +481,89 @@
                             </div>
                         </div>
                     </div>
+                                <?php endforeach; ?>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
+                
+                <?php if (!empty($noSectionProducts)): ?>
+                    <div class="section-group mb-5">
+                        <div class="list-product-grid">
+                            <?php foreach ($noSectionProducts as $product): ?>
+                                <?php $isClaimed = !empty($product['claimed_at']); ?>
+                                <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>" data-list-product-id="<?= $product['list_product_id'] ?>">
+                        <?php if ($isClaimed): ?>
+                            <span class="claimed-badge">
+                                <i class="fas fa-check-circle"></i> Gekocht
+                            </span>
+                        <?php endif; ?>
+                        <div class="list-product-card__media">
+                            <?php if ($product['image_url']): ?>
+                                <img src="<?= esc($product['image_url']) ?>" alt="<?= esc($product['title']) ?>">
+                            <?php else: ?>
+                                <div class="text-muted text-center">
+                                    <i class="fas fa-image fa-2x"></i>
+                                    <p class="small mt-2 mb-0">Geen afbeelding</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="list-product-card__body">
+                            <span class="list-product-card__pill">
+                                <i class="fas fa-heart text-danger"></i>
+                                Favoriet
+                            </span>
+                            <h5 class="list-product-card__title <?= $isClaimed ? 'list-product-card__title--claimed' : '' ?>">
+                                <?= esc(character_limiter($product['title'], 60)) ?>
+                            </h5>
+                            <p class="list-product-card__desc">
+                                <?= esc(character_limiter($product['description'], 90)) ?>
+                            </p>
+                            <?php if ($product['price']): ?>
+                                <div class="list-product-card__price">
+                                    €<?= number_format($product['price'], 2) ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($product['custom_note']): ?>
+                                <div class="list-product-card__note">
+                                    <i class="fas fa-sticky-note me-1"></i>
+                                    <?= esc($product['custom_note']) ?>
+                                </div>
+                            <?php endif; ?>
+                            <small class="text-muted mb-3 d-block">
+                                <i class="fas fa-store me-1"></i> <?= esc($product['source']) ?>
+                            </small>
+                            <div class="list-product-card__actions d-grid gap-2">
+                                <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
+                                   class="btn btn-primary btn-sm" 
+                                   target="_blank"
+                                   title="Bekijk product in winkel">
+                                    <i class="fas fa-external-link-alt"></i> Product Bekijken
+                                </a>
+                                <?php if (!empty($list['is_crossable'])): ?>
+                                    <?php if ($isClaimed): ?>
+                                        <button class="btn btn-outline-success btn-sm" disabled>
+                                            <i class="fas fa-check-circle"></i> Al Gekocht
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-warning btn-sm"
+                                                onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                title="Markeer als gekocht">
+                                            <i class="fas fa-shopping-cart"></i> Ik Kocht Dit
+                                        </button>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                                <button class="btn btn-outline-secondary btn-sm"
+                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
+                                        title="Kopieer affiliate link om te delen">
+                                    <i class="fas fa-share-alt"></i> Link Delen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             <?php else: ?>
                 <div class="col-12">
                     <div class="alert alert-info text-center py-5">
@@ -444,13 +613,22 @@ function switchView(viewType) {
     const gridBtn = document.getElementById('gridViewBtn');
     const listBtn = document.getElementById('listViewBtn');
     
+    // Find all product containers (both grid and list classes)
+    const productContainers = container.querySelectorAll('.list-product-grid, .list-product-list');
+    
     if (viewType === 'grid') {
-        container.className = 'list-product-grid';
+        productContainers.forEach(grid => {
+            grid.classList.remove('list-product-list');
+            grid.classList.add('list-product-grid');
+        });
         gridBtn.classList.add('active');
         listBtn.classList.remove('active');
         localStorage.setItem('listViewPreference', 'grid');
     } else {
-        container.className = 'list-product-list';
+        productContainers.forEach(grid => {
+            grid.classList.remove('list-product-grid');
+            grid.classList.add('list-product-list');
+        });
         listBtn.classList.add('active');
         gridBtn.classList.remove('active');
         localStorage.setItem('listViewPreference', 'list');
