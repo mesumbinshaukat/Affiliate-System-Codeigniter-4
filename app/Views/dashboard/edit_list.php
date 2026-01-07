@@ -196,6 +196,52 @@
         <div class="tab-pane fade show active" id="products" role="tabpanel">
             <div class="row">
                 <div class="col-lg-8">
+                    <!-- Section Management Panel -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-folder-open"></i> Secties Beheren
+                                </h5>
+                                <button class="btn btn-sm btn-primary" onclick="showAddSectionModal()">
+                                    <i class="fas fa-plus"></i> Nieuwe Sectie
+                                </button>
+                            </div>
+                            <p class="text-muted small mb-3">
+                                Organiseer je producten in secties zoals "Sieraden", "Tech", "Lifetime Wensen", etc. Secties zijn optioneel.
+                            </p>
+                            
+                            <div id="sectionsList">
+                                <?php if (!empty($sections)): ?>
+                                    <div class="list-group">
+                                        <?php foreach ($sections as $section): ?>
+                                            <div class="list-group-item d-flex justify-content-between align-items-center" data-section-id="<?= $section['id'] ?>">
+                                                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                                    <i class="fas fa-grip-vertical text-muted" style="cursor: move;"></i>
+                                                    <i class="fas fa-folder text-primary"></i>
+                                                    <span class="section-title-display fw-semibold"><?= esc($section['title']) ?></span>
+                                                    <span class="badge bg-secondary"><?= $section['product_count'] ?? 0 ?> producten</span>
+                                                </div>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-primary" onclick="editSection(<?= $section['id'] ?>, '<?= esc($section['title'], 'js') ?>')" title="Bewerken">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger" onclick="deleteSection(<?= $section['id'] ?>)" title="Verwijderen">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-info-circle"></i> Nog geen secties aangemaakt. Klik op "Nieuwe Sectie" om te beginnen.
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Search Products with Filters (MOVED TO TOP) -->
                     <div class="card mb-4">
                         <div class="card-body">
@@ -376,24 +422,38 @@
                             <div id="productList" class="sortable-list">
                                 <?php if (!empty($products)): ?>
                                     <?php foreach ($products as $product): ?>
-                                        <div class="card mb-3" data-product-id="<?= $product['product_id'] ?>">
+                                        <div class="card mb-3" data-product-id="<?= $product['product_id'] ?>" data-list-product-id="<?= $product['list_product_id'] ?>">
                                             <div class="card-body">
                                                 <div class="row align-items-center">
                                                     <div class="col-md-2">
                                                         <?php if ($product['image_url']): ?>
-                                                            <img src="<?= esc($product['image_url']) ?>" class="img-fluid" alt="<?= esc($product['title']) ?>">
+                                                            <img src="<?= esc($product['image_url']) ?>" class="img-fluid rounded" alt="<?= esc($product['title']) ?>">
                                                         <?php endif; ?>
                                                     </div>
-                                                    <div class="col-md-8">
+                                                    <div class="col-md-7">
                                                         <h6><?= esc($product['title']) ?></h6>
-                                                        <p class="text-muted mb-0"><?= esc(character_limiter($product['description'], 100)) ?></p>
+                                                        <p class="text-muted mb-1 small"><?= esc(character_limiter($product['description'], 100)) ?></p>
                                                         <?php if ($product['price']): ?>
                                                             <strong class="text-primary">€<?= number_format($product['price'], 2) ?></strong>
                                                         <?php endif; ?>
+                                                        
+                                                        <!-- Section Assignment -->
+                                                        <div class="mt-2">
+                                                            <select class="form-select form-select-sm" style="max-width: 250px;" onchange="moveProductToSection(<?= $product['list_product_id'] ?>, this.value)">
+                                                                <option value="">Geen sectie</option>
+                                                                <?php if (!empty($sections)): ?>
+                                                                    <?php foreach ($sections as $section): ?>
+                                                                        <option value="<?= $section['id'] ?>" <?= ($product['section_id'] ?? null) == $section['id'] ? 'selected' : '' ?>>
+                                                                            📁 <?= esc($section['title']) ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                <?php endif; ?>
+                                                            </select>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-2 text-end">
+                                                    <div class="col-md-3 text-end">
                                                         <button class="btn btn-sm btn-danger" onclick="removeProduct(<?= $product['product_id'] ?>)">
-                                                            <i class="fas fa-trash"></i>
+                                                            <i class="fas fa-trash"></i> Verwijderen
                                                         </button>
                                                     </div>
                                                 </div>
@@ -401,7 +461,10 @@
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <p class="text-muted text-center">Nog geen producten toegevoegd. Zoeken en voeg producten van Bol.com toe.</p>
+                                    <p class="text-muted text-center py-4">
+                                        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                        Nog geen producten toegevoegd. Zoek en voeg producten van Bol.com toe.
+                                    </p>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -1322,6 +1385,178 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// ========================================
+// SECTION MANAGEMENT FUNCTIONS
+// ========================================
+
+// Show add section modal
+function showAddSectionModal() {
+    const title = prompt('Voer sectie titel in (bijv. Sieraden, Tech, Lifetime Wensen):');
+    if (!title || title.trim() === '') {
+        return;
+    }
+    
+    addSection(title.trim());
+}
+
+// Add new section
+function addSection(title) {
+    fetch('<?= base_url('index.php/dashboard/section/add') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            list_id: listId,
+            title: title
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`Sectie "${title}" aangemaakt!`, 'success');
+            // Reload page to show new section
+            location.reload();
+        } else {
+            showToast('Fout: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Fout bij aanmaken sectie', 'error');
+    });
+}
+
+// Edit section
+function editSection(sectionId, currentTitle) {
+    const newTitle = prompt('Wijzig sectie titel:', currentTitle);
+    if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) {
+        return;
+    }
+    
+    fetch('<?= base_url('index.php/dashboard/section/update') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            section_id: sectionId,
+            title: newTitle.trim()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Sectie bijgewerkt!', 'success');
+            // Update UI without reload
+            const sectionItem = document.querySelector(`[data-section-id="${sectionId}"]`);
+            if (sectionItem) {
+                const titleDisplay = sectionItem.querySelector('.section-title-display');
+                if (titleDisplay) {
+                    titleDisplay.textContent = newTitle;
+                }
+            }
+            // Also update all dropdowns
+            document.querySelectorAll('select option').forEach(option => {
+                if (option.value == sectionId) {
+                    option.textContent = '📁 ' + newTitle;
+                }
+            });
+        } else {
+            showToast('Fout: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Fout bij bijwerken sectie', 'error');
+    });
+}
+
+// Delete section
+function deleteSection(sectionId) {
+    if (!confirm('Weet je zeker dat je deze sectie wilt verwijderen? Producten in deze sectie blijven behouden maar verliezen hun sectie-toewijzing.')) {
+        return;
+    }
+    
+    fetch('<?= base_url('index.php/dashboard/section/delete') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            section_id: sectionId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Sectie verwijderd!', 'success');
+            // Reload page to update UI
+            location.reload();
+        } else {
+            showToast('Fout: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Fout bij verwijderen sectie', 'error');
+    });
+}
+
+// Move product to section
+function moveProductToSection(listProductId, sectionId) {
+    // Convert empty string to null
+    const targetSectionId = sectionId === '' ? null : sectionId;
+    
+    fetch('<?= base_url('index.php/dashboard/product/move-to-section') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            list_product_id: listProductId,
+            section_id: targetSectionId || ''
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Product verplaatst!', 'success');
+            // Update product count in sections list
+            refreshSectionCounts();
+        } else {
+            showToast('Fout: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Fout bij verplaatsen product', 'error');
+    });
+}
+
+// Refresh section product counts
+function refreshSectionCounts() {
+    // Count products per section from current page
+    const sectionCounts = {};
+    document.querySelectorAll('[data-list-product-id]').forEach(productCard => {
+        const select = productCard.querySelector('select');
+        if (select && select.value) {
+            const sectionId = select.value;
+            sectionCounts[sectionId] = (sectionCounts[sectionId] || 0) + 1;
+        }
+    });
+    
+    // Update badges
+    document.querySelectorAll('[data-section-id]').forEach(sectionItem => {
+        const sectionId = sectionItem.dataset.sectionId;
+        const badge = sectionItem.querySelector('.badge');
+        if (badge) {
+            const count = sectionCounts[sectionId] || 0;
+            badge.textContent = count + ' producten';
+        }
+    });
+}
 </script>
 
 <!-- Sortable.js for drag-and-drop -->
