@@ -14,7 +14,7 @@ class UserModel extends Model
     protected $protectFields = true;
     protected $allowedFields = [
         'username', 'email', 'password', 'first_name', 'last_name', 'date_of_birth', 'gender',
-        'role', 'status', 'avatar', 'bio'
+        'role', 'status', 'avatar', 'bio', 'provider', 'provider_id', 'provider_token', 'email_verified'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -99,5 +99,126 @@ class UserModel extends Model
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Find user by social provider credentials
+     * 
+     * @param string $provider Provider name (facebook, google)
+     * @param string $providerId Provider's unique user ID
+     * @return array|null User data or null if not found
+     */
+    public function findBySocialProvider(string $provider, string $providerId): ?array
+    {
+        return $this->where('provider', $provider)
+                    ->where('provider_id', $providerId)
+                    ->first();
+    }
+
+    /**
+     * Create or update user from social provider data
+     * 
+     * @param array $providerData Data from OAuth provider
+     * @param string $provider Provider name (facebook, google)
+     * @return array|false User data or false on failure
+     */
+    public function createOrUpdateFromSocial(array $providerData, string $provider)
+    {
+        // Check if user exists with this provider
+        $existingUser = $this->findBySocialProvider($provider, $providerData['identifier']);
+        
+        if ($existingUser) {
+            // Update existing user's token and info
+            $updateData = [
+                'provider_token' => $providerData['access_token'] ?? null,
+                'email_verified' => !empty($providerData['emailVerified']) ? 1 : 0,
+            ];
+            
+            // Update avatar if provided and not already set
+            if (!empty($providerData['photoURL']) && empty($existingUser['avatar'])) {
+                $updateData['avatar'] = $providerData['photoURL'];
+            }
+            
+            $this->update($existingUser['id'], $updateData);
+            return $this->find($existingUser['id']);
+        }
+        
+        // Check if email already exists (user registered normally)
+        if (!empty($providerData['email'])) {
+            $emailUser = $this->where('email', $providerData['email'])->first();
+            if ($emailUser) {
+                // Link social account to existing email account
+                $this->update($emailUser['id'], [
+                    'provider' => $provider,
+                    'provider_id' => $providerData['identifier'],
+                    'provider_token' => $providerData['access_token'] ?? null,
+                    'email_verified' => 1,
+                ]);
+                return $this->find($emailUser['id']);
+            }
+        }
+        
+        // Create new user
+        $username = $this->generateUniqueUsername($providerData);
+        
+        $userData = [
+            'username' => $username,
+            'email' => $providerData['email'] ?? null,
+            'password' => password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT), // Random password
+            'first_name' => $providerData['firstName'] ?? '',
+            'last_name' => $providerData['lastName'] ?? '',
+            'avatar' => $providerData['photoURL'] ?? null,
+            'provider' => $provider,
+            'provider_id' => $providerData['identifier'],
+            'provider_token' => $providerData['access_token'] ?? null,
+            'email_verified' => !empty($providerData['emailVerified']) ? 1 : 0,
+            'role' => 'user',
+            'status' => 'active',
+        ];
+        
+        if ($this->insert($userData)) {
+            return $this->find($this->getInsertID());
+        }
+        
+        return false;
+    }
+
+    /**
+     * Generate unique username from social provider data
+     * 
+     * @param array $providerData Provider user data
+     * @return string Unique username
+     */
+    private function generateUniqueUsername(array $providerData): string
+    {
+        // Try email-based username first
+        if (!empty($providerData['email'])) {
+            $baseUsername = explode('@', $providerData['email'])[0];
+        } 
+        // Try display name
+        elseif (!empty($providerData['displayName'])) {
+            $baseUsername = strtolower(str_replace(' ', '', $providerData['displayName']));
+        }
+        // Try first name
+        elseif (!empty($providerData['firstName'])) {
+            $baseUsername = strtolower($providerData['firstName']);
+        }
+        // Fallback to random
+        else {
+            $baseUsername = 'user' . time();
+        }
+        
+        // Clean username
+        $baseUsername = preg_replace('/[^a-z0-9_]/', '', strtolower($baseUsername));
+        $username = $baseUsername;
+        $counter = 1;
+        
+        // Ensure uniqueness
+        while ($this->where('username', $username)->first()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+        
+        return $username;
     }
 }
