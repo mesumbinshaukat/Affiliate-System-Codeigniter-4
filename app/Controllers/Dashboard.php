@@ -48,7 +48,8 @@ class Dashboard extends BaseController
         $listModel = new ListModel();
         $userId = $this->session->get('user_id');
 
-        $this->data['lists'] = $listModel->getUserLists($userId, true);
+        // Get both owned and collaborated lists
+        $this->data['lists'] = $listModel->getUserAccessibleLists($userId, true);
 
         return view('dashboard/lists', $this->data);
     }
@@ -112,10 +113,15 @@ class Dashboard extends BaseController
         $listSectionModel = new \App\Models\ListSectionModel();
 
         $list = $listModel->find($listId);
+        $userId = $this->session->get('user_id');
 
-        if (!$list || $list['user_id'] != $this->session->get('user_id')) {
-            return redirect()->to('/dashboard')->with('error', 'List not found');
+        // Updated permission check: allow owner or collaborators
+        if (!$list || !$listModel->canUserEdit($listId, $userId)) {
+            return redirect()->to('/dashboard')->with('error', 'List not found or you do not have permission to edit it');
         }
+
+        // Check if user is the original owner
+        $this->data['is_owner'] = $listModel->isUserOwner($listId, $userId);
 
         $this->data['list'] = $list;
         $this->data['categories'] = $categoryModel->getActiveCategories();
@@ -330,11 +336,12 @@ class Dashboard extends BaseController
                 ]);
             }
 
-            // Verify list ownership
+            // Verify list access (owner or co-owner)
             $listModel = new ListModel();
             $list = $listModel->find($listId);
+            $userId = $this->session->get('user_id');
 
-            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+            if (!$list || !$listModel->canUserEdit($listId, $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'List not found or access denied',
@@ -701,11 +708,12 @@ class Dashboard extends BaseController
             ]);
         }
 
-        // Verify list ownership
+        // Verify list access (owner or co-owner)
         $listModel = new ListModel();
         $list = $listModel->find($listId);
+        $userId = $this->session->get('user_id');
 
-        if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+        if (!$list || !$listModel->canUserEdit($listId, $userId)) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'List not found or access denied',
@@ -735,11 +743,12 @@ class Dashboard extends BaseController
             $listId = $this->request->getPost('list_id');
             $productId = $this->request->getPost('product_id');
 
-            // Verify list ownership
+            // Verify list access (owner or co-owner)
             $listModel = new ListModel();
             $list = $listModel->find($listId);
+            $userId = $this->session->get('user_id');
 
-            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+            if (!$list || !$listModel->canUserEdit($listId, $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'List not found',
@@ -774,11 +783,12 @@ class Dashboard extends BaseController
             $listId = $this->request->getPost('list_id');
             $positions = $this->request->getPost('positions');
 
-            // Verify list ownership
+            // Verify list access (owner or co-owner)
             $listModel = new ListModel();
             $list = $listModel->find($listId);
+            $userId = $this->session->get('user_id');
 
-            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+            if (!$list || !$listModel->canUserEdit($listId, $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'List not found',
@@ -882,11 +892,12 @@ class Dashboard extends BaseController
                 ]);
             }
 
-            // Verify list ownership
+            // Verify list access (owner or co-owner)
             $listModel = new ListModel();
             $list = $listModel->find($listId);
+            $userId = $this->session->get('user_id');
 
-            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+            if (!$list || !$listModel->canUserEdit($listId, $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'List not found or access denied',
@@ -947,11 +958,12 @@ class Dashboard extends BaseController
                 ]);
             }
 
-            // Verify list ownership
+            // Verify list access (owner or co-owner)
             $listModel = new ListModel();
             $list = $listModel->find($section['list_id']);
+            $userId = $this->session->get('user_id');
 
-            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+            if (!$list || !$listModel->canUserEdit($section['list_id'], $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Access denied',
@@ -1006,11 +1018,12 @@ class Dashboard extends BaseController
                 ]);
             }
 
-            // Verify list ownership
+            // Verify list access (owner or co-owner)
             $listModel = new ListModel();
             $list = $listModel->find($section['list_id']);
+            $userId = $this->session->get('user_id');
 
-            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+            if (!$list || !$listModel->canUserEdit($section['list_id'], $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Access denied',
@@ -1067,11 +1080,12 @@ class Dashboard extends BaseController
                 ]);
             }
 
-            // Verify list ownership
+            // Verify list access (owner or co-owner)
             $listModel = new ListModel();
             $list = $listModel->find($listProduct['list_id']);
+            $userId = $this->session->get('user_id');
 
-            if (!$list || $list['user_id'] != $this->session->get('user_id')) {
+            if (!$list || !$listModel->canUserEdit($listProduct['list_id'], $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Access denied',

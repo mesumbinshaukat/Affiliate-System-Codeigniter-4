@@ -24,6 +24,18 @@ $routes->get('auth/social/(:segment)', 'SocialAuth::login/$1');
 $routes->get('auth/social/callback', 'SocialAuth::callback');
 $routes->get('auth/social/disconnect', 'SocialAuth::disconnect', ['filter' => 'auth']);
 
+// Collaboration Routes
+$routes->group('collaboration', ['filter' => 'auth'], function($routes) {
+    $routes->post('invite', 'Collaboration::invite');
+    $routes->get('accept/(:segment)', 'Collaboration::accept/$1');
+    $routes->get('reject/(:segment)', 'Collaboration::reject/$1');
+    $routes->post('cancel/(:num)', 'Collaboration::cancel/$1');
+    $routes->post('remove', 'Collaboration::remove');
+    $routes->post('leave', 'Collaboration::leave');
+    $routes->get('list/(:num)/collaborators', 'Collaboration::getCollaborators/$1');
+    $routes->post('permissions/update', 'Collaboration::updatePermissions');
+});
+
 // List Routes
 $routes->get('/list/(:segment)', 'Lists::view/$1');
 $routes->get('/list/(:segment)/share', 'Lists::share/$1');
@@ -86,6 +98,9 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     
     // Purchased Products
     $routes->get('purchased', 'Dashboard::purchasedProducts');
+    
+    // Collaboration & Invitations
+    $routes->get('invitations', 'Collaboration::invitations');
 });
 
 // Admin Routes

@@ -134,6 +134,11 @@
                 <i class="fas fa-box"></i> Producten
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="collaborators-tab" data-bs-toggle="tab" data-bs-target="#collaborators" type="button">
+                <i class="fas fa-users"></i> Samenwerken
+            </button>
+        </li>
     </ul>
 
     <div class="tab-content" id="listTabsContent">
@@ -258,6 +263,22 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Section Selector for New Products -->
+                            <?php if (!empty($sections)): ?>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-folder"></i> Voeg nieuwe producten toe aan sectie:
+                                </label>
+                                <select class="form-select" id="defaultSectionSelect">
+                                    <option value="">Geen sectie (los product)</option>
+                                    <?php foreach ($sections as $section): ?>
+                                        <option value="<?= $section['id'] ?>">📁 <?= esc($section['title']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small class="text-muted">Dit wordt de standaard sectie voor nieuwe producten. Je kunt dit later wijzigen.</small>
+                            </div>
+                            <?php endif; ?>
                             
                             <!-- Manual Scrape Toggle -->
                             <div class="form-check form-switch mb-2">
@@ -469,6 +490,15 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collaborators Tab -->
+        <div class="tab-pane fade" id="collaborators" role="tabpanel">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <?= view('partials/collaborator_management', ['list' => $list, 'is_owner' => $is_owner ?? false]) ?>
                 </div>
             </div>
         </div>
@@ -947,7 +977,8 @@ function addSelectedProducts() {
                 'product[price]': product.price || 0,
                 'product[affiliate_url]': product.affiliate_url,
                 'product[source]': product.source,
-                'product[ean]': product.ean || ''
+                'product[ean]': product.ean || '',
+                section_id: document.getElementById('defaultSectionSelect').value,
             })
         })
         .then(response => {
@@ -1022,6 +1053,10 @@ function addSingleProduct(product, triggerBtn = null) {
         ean: product.ean || '',
     };
     
+    // Get selected section (if any)
+    const sectionSelect = document.getElementById('defaultSectionSelect');
+    const sectionId = sectionSelect ? sectionSelect.value : '';
+    
     const params = {
         list_id: listId,
         'product[external_id]': normalizedProduct.external_id,
@@ -1032,6 +1067,7 @@ function addSingleProduct(product, triggerBtn = null) {
         'product[affiliate_url]': normalizedProduct.affiliate_url,
         'product[source]': normalizedProduct.source,
         'product[ean]': normalizedProduct.ean,
+        section_id: sectionId,
     };
     
     fetch('<?= base_url('index.php/dashboard/product/add') ?>', {

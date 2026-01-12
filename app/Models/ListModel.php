@@ -107,4 +107,64 @@ class ListModel extends Model
             ->orderBy('lists.views', 'DESC')
             ->findAll($limit);
     }
+
+    /**
+     * Check if user can edit a list (is owner or collaborator)
+     */
+    public function canUserEdit(int $listId, int $userId): bool
+    {
+        // Check if user is the owner
+        $list = $this->find($listId);
+        if ($list && $list['user_id'] == $userId) {
+            return true;
+        }
+
+        // Check if user is a collaborator
+        $collaboratorModel = new \App\Models\ListCollaboratorModel();
+        return $collaboratorModel->canEdit($listId, $userId);
+    }
+
+    /**
+     * Check if user is the original owner of the list
+     */
+    public function isUserOwner(int $listId, int $userId): bool
+    {
+        $list = $this->find($listId);
+        return $list && $list['user_id'] == $userId;
+    }
+
+    /**
+     * Get all lists user has access to (owned + collaborating)
+     */
+    public function getUserAccessibleLists(int $userId, bool $includePrivate = false): array
+    {
+        // Get user's own lists
+        $ownLists = $this->getUserLists($userId, $includePrivate);
+
+        // Get lists user is collaborating on
+        $collaboratorModel = new \App\Models\ListCollaboratorModel();
+        $collaborations = $collaboratorModel->getUserCollaborations($userId);
+
+        // Merge and return
+        $collaboratingListIds = array_column($collaborations, 'list_id');
+        
+        if (!empty($collaboratingListIds)) {
+            $collaboratingLists = $this->select('lists.*, categories.name as category_name, COUNT(list_products.id) as product_count')
+                ->join('categories', 'categories.id = lists.category_id', 'left')
+                ->join('list_products', 'list_products.list_id = lists.id', 'left')
+                ->whereIn('lists.id', $collaboratingListIds)
+                ->groupBy('lists.id')
+                ->orderBy('lists.created_at', 'DESC')
+                ->findAll();
+
+            // Add collaboration flag
+            foreach ($collaboratingLists as &$list) {
+                $list['is_collaboration'] = true;
+            }
+
+            return array_merge($ownLists, $collaboratingLists);
+        }
+
+        return $ownLists;
+    }
 }

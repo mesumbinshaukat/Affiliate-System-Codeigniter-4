@@ -89,6 +89,14 @@
                 </div>
             </a>
         </div>
+        <div class="col-md-3 col-6 mb-3">
+            <a href="<?= base_url('index.php/dashboard/invitations') ?>" class="card text-center text-decoration-none">
+                <div class="card-body">
+                    <i class="fas fa-envelope fa-3x mb-3" style="color: #8b5cf6;"></i>
+                    <h5>Lijstuitnodigingen</h5>
+                </div>
+            </a>
+        </div>
     </div>
 
     <!-- Recent Lists -->
