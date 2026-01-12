@@ -12,7 +12,7 @@ class ListProductModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
-    protected $allowedFields = ['list_id', 'product_id', 'section_id', 'position', 'custom_note', 'claimed_at', 'claimed_by_subid'];
+    protected $allowedFields = ['list_id', 'product_id', 'section_id', 'position', 'custom_note', 'claimed_at', 'claimed_by_subid', 'is_group_gift', 'target_amount'];
 
     protected bool $allowEmptyInserts = false;
 

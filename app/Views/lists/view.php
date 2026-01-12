@@ -453,6 +453,10 @@
                             <small class="text-muted mb-3 d-block">
                                 <i class="fas fa-store me-1"></i> <?= esc($product['source']) ?>
                             </small>
+                            
+                            <!-- Group Gift Contribution UI -->
+                            <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
+                            
                             <div class="list-product-card__actions d-grid gap-2">
                                 <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
                                    class="btn btn-primary btn-sm" 
@@ -532,6 +536,10 @@
                             <small class="text-muted mb-3 d-block">
                                 <i class="fas fa-store me-1"></i> <?= esc($product['source']) ?>
                             </small>
+                            
+                            <!-- Group Gift Contribution UI -->
+                            <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
+                            
                             <div class="list-product-card__actions d-grid gap-2">
                                 <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
                                    class="btn btn-primary btn-sm" 
@@ -576,6 +584,9 @@
         </div>
     </div>
 </div>
+
+<!-- Contribution Modal -->
+<?= view('partials/contribution_modal') ?>
 
 <?= $this->endSection() ?>
 

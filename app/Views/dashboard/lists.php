@@ -6,6 +6,7 @@
     <div class="row mb-4">
         <div class="col">
             <h1>Mijn Lijsten</h1>
+            <p class="text-muted">Lijsten die u bezit en lijsten waar u aan meewerkt</p>
         </div>
         <div class="col-auto">
             <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="btn btn-primary">
@@ -21,6 +22,7 @@
                     <th>Titel</th>
                     <th>Categorie</th>
                     <th>Status</th>
+                    <th>Rol</th>
                     <th>Producten</th>
                     <th>Weergaven</th>
                     <th>Gemaakt op</th>
@@ -33,6 +35,11 @@
                         <tr>
                             <td>
                                 <strong><?= esc($list['title']) ?></strong>
+                                <?php if (!empty($list['is_collaboration'])): ?>
+                                    <span class="badge bg-info ms-2" title="U bent medewerker aan deze lijst">
+                                        <i class="fas fa-users"></i> Samenwerking
+                                    </span>
+                                <?php endif; ?>
                             </td>
                             <td><?= esc($list['category_name'] ?? 'Zonder categorie') ?></td>
                             <td>
@@ -44,31 +51,47 @@
                                     <span class="badge bg-secondary">Privé</span>
                                 <?php endif; ?>
                             </td>
+                            <td>
+                                <?php if (!empty($list['is_collaboration'])): ?>
+                                    <span class="text-muted"><i class="fas fa-user-edit"></i> Medewerker</span>
+                                <?php else: ?>
+                                    <span class="text-primary"><i class="fas fa-crown"></i> Eigenaar</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= $list['product_count'] ?? 0 ?></td>
                             <td><?= number_format($list['views']) ?></td>
                             <td><?= date('M d, Y', strtotime($list['created_at'])) ?></td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a href="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                    <a href="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>" class="btn btn-sm btn-outline-primary" title="Bewerken">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <?php if ($list['status'] === 'published'): ?>
-                                        <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info" target="_blank">
+                                        <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info" target="_blank" title="Bekijken">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     <?php endif; ?>
-                                    <a href="<?= base_url('index.php/dashboard/list/delete/' . $list['id']) ?>" 
-                                       class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('Weet u zeker dat u deze lijst wilt verwijderen?')">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <?php if (empty($list['is_collaboration'])): ?>
+                                        <a href="<?= base_url('index.php/dashboard/list/delete/' . $list['id']) ?>" 
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Weet u zeker dat u deze lijst wilt verwijderen?')"
+                                           title="Verwijderen">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <button class="btn btn-sm btn-outline-warning" 
+                                                onclick="leaveCollaboration(<?= $list['id'] ?>)"
+                                                title="Verlaten">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="7" class="text-center text-muted">
+                        <td colspan="8" class="text-center text-muted">
                             Nog geen lijsten. <a href="<?= base_url('index.php/dashboard/list/create') ?>">Maak uw eerste lijst</a>
                         </td>
                     </tr>
@@ -77,5 +100,36 @@
         </table>
     </div>
 </div>
+
+<script>
+function leaveCollaboration(listId) {
+    if (!confirm('Weet u zeker dat u deze samenwerking wilt verlaten? U verliest toegang tot het bewerken van deze lijst.')) {
+        return;
+    }
+    
+    fetch('<?= base_url('index.php/collaboration/leave') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            list_id: listId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('U heeft de samenwerking succesvol verlaten');
+            location.reload();
+        } else {
+            alert('Fout: ' + (data.message || 'Kon samenwerking niet verlaten'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Er is een fout opgetreden bij het verlaten van de samenwerking');
+    });
+}
+</script>
 
 <?= $this->endSection() ?>

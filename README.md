@@ -17,6 +17,9 @@ A complete affiliate marketing platform built with CodeIgniter 4, allowing users
 - User registration and authentication with optional gender field
 - User profile management with age calculation
 - Create and manage product lists
+- **Co-owner collaboration** - Invite others to co-manage lists
+- **Section organization** - Organize products into custom sections
+- **Group Gift crowdfunding** - Enable contributions for expensive items
 - Search products via Bol.com API with advanced filters
 - Personalized product suggestions based on age and gender
 - Professional product filters (sort, category, price range)
@@ -52,6 +55,19 @@ A complete affiliate marketing platform built with CodeIgniter 4, allowing users
 - Commission status tracking (pending, approved, rejected)
 
 ### Special Features
+- **Group Gift / Crowdfunding System**
+  - Enable group contributions for expensive items
+  - Set funding goals for products
+  - Track contributions with progress bars
+  - Anonymous contribution option
+  - Contributor list with messages
+  - Real-time funding progress
+- **Co-Owner / Collaboration System**
+  - Invite co-owners to edit lists
+  - Accept/reject collaboration invitations
+  - Share list management permissions
+  - Section management for co-owners
+  - Full CRUD permissions for collaborators
 - Drawing/Lottery System (Loten Trekken)
   - Create drawing events
   - Invite participants
@@ -218,18 +234,35 @@ After running the seeder, you can login with:
    - Search for specific products from Bol.com
    - Click "Add" to include them in your list
 
-5. **Publish and Share**
+5. **Organize with Sections** (Optional)
+   - Go to Products tab
+   - Click "Nieuwe Sectie" to create sections
+   - Examples: "Sieraden", "Tech", "Lifetime Wensen"
+   - Assign products to sections when adding or after
+
+6. **Enable Group Gifts** (Optional)
+   - For expensive items, toggle "Groepscadeau"
+   - Set a target amount (funding goal)
+   - Friends can contribute money towards the item
+   - Track progress with real-time updates
+
+7. **Invite Co-Owners** (Optional)
+   - Go to "Samenwerken" tab
+   - Enter email to invite someone
+   - They can help manage the list once accepted
+
+8. **Publish and Share**
    - Set list status to "Published"
    - Share the public URL with others
    - Track clicks and commissions in your analytics
 
-6. **View Sales & Commissions**
+9. **View Sales & Commissions**
    - Go to Dashboard → Analytics
    - View your sales history
    - Track commission status (pending, approved, rejected)
    - See total earned commissions
 
-7. **Create Drawing Events (Loten Trekken)**
+10. **Create Drawing Events (Loten Trekken)**
    - Go to Drawings section
    - Create new drawing event
    - Invite participants
@@ -375,6 +408,10 @@ To add additional affiliate sources (Amazon, Coolblue, etc.):
 - **sales**: Commission and sales data from Bol.com API
 - **drawings**: Drawing/Lottery events
 - **drawing_participants**: Participants in drawing events
+- **list_sections**: Sections for organizing products within lists
+- **list_collaborators**: Co-owners/collaborators for lists
+- **list_invitations**: Collaboration invitation tracking
+- **contributions**: Group gift contributions and crowdfunding
 
 ### New Fields Added
 
@@ -399,6 +436,37 @@ To add additional affiliate sources (Amazon, Coolblue, etc.):
 - `status` - Commission status (pending, approved, rejected)
 - `user_id` - List owner user ID
 - `list_id` - List ID
+
+**list_products table:**
+- `is_group_gift` - Enable group contributions (0 or 1)
+- `target_amount` - Funding goal in EUR
+- `section_id` - Reference to list_sections table
+
+**contributions table (new):**
+- `list_product_id` - Reference to list_products
+- `contributor_name` - Name of contributor
+- `contributor_email` - Optional email for notifications
+- `amount` - Contribution amount in EUR
+- `message` - Optional message from contributor
+- `is_anonymous` - Hide contributor name (0 or 1)
+- `status` - Contribution status (pending, completed, refunded)
+
+**list_collaborators table (new):**
+- `list_id` - Reference to lists
+- `user_id` - Collaborator user ID
+- `role` - Collaborator role (owner, editor)
+- `invited_by` - User who sent invitation
+- `invited_at` - Invitation timestamp
+- `accepted_at` - Acceptance timestamp
+
+**list_invitations table (new):**
+- `list_id` - Reference to lists
+- `inviter_id` - User sending invitation
+- `invitee_email` - Email of invited user
+- `invitee_id` - User ID once accepted
+- `token` - Unique invitation token
+- `status` - Invitation status (pending, accepted, rejected, expired)
+- `expires_at` - Expiration date (default 7 days)
 
 ## Security Features
 

@@ -41,6 +41,11 @@ $routes->get('/list/(:segment)', 'Lists::view/$1');
 $routes->get('/list/(:segment)/share', 'Lists::share/$1');
 $routes->post('/list/claim', 'Lists::claimProduct');
 
+// Contribution Routes
+$routes->post('contribution/add', 'Contribution::add');
+$routes->get('contribution/product/(:num)', 'Contribution::getProductContributions/$1');
+$routes->post('contribution/toggle', 'Contribution::toggleGroupGift', ['filter' => 'auth']);
+
 // Drawings Routes (Loten Trekken)
 $routes->group('drawings', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Drawings::index');

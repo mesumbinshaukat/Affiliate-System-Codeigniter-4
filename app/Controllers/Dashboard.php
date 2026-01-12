@@ -8,6 +8,7 @@ use App\Models\ProductModel;
 use App\Models\CategoryModel;
 use App\Models\ClickModel;
 use App\Models\SalesModel;
+use App\Models\ContributionModel;
 use App\Libraries\ProductScraper;
 use App\Libraries\BolComAPI;
 use Config\Services;
@@ -27,6 +28,7 @@ class Dashboard extends BaseController
         $listModel = new ListModel();
         $clickModel = new ClickModel();
         $salesModel = new SalesModel();
+        $contributionModel = new ContributionModel();
 
         $userId = $this->session->get('user_id');
 
@@ -36,6 +38,29 @@ class Dashboard extends BaseController
         
         // Add sales statistics
         $this->data['salesStats'] = $salesModel->getUserStatistics($userId);
+        
+        // Add contribution statistics for user's lists
+        $userListIds = array_column($this->data['lists'], 'id');
+        $totalContributions = 0;
+        $contributionCount = 0;
+        
+        if (!empty($userListIds)) {
+            $db = \Config\Database::connect();
+            $builder = $db->table('contributions c');
+            $builder->select('SUM(c.amount) as total, COUNT(c.id) as count')
+                ->join('list_products lp', 'lp.id = c.list_product_id')
+                ->whereIn('lp.list_id', $userListIds)
+                ->where('c.status', 'completed');
+            $result = $builder->get()->getRowArray();
+            
+            $totalContributions = (float) ($result['total'] ?? 0);
+            $contributionCount = (int) ($result['count'] ?? 0);
+        }
+        
+        $this->data['contributionStats'] = [
+            'total_amount' => $totalContributions,
+            'count' => $contributionCount,
+        ];
 
         return view('dashboard/index', $this->data);
     }

@@ -471,6 +471,29 @@
                                                                 <?php endif; ?>
                                                             </select>
                                                         </div>
+                                                        
+                                                        <!-- Group Gift Toggle -->
+                                                        <div class="mt-3 p-2 bg-light rounded">
+                                                            <div class="form-check form-switch">
+                                                                <input class="form-check-input" type="checkbox" id="groupGift<?= $product['list_product_id'] ?>" 
+                                                                       <?= !empty($product['is_group_gift']) ? 'checked' : '' ?>
+                                                                       onchange="toggleGroupGift(<?= $product['list_product_id'] ?>, this.checked)">
+                                                                <label class="form-check-label" for="groupGift<?= $product['list_product_id'] ?>">
+                                                                    <i class="fas fa-users"></i> Groepscadeau
+                                                                </label>
+                                                            </div>
+                                                            <div id="groupGiftAmount<?= $product['list_product_id'] ?>" class="mt-2" style="display: <?= !empty($product['is_group_gift']) ? 'block' : 'none' ?>">
+                                                                <label class="form-label small mb-1">Doelbedrag:</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <span class="input-group-text">€</span>
+                                                                    <input type="number" class="form-control" id="targetAmount<?= $product['list_product_id'] ?>" 
+                                                                           value="<?= !empty($product['target_amount']) ? $product['target_amount'] : ($product['price'] ?? '') ?>" 
+                                                                           step="0.01" min="0.01"
+                                                                           onchange="updateGroupGiftAmount(<?= $product['list_product_id'] ?>, this.value)">
+                                                                </div>
+                                                                <small class="text-muted">Mensen kunnen geldbedragen bijdragen</small>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-3 text-end">
                                                         <button class="btn btn-sm btn-danger" onclick="removeProduct(<?= $product['product_id'] ?>)">
@@ -1591,6 +1614,83 @@ function refreshSectionCounts() {
             const count = sectionCounts[sectionId] || 0;
             badge.textContent = count + ' producten';
         }
+    });
+}
+
+// ========================================
+// GROUP GIFT FUNCTIONS
+// ========================================
+
+// Toggle group gift for a product
+function toggleGroupGift(listProductId, isEnabled) {
+    const amountDiv = document.getElementById('groupGiftAmount' + listProductId);
+    const targetInput = document.getElementById('targetAmount' + listProductId);
+    
+    // Show/hide amount input
+    amountDiv.style.display = isEnabled ? 'block' : 'none';
+    
+    if (!isEnabled) {
+        // Disable group gift
+        updateGroupGiftStatus(listProductId, false, null);
+        return;
+    }
+    
+    // Validate target amount before enabling
+    const targetAmount = parseFloat(targetInput.value);
+    if (!targetAmount || targetAmount <= 0) {
+        showToast('Voer een geldig doelbedrag in', 'warning');
+        document.getElementById('groupGift' + listProductId).checked = false;
+        amountDiv.style.display = 'none';
+        return;
+    }
+    
+    updateGroupGiftStatus(listProductId, true, targetAmount);
+}
+
+// Update group gift amount
+function updateGroupGiftAmount(listProductId, targetAmount) {
+    const checkbox = document.getElementById('groupGift' + listProductId);
+    
+    if (!checkbox.checked) {
+        return; // Not enabled, no need to update
+    }
+    
+    targetAmount = parseFloat(targetAmount);
+    if (!targetAmount || targetAmount <= 0) {
+        showToast('Voer een geldig doelbedrag in', 'warning');
+        return;
+    }
+    
+    updateGroupGiftStatus(listProductId, true, targetAmount);
+}
+
+// Send update to server
+function updateGroupGiftStatus(listProductId, isGroupGift, targetAmount) {
+    fetch('<?= base_url('index.php/contribution/toggle') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            list_product_id: listProductId,
+            is_group_gift: isGroupGift ? '1' : '0',
+            target_amount: targetAmount || ''
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+        } else {
+            showToast('Fout: ' + data.message, 'error');
+            // Revert checkbox if failed
+            const checkbox = document.getElementById('groupGift' + listProductId);
+            checkbox.checked = !checkbox.checked;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Fout bij bijwerken groepscadeau', 'error');
     });
 }
 </script>

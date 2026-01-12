@@ -194,26 +194,31 @@ class Collaboration extends BaseController
     public function leave()
     {
         if (!$this->isLoggedIn()) {
-            return redirect()->to('/login');
+            return $this->response->setJSON(['success' => false, 'message' => 'Not authenticated']);
         }
 
-        $listId = $this->request->getPost('list_id');
-        $userId = $this->session->get('user_id');
+        $json = $this->request->getJSON();
+        $listId = $json->list_id ?? $this->request->getPost('list_id');
+        
+        if (!$listId) {
+            return $this->response->setJSON(['success' => false, 'message' => 'List ID is required']);
+        }
 
+        $userId = $this->session->get('user_id');
         $listModel = new ListModel();
         $collaboratorModel = new ListCollaboratorModel();
 
         // Cannot leave if you're the owner
         if ($listModel->isUserOwner($listId, $userId)) {
-            return redirect()->back()->with('error', 'You cannot leave your own list. Transfer ownership first.');
+            return $this->response->setJSON(['success' => false, 'message' => 'You cannot leave your own list. Transfer ownership first.']);
         }
 
         if ($collaboratorModel->removeCollaborator($listId, $userId)) {
             log_message('info', "User {$userId} left collaboration on list {$listId}");
             
-            return redirect()->to('/dashboard')->with('success', 'You have left the collaboration');
+            return $this->response->setJSON(['success' => true, 'message' => 'You have left the collaboration']);
         } else {
-            return redirect()->back()->with('error', 'Failed to leave collaboration');
+            return $this->response->setJSON(['success' => false, 'message' => 'Failed to leave collaboration']);
         }
     }
 
