@@ -21,7 +21,9 @@ $routes->get('/logout', 'Auth::logout');
 
 // Social Authentication Routes
 $routes->get('auth/social/(:segment)', 'SocialAuth::login/$1');
+$routes->post('auth/social/(:segment)', 'SocialAuth::login/$1');
 $routes->get('auth/social/callback', 'SocialAuth::callback');
+$routes->post('auth/social/callback', 'SocialAuth::callback');
 $routes->get('auth/social/disconnect', 'SocialAuth::disconnect', ['filter' => 'auth']);
 
 // Collaboration Routes

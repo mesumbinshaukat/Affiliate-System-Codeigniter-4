@@ -26,20 +26,36 @@ class SocialAuth extends BaseController
      * @param string $provider Provider name (facebook, google)
      * @return \CodeIgniter\HTTP\RedirectResponse
      */
-    public function login(string $provider)
+    public function login(string $provider = '')
     {
         try {
+            // Get referrer to redirect back after error (register or login page)
+            $referrer = $this->request->getServer('HTTP_REFERER');
+            $redirectPage = (strpos($referrer, '/register') !== false) ? '/register' : '/login';
+            
+            // Log raw request data
+            log_message('info', 'Social auth login - Raw provider param: [' . $provider . ']');
+            log_message('info', 'Social auth login - URI: ' . $this->request->getUri());
+            log_message('info', 'Social auth login - Method: ' . $this->request->getMethod());
+            log_message('info', 'Social auth login - Referrer: ' . ($referrer ?? 'NULL'));
+            
             // Validate provider
-            $provider = strtolower($provider);
+            $provider = strtolower(trim($provider));
+            
+            if (empty($provider)) {
+                log_message('error', 'Empty provider parameter received');
+                return redirect()->to($redirectPage)->with('error', 'Invalid social login provider.');
+            }
+            
             if (!in_array($provider, ['facebook', 'google'])) {
-                log_message('error', 'Invalid social provider attempted: ' . $provider);
-                return redirect()->to('/login')->with('error', 'Invalid social login provider.');
+                log_message('error', 'Invalid social provider attempted: [' . $provider . '] - Length: ' . strlen($provider));
+                return redirect()->to($redirectPage)->with('error', 'Invalid social login provider.');
             }
 
             // Check if provider is enabled
             if (!$this->socialAuthConfig->isProviderEnabled($provider)) {
                 log_message('error', 'Disabled social provider attempted: ' . $provider);
-                return redirect()->to('/login')->with('error', ucfirst($provider) . ' login is currently disabled.');
+                return redirect()->to($redirectPage)->with('error', ucfirst($provider) . ' login is currently disabled.');
             }
 
             // Store intended redirect URL in session
@@ -48,6 +64,12 @@ class SocialAuth extends BaseController
 
             // Store provider in session for callback
             $this->session->set('social_auth_provider', $provider);
+            
+            // Force save session before redirect
+            session_write_close();
+            
+            log_message('info', 'Starting OAuth flow for provider: ' . $provider);
+            log_message('info', 'Callback URL configured: ' . $this->socialAuthConfig->config['callback']);
 
             // Initialize Hybridauth
             $hybridauth = new Hybridauth($this->socialAuthConfig->config);
@@ -83,8 +105,16 @@ class SocialAuth extends BaseController
             // Get provider from session
             $provider = $this->session->get('social_auth_provider');
             
+            // Log callback details for debugging
+            log_message('info', 'OAuth callback received. Session provider: ' . ($provider ?? 'NULL'));
+            log_message('info', 'OAuth callback params: ' . json_encode([
+                'state' => $this->request->getGet('state'),
+                'code' => $this->request->getGet('code') ? 'present' : 'missing',
+                'error' => $this->request->getGet('error')
+            ]));
+            
             if (!$provider) {
-                log_message('error', 'Social auth callback without provider in session');
+                log_message('error', 'Social auth callback without provider in session. Full session: ' . json_encode($_SESSION ?? []));
                 return redirect()->to('/login')->with('error', 'Authentication session expired. Please try again.');
             }
 

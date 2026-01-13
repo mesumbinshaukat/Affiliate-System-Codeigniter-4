@@ -24,10 +24,10 @@
                     
                     <!-- Social Login Buttons -->
                     <div class="mb-4">
-                        <a href="<?= base_url('auth/social/facebook') ?>" class="btn btn-primary w-100 mb-2" style="background-color: #1877f2; border-color: #1877f2;">
+                        <a href="<?= base_url('index.php/auth/social/facebook') ?>" class="btn btn-primary w-100 mb-2" style="background-color: #1877f2; border-color: #1877f2;">
                             <i class="fab fa-facebook-f me-2"></i> Inloggen met Facebook
                         </a>
-                        <a href="<?= base_url('auth/social/google') ?>" class="btn btn-danger w-100 mb-2">
+                        <a href="<?= base_url('index.php/auth/social/google') ?>" class="btn btn-danger w-100 mb-2">
                             <i class="fab fa-google me-2"></i> Inloggen met Google
                         </a>
                     </div>

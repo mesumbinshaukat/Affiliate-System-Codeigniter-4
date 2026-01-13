@@ -17,8 +17,14 @@ class SocialAuth extends BaseConfig
     {
         parent::__construct();
 
+        // Force HTTPS for callback URL in production
+        $callbackUrl = base_url('auth/social/callback');
+        if (strpos(base_url(), 'https://') === 0) {
+            $callbackUrl = str_replace('http://', 'https://', $callbackUrl);
+        }
+
         $this->config = [
-            'callback' => base_url('auth/social/callback'),
+            'callback' => $callbackUrl,
             
             'providers' => [
                 'Facebook' => [
@@ -37,9 +43,10 @@ class SocialAuth extends BaseConfig
                         'id' => getenv('GOOGLE_CLIENT_ID'),
                         'secret' => getenv('GOOGLE_CLIENT_SECRET'),
                     ],
-                    'scope' => 'profile email',
-                    'access_type' => 'offline',
+                    'scope' => 'openid profile email',
+                    'access_type' => 'online',
                     'approval_prompt' => 'auto',
+                    'trustForwarded' => true,
                 ],
             ],
             
