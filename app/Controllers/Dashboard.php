@@ -107,10 +107,20 @@ class Dashboard extends BaseController
                 'description' => $this->request->getPost('description'),
                 'status' => 'published',
                 'is_crossable' => $this->request->getPost('is_crossable') ? 1 : 0,
+                'event_date' => $this->request->getPost('event_date') ?: null,
+                'reminder_enabled' => $this->request->getPost('reminder_enabled') ? 1 : 0,
+                'reminder_intervals' => $this->request->getPost('reminder_intervals') ?: '30,14,7',
             ];
 
             if ($listModel->insert($data)) {
                 $listId = $listModel->getInsertID();
+                
+                // Generate reminders if enabled
+                if ($data['reminder_enabled'] && $data['event_date']) {
+                    $reminderService = new \App\Libraries\ReminderService();
+                    $reminderService->generateRemindersForList($listId);
+                }
+                
                 // If first_list flag is set, redirect to products tab
                 $isFirstList = $this->request->getGet('first_list') === 'true';
                 $redirectUrl = '/dashboard/list/edit/' . $listId;
@@ -255,9 +265,27 @@ class Dashboard extends BaseController
                 'slug' => $slug,
                 'description' => $this->request->getPost('description'),
                 'is_crossable' => $this->request->getPost('is_crossable') ? 1 : 0,
+                'event_date' => $this->request->getPost('event_date') ?: null,
+                'reminder_enabled' => $this->request->getPost('reminder_enabled') ? 1 : 0,
+                'reminder_intervals' => $this->request->getPost('reminder_intervals') ?: '30,14,7',
             ];
 
             if ($listModel->update($listId, $data)) {
+                // Check if reminder settings changed
+                $oldEventDate = $list['event_date'] ?? null;
+                $newEventDate = $data['event_date'];
+                $reminderEnabled = $data['reminder_enabled'];
+                
+                // Regenerate reminders if event date changed or reminder settings changed
+                if ($reminderEnabled && $newEventDate && $oldEventDate !== $newEventDate) {
+                    $reminderService = new \App\Libraries\ReminderService();
+                    $reminderService->regenerateReminders($listId);
+                } elseif (!$reminderEnabled) {
+                    // Delete reminders if disabled
+                    $reminderModel = new \App\Models\ListReminderModel();
+                    $reminderModel->deleteListReminders($listId);
+                }
+                
                 return redirect()->back()->with('success', 'List updated successfully');
             }
 

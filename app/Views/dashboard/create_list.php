@@ -42,6 +42,33 @@
                             </div>
                         </div>
 
+                        <hr class="my-4">
+
+                        <h5 class="mb-3"><i class="fas fa-bell text-primary"></i> Evenement & Herinneringen</h5>
+                        <p class="text-muted small mb-3">Stel een evenementdatum in (bijv. verjaardag) en ontvang automatische herinneringen</p>
+
+                        <div class="mb-3">
+                            <label for="event_date" class="form-label">Evenementdatum (optioneel)</label>
+                            <input type="date" class="form-control" id="event_date" name="event_date" value="<?= old('event_date') ?>">
+                            <small class="text-muted">Bijvoorbeeld uw verjaardag: 19 februari 2025</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="reminder_enabled" name="reminder_enabled" value="1" <?= old('reminder_enabled') == '1' ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="reminder_enabled">
+                                    <strong>Stuur automatische e-mail herinneringen</strong>
+                                    <small class="d-block text-muted">Medewerkers ontvangen herinneringen voor het evenement</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="reminder_settings" style="display: none;">
+                            <label for="reminder_intervals" class="form-label">Herinneringsmomenten (in dagen)</label>
+                            <input type="text" class="form-control" id="reminder_intervals" name="reminder_intervals" value="<?= old('reminder_intervals', '30,14,7') ?>" placeholder="30,14,7">
+                            <small class="text-muted">Kommagescheiden: bijv. "30,14,7" stuurt herinneringen 30, 14 en 7 dagen voor het evenement</small>
+                        </div>
+
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Lijst Maken</button>
                             <a href="<?= base_url('index.php/dashboard/lists') ?>" class="btn btn-secondary">Annuleren</a>
@@ -78,5 +105,27 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const reminderEnabled = document.getElementById('reminder_enabled');
+    const reminderSettings = document.getElementById('reminder_settings');
+    const eventDate = document.getElementById('event_date');
+    
+    function toggleReminderSettings() {
+        if (reminderEnabled.checked && eventDate.value) {
+            reminderSettings.style.display = 'block';
+        } else {
+            reminderSettings.style.display = 'none';
+        }
+    }
+    
+    reminderEnabled.addEventListener('change', toggleReminderSettings);
+    eventDate.addEventListener('change', toggleReminderSettings);
+    
+    // Initial state
+    toggleReminderSettings();
+});
+</script>
 
 <?= $this->endSection() ?>

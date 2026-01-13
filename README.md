@@ -55,6 +55,14 @@ A complete affiliate marketing platform built with CodeIgniter 4, allowing users
 - Commission status tracking (pending, approved, rejected)
 
 ### Special Features
+- **Automated Event Reminder System**
+  - Set event dates (birthdays, anniversaries, etc.) for lists
+  - Automated email reminders to collaborators
+  - Customizable reminder intervals (e.g., 30, 14, 7 days before)
+  - Smart scheduling with cron job support
+  - Beautiful HTML email templates
+  - Prevents duplicate reminders
+  - Tracks sent/pending/failed reminders
 - **Group Gift / Crowdfunding System**
   - Enable group contributions for expensive items
   - Set funding goals for products
@@ -246,23 +254,30 @@ After running the seeder, you can login with:
    - Friends can contribute money towards the item
    - Track progress with real-time updates
 
-7. **Invite Co-Owners** (Optional)
+7. **Set Event Date & Reminders** (Optional)
+   - Set an event date (e.g., your birthday: February 19)
+   - Enable "Stuur automatische e-mail herinneringen"
+   - Customize reminder intervals (default: 30, 14, 7 days before)
+   - Collaborators automatically receive email reminders
+   - Example: Birthday on Feb 19 → Reminders on Jan 20, Feb 5, Feb 12
+
+8. **Invite Co-Owners** (Optional)
    - Go to "Samenwerken" tab
    - Enter email to invite someone
    - They can help manage the list once accepted
 
-8. **Publish and Share**
+9. **Publish and Share**
    - Set list status to "Published"
    - Share the public URL with others
    - Track clicks and commissions in your analytics
 
-9. **View Sales & Commissions**
+10. **View Sales & Commissions**
    - Go to Dashboard → Analytics
    - View your sales history
    - Track commission status (pending, approved, rejected)
    - See total earned commissions
 
-10. **Create Drawing Events (Loten Trekken)**
+11. **Create Drawing Events (Loten Trekken)**
    - Go to Drawings section
    - Create new drawing event
    - Invite participants
@@ -561,6 +576,66 @@ php spark make:controller ControllerName
 php spark make:model ModelName
 ```
 
+## Automated Reminder System Setup
+
+### Prerequisites
+- Email configuration in `.env`
+- Cron job access on your server
+
+### Configure Email Settings
+
+In your `.env` file, set up email:
+```
+email.fromEmail = noreply@lijst.je
+email.fromName = Lijst.je
+email.SMTPHost = smtp.gmail.com
+email.SMTPUser = your-email@gmail.com
+email.SMTPPass = your-password
+email.SMTPPort = 587
+email.SMTPCrypto = tls
+```
+
+### Set Up Cron Job
+
+Add this to your crontab to send reminders daily at 9:00 AM:
+
+```bash
+# Open crontab
+crontab -e
+
+# Add this line (adjust path to your project)
+0 9 * * * cd /path/to/project && php spark reminders:send
+```
+
+**Alternative: Manual Testing**
+```bash
+# Test reminder system manually
+php spark reminders:send
+```
+
+### How It Works
+
+1. **User creates a list** with event date (e.g., Birthday: Feb 19, 2025)
+2. **User enables reminders** with intervals (30, 14, 7 days before)
+3. **System generates reminder records** for all collaborators
+4. **Cron job runs daily** and checks for pending reminders
+5. **Emails are sent** X days before the event
+6. **Status tracked** (pending → sent/failed)
+
+### Example Flow
+
+```
+List: "John's Birthday"
+Event Date: February 19, 2025
+Collaborators: alice@email.com, bob@email.com
+Reminder Intervals: 30,14,7
+
+Reminders Sent:
+- January 20, 2025 (30 days before) → Alice & Bob
+- February 5, 2025 (14 days before) → Alice & Bob  
+- February 12, 2025 (7 days before) → Alice & Bob
+```
+
 ## Production Deployment
 
 1. Set `CI_ENVIRONMENT = production` in `.env`
@@ -569,9 +644,12 @@ php spark make:model ModelName
 4. Set proper file permissions (755 for directories, 644 for files)
 5. Configure SSL certificate
 6. Set up proper backup system
-7. Configure cron jobs for maintenance tasks
+7. **Configure cron jobs:**
+   - Daily reminder emails: `0 9 * * * php spark reminders:send`
+   - Commission sync: As per existing schedule
 8. Use production database credentials
 9. Enable caching for better performance
+10. Configure production email SMTP settings
 
 ## License
 

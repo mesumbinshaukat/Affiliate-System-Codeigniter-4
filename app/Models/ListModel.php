@@ -14,7 +14,8 @@ class ListModel extends Model
     protected $protectFields = true;
     protected $allowedFields = [
         'user_id', 'category_id', 'title', 'slug', 'description',
-        'status', 'is_featured', 'is_crossable', 'views'
+        'status', 'is_featured', 'is_crossable', 'views',
+        'event_date', 'reminder_enabled', 'reminder_intervals'
     ];
 
     protected bool $allowEmptyInserts = false;
