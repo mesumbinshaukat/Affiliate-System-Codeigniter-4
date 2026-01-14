@@ -124,63 +124,131 @@ class UserModel extends Model
      */
     public function createOrUpdateFromSocial(array $providerData, string $provider)
     {
-        // Check if user exists with this provider
-        $existingUser = $this->findBySocialProvider($provider, $providerData['identifier']);
-        
-        if ($existingUser) {
-            // Update existing user's token and info
-            $updateData = [
+        try {
+            // Validate provider data
+            if (empty($providerData['identifier'])) {
+                log_message('error', 'createOrUpdateFromSocial: Missing provider identifier');
+                return false;
+            }
+            
+            log_message('info', "Checking if user exists - Provider: {$provider}, ID: {$providerData['identifier']}");
+            
+            // Check if user exists with this provider
+            $existingUser = $this->findBySocialProvider($provider, $providerData['identifier']);
+            
+            if ($existingUser) {
+                log_message('info', "Existing user found by provider. User ID: {$existingUser['id']}, Email: " . ($existingUser['email'] ?? 'NULL'));
+                
+                // Update existing user's token and info
+                $updateData = [
+                    'provider_token' => $providerData['access_token'] ?? null,
+                    'email_verified' => !empty($providerData['emailVerified']) ? 1 : 0,
+                ];
+                
+                // Update name if provided and current name is empty
+                if (!empty($providerData['firstName']) && empty($existingUser['first_name'])) {
+                    $updateData['first_name'] = $providerData['firstName'];
+                }
+                if (!empty($providerData['lastName']) && empty($existingUser['last_name'])) {
+                    $updateData['last_name'] = $providerData['lastName'];
+                }
+                
+                // Update avatar if provided and not already set
+                if (!empty($providerData['photoURL']) && empty($existingUser['avatar'])) {
+                    $updateData['avatar'] = $providerData['photoURL'];
+                }
+                
+                // Update email if missing and provided
+                if (!empty($providerData['email']) && empty($existingUser['email'])) {
+                    $updateData['email'] = $providerData['email'];
+                }
+                
+                $this->update($existingUser['id'], $updateData);
+                log_message('info', "User updated successfully. User ID: {$existingUser['id']}");
+                return $this->find($existingUser['id']);
+            }
+            
+            // Check if email already exists (user registered normally)
+            if (!empty($providerData['email'])) {
+                log_message('info', "Checking if email exists: {$providerData['email']}");
+                $emailUser = $this->where('email', $providerData['email'])->first();
+                
+                if ($emailUser) {
+                    log_message('info', "User found by email. Linking social account. User ID: {$emailUser['id']}, Provider: {$provider}");
+                    
+                    // Link social account to existing email account
+                    $updateData = [
+                        'provider' => $provider,
+                        'provider_id' => $providerData['identifier'],
+                        'provider_token' => $providerData['access_token'] ?? null,
+                        'email_verified' => 1,
+                    ];
+                    
+                    // Update avatar if missing
+                    if (!empty($providerData['photoURL']) && empty($emailUser['avatar'])) {
+                        $updateData['avatar'] = $providerData['photoURL'];
+                    }
+                    
+                    // Update names if missing
+                    if (!empty($providerData['firstName']) && empty($emailUser['first_name'])) {
+                        $updateData['first_name'] = $providerData['firstName'];
+                    }
+                    if (!empty($providerData['lastName']) && empty($emailUser['last_name'])) {
+                        $updateData['last_name'] = $providerData['lastName'];
+                    }
+                    
+                    $this->update($emailUser['id'], $updateData);
+                    log_message('info', "Social account linked successfully. User ID: {$emailUser['id']}");
+                    return $this->find($emailUser['id']);
+                }
+            }
+            
+            // Create new user
+            log_message('info', "Creating new user from social auth. Provider: {$provider}");
+            $username = $this->generateUniqueUsername($providerData);
+            
+            $userData = [
+                'username' => $username,
+                'email' => $providerData['email'] ?? null,
+                'password' => password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT), // Random password
+                'first_name' => $providerData['firstName'] ?? '',
+                'last_name' => $providerData['lastName'] ?? '',
+                'avatar' => $providerData['photoURL'] ?? null,
+                'provider' => $provider,
+                'provider_id' => $providerData['identifier'],
                 'provider_token' => $providerData['access_token'] ?? null,
                 'email_verified' => !empty($providerData['emailVerified']) ? 1 : 0,
+                'role' => 'user',
+                'status' => 'active',
             ];
             
-            // Update avatar if provided and not already set
-            if (!empty($providerData['photoURL']) && empty($existingUser['avatar'])) {
-                $updateData['avatar'] = $providerData['photoURL'];
+            log_message('info', "Inserting new user. Username: {$username}, Email: " . ($userData['email'] ?? 'NULL'));
+            
+            // Disable validation temporarily for social auth users
+            $this->skipValidation = true;
+            
+            if ($this->insert($userData)) {
+                $userId = $this->getInsertID();
+                log_message('info', "New user created successfully. User ID: {$userId}");
+                
+                // Re-enable validation
+                $this->skipValidation = false;
+                
+                return $this->find($userId);
+            } else {
+                log_message('error', 'Failed to insert user. Validation errors: ' . json_encode($this->errors()));
+                
+                // Re-enable validation
+                $this->skipValidation = false;
+                
+                return false;
             }
             
-            $this->update($existingUser['id'], $updateData);
-            return $this->find($existingUser['id']);
+        } catch (\Exception $e) {
+            log_message('error', 'Exception in createOrUpdateFromSocial: ' . $e->getMessage());
+            log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+            return false;
         }
-        
-        // Check if email already exists (user registered normally)
-        if (!empty($providerData['email'])) {
-            $emailUser = $this->where('email', $providerData['email'])->first();
-            if ($emailUser) {
-                // Link social account to existing email account
-                $this->update($emailUser['id'], [
-                    'provider' => $provider,
-                    'provider_id' => $providerData['identifier'],
-                    'provider_token' => $providerData['access_token'] ?? null,
-                    'email_verified' => 1,
-                ]);
-                return $this->find($emailUser['id']);
-            }
-        }
-        
-        // Create new user
-        $username = $this->generateUniqueUsername($providerData);
-        
-        $userData = [
-            'username' => $username,
-            'email' => $providerData['email'] ?? null,
-            'password' => password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT), // Random password
-            'first_name' => $providerData['firstName'] ?? '',
-            'last_name' => $providerData['lastName'] ?? '',
-            'avatar' => $providerData['photoURL'] ?? null,
-            'provider' => $provider,
-            'provider_id' => $providerData['identifier'],
-            'provider_token' => $providerData['access_token'] ?? null,
-            'email_verified' => !empty($providerData['emailVerified']) ? 1 : 0,
-            'role' => 'user',
-            'status' => 'active',
-        ];
-        
-        if ($this->insert($userData)) {
-            return $this->find($this->getInsertID());
-        }
-        
-        return false;
     }
 
     /**

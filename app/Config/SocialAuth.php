@@ -17,9 +17,19 @@ class SocialAuth extends BaseConfig
     {
         parent::__construct();
 
-        // Force HTTPS for callback URL in production
-        $callbackUrl = base_url('auth/social/callback');
-        if (strpos(base_url(), 'https://') === 0) {
+        // Build callback URL with proper index.php handling
+        $baseUrl = rtrim(base_url(), '/');
+        $indexPage = config('App')->indexPage;
+        
+        // Force include index.php in callback URL for production
+        if (!empty($indexPage)) {
+            $callbackUrl = $baseUrl . '/' . $indexPage . '/auth/social/callback';
+        } else {
+            $callbackUrl = $baseUrl . '/auth/social/callback';
+        }
+        
+        // Ensure HTTPS in production
+        if (strpos($baseUrl, 'https://') === 0) {
             $callbackUrl = str_replace('http://', 'https://', $callbackUrl);
         }
 
@@ -33,8 +43,8 @@ class SocialAuth extends BaseConfig
                         'id' => getenv('FACEBOOK_APP_ID'),
                         'secret' => getenv('FACEBOOK_APP_SECRET'),
                     ],
-                    'scope' => 'email, public_profile',
-                    'trustForwarded' => false,
+                    'scope' => 'email,public_profile',
+                    'trustForwarded' => true,
                 ],
                 
                 'Google' => [

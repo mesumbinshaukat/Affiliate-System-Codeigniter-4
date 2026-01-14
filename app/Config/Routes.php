@@ -20,11 +20,12 @@ $routes->post('/register', 'Auth::register');
 $routes->get('/logout', 'Auth::logout');
 
 // Social Authentication Routes
-$routes->get('auth/social/(:segment)', 'SocialAuth::login/$1');
-$routes->post('auth/social/(:segment)', 'SocialAuth::login/$1');
+// IMPORTANT: Specific routes MUST come before generic (:segment) pattern
 $routes->get('auth/social/callback', 'SocialAuth::callback');
 $routes->post('auth/social/callback', 'SocialAuth::callback');
 $routes->get('auth/social/disconnect', 'SocialAuth::disconnect', ['filter' => 'auth']);
+$routes->get('auth/social/(:segment)', 'SocialAuth::login/$1');
+$routes->post('auth/social/(:segment)', 'SocialAuth::login/$1');
 
 // Collaboration Routes
 $routes->group('collaboration', ['filter' => 'auth'], function($routes) {
