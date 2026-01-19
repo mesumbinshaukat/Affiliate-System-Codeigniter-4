@@ -71,7 +71,7 @@
         border-radius: 999px;
         padding: 0.95rem 1.5rem;
         font-weight: 600;
-        background: #2F4CF1;
+        background: #3479CD;
         border: none;
         color: #fff;
         width: 100%;
@@ -83,7 +83,7 @@
     }
 
     .privacy-note a {
-        color: #2F4CF1;
+        color: #3479CD;
         text-decoration: none;
     }
 

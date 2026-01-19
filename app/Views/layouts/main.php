@@ -14,7 +14,7 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary-color: #E31E24;
+            --primary-color: #3479CD;
             --secondary-color: #64748b;
             --success-color: #10b981;
             --danger-color: #ef4444;
@@ -55,13 +55,13 @@
         }
         
         .btn-primary:hover {
-            background-color: #c41a1f;
-            border-color: #c41a1f;
+            background-color: #2B63BB;
+            border-color: #2B63BB;
         }
         
         /* Hero Section Styles */
         .hero-section {
-            background: linear-gradient(135deg, #E31E24 0%, #c41a1f 100%);
+            background: linear-gradient(135deg, #3479CD 0%, #2B63BB 100%);
             min-height: 600px;
             padding: 60px 0;
             position: relative;
@@ -89,7 +89,7 @@
         }
         
         .hero-subtitle {
-            color: #FFD54F;
+            color: #E4EEFF;
             font-size: 1.5rem;
             font-weight: 400;
             margin-bottom: 2rem;
@@ -119,10 +119,10 @@
         }
         
         .btn-make-list:hover {
-            background-color: #c41a1f;
+            background-color: #2B63BB;
             color: #fff;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3);
+            box-shadow: 0 4px 12px rgba(52, 121, 205, 0.35);
         }
         
         .divider-text {
@@ -154,7 +154,7 @@
         
         .find-list-input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(227, 30, 36, 0.1);
+            box-shadow: 0 0 0 0.2rem rgba(52, 121, 205, 0.2);
         }
         
         .how-it-works {
@@ -313,7 +313,7 @@
         }
         
         .stats-card {
-            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            background: linear-gradient(135deg, var(--primary-color), #4F9BFF);
             color: white;
             border-radius: 1rem;
             padding: 1.5rem;
@@ -326,33 +326,77 @@
             margin-bottom: 0.5rem;
         }
         
-        footer {
-            background-color: #2c2c2c;
-            color: #999;
-            padding: 3rem 0 2rem;
-            margin-top: 0;
+        .landing-footer {
+            margin-top: 4rem;
+            background: #050C3E;
+            color: rgba(255,255,255,0.75);
+            padding: 4rem 0 3rem;
         }
-        
-        footer a {
-            color: #999;
+
+        .landing-footer a {
+            color: rgba(255,255,255,0.85);
             text-decoration: none;
         }
-        
-        footer a:hover {
+
+        .landing-footer a:hover {
+            color: #ffffff;
+        }
+
+        .footer-heading {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links-inline {
+            display: flex;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            font-weight: 600;
+            justify-content: flex-end;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 0.85rem;
+        }
+
+        .social-links a {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.35);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .social-links a:hover {
+            border-color: rgba(255,255,255,0.8);
             color: #fff;
         }
-        
-        .footer-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+
+        .social-links svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
         }
-        
-        .footer-copyright {
-            color: #666;
+
+        .landing-footer hr {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            margin: 2rem 0 1.5rem;
+        }
+
+        .landing-footer .footer-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
             font-size: 0.9rem;
         }
         
@@ -589,32 +633,45 @@
     </main>
 
     <!-- Footer -->
-    <footer>
+    <footer class="landing-footer" id="dashboard-footer">
         <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <ul class="footer-links">
-                        <li><a href="#">Frequently Asked Questions</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="<?= base_url('index.php/drawings') ?>">Loten Trekken</a></li>
-                        <li><a href="#">Shops</a></li>
-                        <li><a href="#">About Lijstje.nl</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <div class="app-badges">
-                        <a href="#" class="d-inline-block me-2">
-                            <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on App Store" style="height: 40px;">
-                        </a>
-                        <a href="#" class="d-inline-block">
-                            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 60px; margin-top: -10px;">
-                        </a>
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-6">
+                    <h4 class="footer-heading">Remcom</h4>
+                    <p>Een betrouwbaar platform dat veilige, transparante en moderne cadeau-oplossingen biedt voor families en vrienden.</p>
+                    <div class="d-flex align-items-center gap-3 mt-3">
+                        <span>Volg ons:</span>
+                        <div class="social-links">
+                            <a href="https://facebook.com" aria-label="Facebook" target="_blank" rel="noopener">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 8.5V6.75c0-.6.4-.75.7-.75H16V3h-2.3C11.6 3 10 4.7 10 6.7V8.5H8v3h2v9h3.3v-9h2.3l.4-3h-2.5z"/></svg>
+                            </a>
+                            <a href="https://instagram.com" aria-label="Instagram" target="_blank" rel="noopener">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3h-9C5 3 3 5 3 7.5v9C3 19 5 21 7.5 21h9c2.5 0 4.5-2 4.5-4.5v-9C21 5 19 3 16.5 3zm3 12.5c0 1.7-1.3 3-3 3h-9c-1.7 0-3-1.3-3-3v-9c0-1.7 1.3-3 3-3h9c1.7 0 3 1.3 3 3v9z"/><path d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 1 0 12 8.5zm0 5.5a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/><circle cx="17" cy="7" r="1"/></svg>
+                            </a>
+                            <a href="https://google.com" aria-label="Google" target="_blank" rel="noopener">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.2c0-.7-.1-1.4-.2-2.1H12v4h5.1c-.2 1.2-.9 2.3-2 3l-.1.1 3.3 2.6.2.1c1.9-1.7 2.5-4.2 2.5-7.7z"/><path d="M12 21c2.7 0 5-1 6.7-2.7l-3.6-2.8c-.8.5-1.8.8-3.1.8-2.4 0-4.5-1.6-5.3-3.8H3.1l-.1.1A9 9 0 0 0 12 21z"/><path d="M6.7 12c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2L6.7 8H3.1a9 9 0 0 0 0 8l3.6-2.8z"/><path d="M12 5.5c1.5 0 2.8.5 3.8 1.4l2.9-2.9A9 9 0 0 0 12 3c-3.5 0-6.6 2-8.2 5l3.7 2.9C8.2 8.1 9.9 5.5 12 5.5z"/></svg>
+                            </a>
+                            <a href="https://youtube.com" aria-label="YouTube" target="_blank" rel="noopener">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 7s-.2-1.4-.8-2c-.8-.8-1.8-.8-2.3-.9C15.2 4 12 4 12 4h-.1s-3.2 0-6.5.1c-.5.1-1.5.1-2.3.9-.6.6-.8 2-.8 2S2 8.7 2 10.4v1.2c0 1.7.2 3.4.2 3.4s.2 1.4.8 2c.8.8 1.9.7 2.4.8 1.8.2 7.6.3 7.6.3s3.2 0 6.5-.1c.5-.1 1.5-.1 2.3-.9.6-.6.8-2 .8-2s.2-1.7.2-3.4v-1.2c0-1.7-.2-3.4-.2-3.4zM10 14.7V7.8l5.6 3.4L10 14.7z"/></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
+                <div class="col-lg-6 text-lg-end">
+                    <nav class="footer-links-inline">
+                        <a href="#">Winkel</a>
+                        <a href="#">Over Ons</a>
+                        <a href="#faq">Veelgestelde Vragen</a>
+                        <a href="#contact">Contact</a>
+                    </nav>
+                </div>
             </div>
-            <div class="row mt-4">
-                <div class="col-12">
-                    <p class="footer-copyright mb-0">&copy; <?= date('Y') ?> LIJST.NL &nbsp;&bull;&nbsp; <a href="#">Gebruiksvoorwaarden</a> &nbsp;&bull;&nbsp; <a href="#">Privacyverklaring</a></p>
+            <hr>
+            <div class="footer-meta">
+                <span>&copy; <?= date('Y') ?> Remcom. Alle rechten voorbehouden.</span>
+                <div class="d-flex gap-4">
+                    <a href="#">Gebruiksvoorwaarden</a>
+                    <a href="#">Privacyverklaring</a>
                 </div>
             </div>
         </div>

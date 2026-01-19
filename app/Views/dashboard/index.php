@@ -24,19 +24,19 @@
             </div>
         </div>
         <div class="col-md-3 col-6 mb-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+            <div class="stats-card" style="background: linear-gradient(135deg, #3479CD, #2B63BB);">
                 <h3><?= $totalClicks ?></h3>
                 <p class="mb-0">Totale Klikken</p>
             </div>
         </div>
         <div class="col-md-3 col-6 mb-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+            <div class="stats-card" style="background: linear-gradient(135deg, #3479CD, #4F9BFF);">
                 <h3>€<?= number_format($salesStats['total_commission'] ?? 0, 2) ?></h3>
                 <p class="mb-0">Commissies</p>
             </div>
         </div>
         <div class="col-md-3 col-6 mb-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+            <div class="stats-card" style="background: linear-gradient(135deg, #2957A8, #3479CD);">
                 <h3>€<?= number_format($contributionStats['total_amount'] ?? 0, 2) ?></h3>
                 <p class="mb-0">Groepscadeaus (<?= $contributionStats['count'] ?? 0 ?>)</p>
             </div>
@@ -48,7 +48,7 @@
         <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/dashboard/lists') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
-                    <i class="fas fa-list fa-3x text-primary mb-3"></i>
+                    <i class="fas fa-list fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Mijn Lijsten</h5>
                 </div>
             </a>
@@ -56,7 +56,7 @@
         <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
-                    <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
+                    <i class="fas fa-plus-circle fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Lijst Maken</h5>
                 </div>
             </a>
@@ -64,7 +64,7 @@
         <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/drawings') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
-                    <i class="fas fa-dice fa-3x text-warning mb-3"></i>
+                    <i class="fas fa-dice fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Loten Trekken</h5>
                 </div>
             </a>
@@ -72,7 +72,7 @@
         <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
-                    <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                    <i class="fas fa-chart-line fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Analytica</h5>
                 </div>
             </a>
@@ -84,7 +84,7 @@
         <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/dashboard/purchased') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
-                    <i class="fas fa-shopping-cart fa-3x mb-3" style="color: #10b981;"></i>
+                    <i class="fas fa-shopping-cart fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Gekochte Producten</h5>
                 </div>
             </a>
@@ -92,7 +92,7 @@
         <div class="col-md-3 col-6 mb-3">
             <a href="<?= base_url('index.php/dashboard/invitations') ?>" class="card text-center text-decoration-none">
                 <div class="card-body">
-                    <i class="fas fa-envelope fa-3x mb-3" style="color: #8b5cf6;"></i>
+                    <i class="fas fa-envelope fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Lijstuitnodigingen</h5>
                 </div>
             </a>
