@@ -1,25 +1,42 @@
 <?= $this->extend('layouts/landing') ?>
 
+<?php
+$heroBackground = base_url('media/braakbal10/' . rawurlencode('Frame 93.png'));
+$stepsIllustrations = [
+    base_url('media/braakbal10/' . rawurlencode('Frame 1000011522.png')),
+    base_url('media/braakbal10/' . rawurlencode('Frame 1000011520.png')),
+    base_url('media/braakbal10/' . rawurlencode('Frame 1000011521.png')),
+];
+$whyPhotos = [
+    'front' => base_url('media/braakbal10/' . rawurlencode('Rectangle 4.png')),
+    'back' => base_url('media/braakbal10/' . rawurlencode('Rectangle 3.png')),
+];
+$ctaIllustration = base_url('media/braakbal10/' . rawurlencode('g1.png'));
+$blogImages = [
+    base_url('media/braakbal10/' . rawurlencode('Rectangle 5.png')),
+    base_url('media/braakbal10/' . rawurlencode('Rectangle 6.png')),
+    base_url('media/braakbal10/' . rawurlencode('Rectangle 7.png')),
+];
+?>
+
 <?= $this->section('styles') ?>
 <style>
     .hero-wrapper {
-        background: linear-gradient(180deg, #E1F0FF 0%, #F8FBFF 72%, #FFFFFF 100%);
-        padding: 4.75rem 0 2.5rem;
+        background-color: #E7F2FF;
+        background-image: url('<?= $heroBackground ?>');
+        background-size: cover;
+        background-position: center bottom;
+        background-repeat: no-repeat;
+        padding: 6rem 0 4rem;
         position: relative;
         overflow: hidden;
-    }
-
-    .hero-wrapper::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at 30% -10%, rgba(52,121,205,0.18), transparent 60%);
-        pointer-events: none;
+        min-height: 100vh;
+        margin-bottom: 3rem;
     }
 
     .hero-content {
         position: relative;
-        max-width: 760px;
+        max-width: 950px;
         margin: 0 auto;
         text-align: center;
     }
@@ -79,68 +96,6 @@
         color: #3479CD;
     }
 
-    .hero-art {
-        position: relative;
-        margin-top: 3.25rem;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        gap: 1.5rem;
-        flex-wrap: wrap;
-        z-index: 1;
-    }
-
-    .hero-character {
-        width: 240px;
-        height: 270px;
-        border-radius: 32px;
-        border: 2px dashed rgba(7,17,70,0.2);
-        background: linear-gradient(180deg, #FFE7E0 0%, #F9EEFF 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #6B7CA5;
-        font-weight: 600;
-        text-align: center;
-        padding: 1.5rem;
-    }
-
-    .hero-gifts {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: nowrap;
-        align-items: flex-end;
-    }
-
-    .gift-box {
-        width: 110px;
-        height: 160px;
-        border-radius: 28px;
-        background: linear-gradient(180deg, #F4F8FF, #DDE6FF);
-        border: 6px solid #fff;
-        box-shadow: 0 20px 45px rgba(7, 17, 70, 0.15);
-        position: relative;
-    }
-
-    .gift-box::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 10px;
-        height: 100%;
-        background: rgba(255,255,255,0.6);
-        border-radius: 999px;
-    }
-
-    .gift-box.short {
-        height: 120px;
-    }
-
-    .gift-box.tall {
-        height: 190px;
-    }
 
     .stat-band-wrapper {
         padding: 0 0 3rem;
@@ -150,7 +105,8 @@
         position: relative;
         background: linear-gradient(120deg, #3479CD, #3479CD);
         border-radius: 28px;
-        padding: 1.75rem;
+        padding-top: 3rem;
+        padding-bottom:3rem;
         box-shadow: 0 25px 60px rgba(25, 67, 188, 0.35);
         overflow: hidden;
     }
@@ -261,14 +217,16 @@
 
     .card-illustration {
         border-radius: 22px;
-        background: linear-gradient(180deg, #F6F9FF 0%, #EDF3FF 100%);
         padding: 1rem;
-        min-height: 150px;
+        min-height: 190px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #5A6EA7;
-        font-weight: 600;
+    }
+
+    .card-illustration img {
+        max-width: 100%;
+        height: auto;
     }
 
     .steps-cta {
@@ -279,22 +237,28 @@
         padding: 0.85rem 1.9rem;
         font-weight: 600;
         border: 2px solid rgba(47, 76, 241, 0.3);
-        color: #2F4CF1;
+        color: #3479CD;
         background: transparent;
     }
 
     .steps-cta:hover {
-        border-color: #2F4CF1;
-        color: #1c2fa8;
+        border-color: #3479CD;
+        color: #3479CD;
         text-decoration: none;
     }
 
+    .why-gradient {
+        background: linear-gradient(180deg, #F4F6FF 0%, #EAF2FF 100%);
+        border-radius: 34px;
+        padding: 3.2rem;
+        border: 1px solid rgba(52, 121, 205, 0.15);
+    }
+
     .why-section {
-        background: white;
-        border-radius: 28px;
-        padding: 2.8rem;
-        box-shadow: 0 30px 70px rgba(7, 17, 70, 0.15);
-        border: 1px solid var(--landing-border);
+        background: transparent;
+        padding: 0;
+        box-shadow: none;
+        border: none;
     }
 
     .why-points li {
@@ -304,7 +268,7 @@
     }
 
     .why-points li i {
-        color: #2F4CF1;
+        color: #3479CD;
         margin-right: 0.6rem;
     }
 
@@ -321,62 +285,63 @@
         border-radius: 999px;
         padding: 0.85rem 1.9rem;
         font-weight: 600;
-        color: #14215C;
-        border: 1px solid rgba(20, 33, 92, 0.2);
+        color: #3479CD;
+        border: 2px solid rgba(47, 76, 241, 0.4);
         background: #FFFFFF;
-        box-shadow: 0 12px 30px rgba(10, 23, 70, 0.12);
+        box-shadow: 0 12px 28px rgba(47, 76, 241, 0.15);
         transition: all 0.2s ease;
     }
 
     .why-cta:hover {
-        color: #2F4CF1;
-        border-color: rgba(47, 76, 241, 0.4);
+        color: #3479CD;
+        border-color: rgba(27, 47, 171, 0.6);
         text-decoration: none;
     }
 
     .why-stack {
         position: relative;
         width: 100%;
-        max-width: 360px;
-        min-height: 320px;
+        max-width: 380px;
+        min-height: 360px;
         margin-left: auto;
         margin-right: auto;
     }
 
     .photo-card {
         position: absolute;
-        width: 70%;
-        max-width: 320px;
+        width: 78%;
+        max-width: 340px;
         aspect-ratio: 3 / 4;
-        border-radius: 24px;
-        border: 8px solid #fff;
-        box-shadow: 0 30px 60px rgba(4, 17, 63, 0.2);
-        background: linear-gradient(180deg, #FCE9E3, #F8F1FF);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        color: #5B6B98;
-        font-weight: 600;
+        border-radius: 32px;
+        /* border: 12px solid #fff; */
+        /* box-shadow: 0 30px 65px rgba(9, 28, 80, 0.25); */
+        overflow: hidden;
+        /* background: #fff; */
+    }
+
+    .photo-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
 
     .photo-card.back {
-        right: 8%;
-        top: 20px;
-        transform: rotate(6deg);
-        background: linear-gradient(180deg, #F4FAFF, #E8F0FF);
+        right: -40%;
+        top: -30px;
+        transform: rotate(9deg);
     }
 
     .photo-card.front {
-        left: 2%;
-        top: 60px;
         transform: rotate(-6deg);
     }
 
     .cta-banner {
         background: #3479CD;
         border-radius: 32px;
-        padding: 3rem;
+        padding-top: 5.5rem;
+        padding-bottom: 5.5rem;
+        padding-left: 4.5rem;
         color: white;
         margin-top: 4rem;
         box-shadow: 0 30px 80px rgba(26, 56, 166, 0.35);
@@ -431,68 +396,115 @@
     }
 
     .cta-illustration {
-        flex: 1 1 280px;
-        min-height: 220px;
-        border-radius: 28px;
-        border: 2px dashed rgba(255,255,255,0.6);
+        flex: 1 1 340px;
+        min-height: 260px;
+        position: relative;
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: center;
+        padding-bottom: 1.5rem;
+    }
+
+    /* .cta-illustration::before {
+        content: '';
+        position: absolute;
+        width: 92%;
+        height: 78%;
+        background: #fdfdff;
+        border-radius: 60% 40% 55% 45%;
+        box-shadow: 0 25px 65px rgba(5, 18, 54, 0.25);
+        top: 8%;
+        z-index: 1;
+    } */
+
+    .cta-illustration::after {
+        content: '';
+        position: absolute;
+        width: 75%;
+        height: 35px;
+        /* background: linear-gradient(90deg, rgba(20,58,141,0.2), rgba(255,255,255,0.45), rgba(20,58,141,0.2)); */
+        border-radius: 50%;
+        bottom: 12px;
+        filter: blur(1px);
+        opacity: 0.95;
+        z-index: 1;
+    }
+
+    .cta-illustration img {
+        position: relative;
+        z-index: 2;
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .stories-heading {
         text-align: center;
-        font-weight: 600;
-        color: rgba(255,255,255,0.85);
-        background: rgba(255,255,255,0.1);
     }
 
     .blog-card {
-        background: #3479CD;
-        border-radius: 20px;
+        /* background: #ffffff; */
+        border-radius: 28px;
         overflow: hidden;
-        border: 1px solid var(--landing-border);
-        box-shadow: 0 20px 55px rgba(8, 20, 66, 0.12);
+        border: 1px solid rgba(16, 36, 94, 0.08);
+        box-shadow: 0 25px 65px rgba(6, 18, 68, 0.12);
         text-align: left;
+        height: auto;
     }
 
     .blog-image {
+        position: relative;
         height: 190px;
-        border-bottom: 1px solid var(--landing-border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #6B7CA5;
-        font-weight: 600;
-        background: linear-gradient(135deg, #F2F6FF, #E6EEFF);
     }
 
-    .blog-card .card-body {
-        padding: 1.75rem;
+    .blog-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
 
-    .blog-card .eyebrow {
-        font-size: 0.9rem;
+    .blog-chip {
+        position: absolute;
+        bottom: 15px;
+        left: 24px;
+        background: white;
+        color: #0d1c4d;
+        padding: 0.25rem 0.95rem;
+        border-radius: 999px;
         font-weight: 600;
+        font-size: 0.85rem;
+        box-shadow: 0 10px 30px rgba(6, 18, 68, 0.22);
+    }
+
+    .blog-body {
+        background: #3479CD;
         color: white;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        padding: 2.75rem 1.9rem 2.15rem;
+        border-radius: 0 0 28px 28px;
+        margin-top: 0.35rem;
     }
 
-    .blog-card h5 {
+    .blog-body h5 {
         font-weight: 700;
-        color: white;
-        margin-bottom: 0.6rem;
+        font-size: 1.2rem;
+        margin-bottom: 0.9rem;
     }
 
-    .blog-card p {
-        color: white;
-        font-size: 0.97rem;
+    .blog-body p {
+        color: rgba(255,255,255,0.9);
+        font-size: 0.98rem;
+        margin-bottom: 1.1rem;
     }
 
-    .blog-card .btn-link {
-        font-weight: 600;
-        color: white;
-        text-decoration: underline;
+    .blog-link {
+        background: transparent;
+        border: none;
         padding: 0;
-        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        text-decoration: underline;
     }
 
     @media (max-width: 992px) {
@@ -573,7 +585,9 @@
                     <h4>Maak een verlanglijstje aan of start een loterij.</h4>
                 </div>
                 <p>Kies of je een persoonlijke verlanglijst wilt maken of een cadeauswens wilt organiseren door te loten.</p>
-                <div class="card-illustration">Illustratie placeholder</div>
+                <div class="card-illustration">
+                    <img src="<?= $stepsIllustrations[0] ?>" alt="Illustratie verlanglijst maken">
+                </div>
             </div>
             <div class="step-card light">
                 <div class="heading-line">
@@ -581,7 +595,9 @@
                     <h4>Nodig familie en vrienden uit</h4>
                 </div>
                 <p>Deel een simpele link met de mensen die je wilt uitnodigen. Alleen uitgenodigde personen hebben toegang tot je lijst of groep.</p>
-                <div class="card-illustration">Illustratie placeholder</div>
+                <div class="card-illustration">
+                    <img src="<?= $stepsIllustrations[1] ?>" alt="Illustratie familie uitnodigen">
+                </div>
             </div>
             <div class="step-card">
                 <div class="heading-line">
@@ -589,7 +605,9 @@
                     <h4>Loting en verlanglijstjes bekijken</h4>
                 </div>
                 <p>De loting vindt eerlijk en in het geheim plaats. Iedereen ziet voor wie hij of zij koopt en wat die persoon wil hebben.</p>
-                <div class="card-illustration">Illustratie placeholder</div>
+                <div class="card-illustration">
+                    <img src="<?= $stepsIllustrations[2] ?>" alt="Illustratie loting en lijsten">
+                </div>
             </div>
         </div>
         <a href="<?= base_url('index.php/register') ?>" class="steps-cta mt-4">Maak Een Verlanglijstje Aan</a>
@@ -607,8 +625,12 @@
             </div>
             <div class="col-lg-6">
                 <div class="why-stack">
-                    <div class="photo-card back">Collage afbeelding</div>
-                    <div class="photo-card front">Familie foto placeholder</div>
+                    <div class="photo-card back">
+                        <img src="<?= $whyPhotos['back'] ?>" alt="Collage achtergrond">
+                    </div>
+                    <div class="photo-card front">
+                        <img src="<?= $whyPhotos['front'] ?>" alt="Familie foto">
+                    </div>
                 </div>
             </div>
         </div>
@@ -624,7 +646,9 @@
                     <p class="cta-copy">Maak verlanglijstjes, verloot en geniet van eerlijke en besloten cadeausuitwisselingen in slechts een paar stappen.</p>
                     <a href="<?= base_url('index.php/register') ?>" class="btn cta-btn">Begin nu met het maken van uw lijst</a>
                 </div>
-                <div class="cta-illustration">Illustratie placeholder<br>cadeau stapel</div>
+                <div class="cta-illustration">
+                    <img src="<?= $ctaIllustration ?>" alt="Illustratie Begin Vandaag Nog">
+                </div>
             </div>
         </div>
     </div>
@@ -632,39 +656,45 @@
 
 <section class="section-wrapper" id="verhalen">
     <div class="container text-center">
-        <h2 class="section-heading">Verhalen en Tips Voor Stressvrij Cadeaus Geven</h2>
-        <p class="section-subtitle">Blijf geïnspireerd met verhalen van Remcom gebruikers en handige gidsen.</p>
-        <div class="row g-4 mt-2">
+        <h2 class="section-heading stories-heading">Verhalen en Tips Voor<br>Stressvrij Cadeaus Geven</h2>
+        <p class="section-subtitle">Eenvoudige ideeën, handige tips en inspiratie om het geven van cadeaus gemakkelijker, eerlijker en leuker te maken voor familie en vrienden.</p>
+        <div class="row g-4 mt-1">
             <div class="col-md-4">
-                <div class="blog-card h-100">
-                    <div class="blog-image">Artikel afbeelding</div>
-                    <div class="card-body">
-                        <!-- <p class="eyebrow">Verhalen</p> -->
-                        <h5>Waarom Loting Cadeaus Uiteindelijk Iedereen Blijer Maakt</h5>
-                        <p>Zo zorg je ervoor dat ieder gezin eerlijk cadeaus verdeelt en iedereen een glimlach houdt.</p>
-                        <button class="btn btn-link">Lees artikel <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                <div class="blog-card">
+                    <div class="blog-image">
+                        <img src="<?= $blogImages[0] ?>" alt="Waarom Loting Cadeaus Uitwisselen Eerlijker Maakt">
+                        <span class="blog-chip">Leestijd: 5 minuten</span>
+                    </div>
+                    <div class="blog-body">
+                        <h5>Waarom Loting Cadeaus Uitwisselen Eerlijker Maakt</h5>
+                        <p>Hoe online loterijen het uitwisselen van cadeaus eenvoudig, eerlijk en zonder ongemakkelijke momenten maken.</p>
+                        <button class="blog-link">Lees de Blog</button>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="blog-card h-100">
-                    <div class="blog-image">Artikel afbeelding</div>
-                    <div class="card-body">
-                        <!-- <p class="eyebrow">Tips &amp; Tricks</p> -->
-                        <h5>Stressvrij Cadeaus Geven Voor Grote Families</h5>
-                        <p>Handige stappen om met veel mensen alsnog overzicht te houden en dubbele cadeaus te voorkomen.</p>
-                        <button class="btn btn-link">Lees artikel <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                <div class="blog-card">
+                    <div class="blog-image">
+                        <img src="<?= $blogImages[1] ?>" alt="Stressvrij Cadeaus Geven Voor Het Hele Gezin">
+                        <span class="blog-chip">Leestijd: 5 minuten</span>
+                    </div>
+                    <div class="blog-body">
+                        <h5>Stressvrij Cadeaus Geven Voor Het Hele Gezin</h5>
+                        <p>Eenvoudige tips om verjaardagen en feestdagen te organiseren zonder verrassingen of budgetstress.</p>
+                        <button class="blog-link">Lees de Blog</button>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="blog-card h-100">
-                    <div class="blog-image">Artikel afbeelding</div>
-                    <div class="card-body">
-                        <!-- <p class="eyebrow">Inspiratie</p> -->
+                <div class="blog-card">
+                    <div class="blog-image">
+                        <img src="<?= $blogImages[2] ?>" alt="Vakanties Leuker Maken Voor Iedereen">
+                        <span class="blog-chip">Leestijd: 5 minuten</span>
+                    </div>
+                    <div class="blog-body">
                         <h5>Vakanties Leuker Maken Voor Iedereen</h5>
-                        <p>Gebruik Remcom om feestdagen gezellig, eerlijk en ontspannen te houden voor de hele groep.</p>
-                        <button class="btn btn-link">Lees artikel <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                        <p>Hoe online loterijen het uitwisselen van cadeaus eenvoudig, eerlijk en zonder ongemakkelijke momenten maken.</p>
+                        <button class="blog-link">Lees de Blog</button>
                     </div>
                 </div>
             </div>
