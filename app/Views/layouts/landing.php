@@ -67,7 +67,7 @@
         }
 
         .landing-nav .brand {
-            font-size: 1.5rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: white;
         }
@@ -199,7 +199,7 @@
             font-weight: 700;
             margin-bottom: 0.75rem;
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1.5rem;
         }
 
         .footer-links-inline {

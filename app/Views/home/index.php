@@ -12,6 +12,7 @@ $whyPhotos = [
     'back' => base_url('media/braakbal10/' . rawurlencode('Rectangle 3.png')),
 ];
 $ctaIllustration = base_url('media/braakbal10/' . rawurlencode('g1.png'));
+$ctaSprinkles = base_url('media/braakbal10/' . rawurlencode('Group 3.png'));
 $blogImages = [
     base_url('media/braakbal10/' . rawurlencode('Rectangle 5.png')),
     base_url('media/braakbal10/' . rawurlencode('Rectangle 6.png')),
@@ -347,7 +348,10 @@ $blogImages = [
     }
 
     .cta-banner {
-        background: #3479CD;
+        background-color: #3479CD;
+        background-image: url('<?= $ctaSprinkles ?>');
+        background-size: cover;
+        background-position: center;
         border-radius: 32px;
         padding-top: 2rem;
         padding-bottom: 2rem;
