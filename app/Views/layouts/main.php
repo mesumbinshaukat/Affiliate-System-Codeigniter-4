@@ -3,104 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Lijstje.nl - Create and Share Product Lists' ?></title>
+    <title><?= $title ?? 'Remcom Dashboard' ?></title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
     <style>
         :root {
             --primary-color: #3479CD;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --yellow-color: #FFC107;
+            --primary-dark: #1F3B7A;
+            --primary-soft: rgba(52, 121, 205, 0.12);
+            --surface: #0E173A;
+            --accent-mint: #4FDDC8;
+            --accent-lilac: #A4B4FF;
+            --text-dark: #0B1533;
+            --text-muted: #7A89B5;
+            --card-bg: #FFFFFF;
+            --border-subtle: rgba(15, 23, 42, 0.08);
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+        }
+        
+        * {
+            font-family: 'Parkinsans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #fff;
+            background: #EFF3FF;
             margin: 0;
             padding: 0;
+            color: var(--text-dark);
+            min-height: 100vh;
         }
         
         .navbar {
-            background-color: #fff;
-            box-shadow: none;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 1rem 0;
+            background: linear-gradient(120deg, #09123A, #0D1F52);
+            padding: 0.8rem 0;
+            box-shadow: 0 12px 40px rgba(6, 13, 40, 0.45);
+        }
+        
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
         }
         
         .navbar-brand {
             font-weight: 700;
-            color: #333 !important;
-            font-size: 1.5rem;
-            display: flex;
+            color: #fff !important;
+            font-size: 1.6rem;
+            letter-spacing: 0.02em;
+            display: inline-flex;
             align-items: center;
+            gap: 0.65rem;
         }
         
-        .navbar-brand img {
-            height: 35px;
-            margin-right: 0.5rem;
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #4F8CFF, #24D3FB);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-utilities {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .nav-quick-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        
+        .nav-quick-action:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            transform: translateY(-1px);
         }
         
         .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            background-image: linear-gradient(120deg, #3479CD, #5D9BFF);
+            border: none;
             font-weight: 600;
+            color: #fff !important;
+            box-shadow: 0 15px 35px rgba(52, 121, 205, 0.35);
+            border-radius: 999px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         
         .btn-primary:hover {
-            background-color: #2B63BB;
-            border-color: #2B63BB;
+            transform: translateY(-1px);
+            box-shadow: 0 18px 40px rgba(52, 121, 205, 0.4);
+        }
+        
+        .btn-outline-dark,
+        .btn-secondary,
+        .btn-outline-secondary {
+            border-radius: 999px;
+            font-weight: 600;
         }
         
         /* Hero Section Styles */
-        .hero-section {
-            background: linear-gradient(135deg, #3479CD 0%, #2B63BB 100%);
-            min-height: 600px;
-            padding: 60px 0;
-            position: relative;
-            overflow: hidden;
+        main {
+            padding: 2.5rem 0 4rem;
         }
         
-        .hero-section::before {
+        .dashboard-shell {
+            padding: 2rem;
+            border-radius: 32px;
+            background: #FFFFFF;
+            box-shadow: 0 35px 80px rgba(15, 26, 67, 0.12);
+        }
+        
+        .dashboard-hero {
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.15), transparent 45%), linear-gradient(135deg, #101D4A 0%, #152863 60%, #1F3B7A 100%);
+            color: white;
+            border-radius: 32px;
+            padding: 2.75rem 3rem;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2.5rem;
+        }
+        
+        .dashboard-hero::after {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background-image: 
-                radial-circle(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 28px 28px;
+            opacity: 0.45;
             pointer-events: none;
         }
         
-        .hero-title {
-            color: #fff;
-            font-size: 3rem;
+        .dashboard-hero .hero-meta {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .dashboard-hero h1 {
+            font-size: clamp(2.4rem, 4vw, 3rem);
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
         
-        .hero-subtitle {
-            color: #E4EEFF;
-            font-size: 1.5rem;
-            font-weight: 400;
-            margin-bottom: 2rem;
+        .dashboard-hero p {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 1.5rem;
         }
         
-        .action-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+        .dashboard-hero .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
         }
         
         .btn-make-list {
@@ -234,49 +308,130 @@
         }
         
         /* Stats Section */
-        .stats-section {
-            background-color: #f8f8f8;
-            padding: 60px 0;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
         }
         
-        .stats-intro {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 2rem;
+        .stats-card {
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            color: white;
+            background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #3479CD, #5D9BFF);
+            box-shadow: 0 25px 60px rgba(19, 54, 111, 0.35);
+            border: none;
+            position: relative;
+            overflow: hidden;
         }
         
-        .stat-item {
-            padding: 2rem;
-        }
-        
-        .stat-icon {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
+        .stats-card h3 {
+            font-size: 2.2rem;
             font-weight: 700;
-            color: #333;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.35rem;
         }
         
-        .stat-label {
-            color: #666;
-            font-size: 1.1rem;
+        .stats-card p {
+            margin: 0;
+            color: rgba(255,255,255,0.85);
+        }
+        
+        .glass-card,
+        .card,
+        .white-card {
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            background: var(--card-bg);
+            box-shadow: 0 16px 45px rgba(9, 12, 34, 0.08);
+        }
+
+        /* Data tables */
+        .table-responsive {
+            border-radius: var(--radius-lg);
+            background: var(--card-bg);
+            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+        }
+
+        .data-table {
+            width: 100%;
+            min-width: 720px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .data-table thead th {
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: linear-gradient(120deg, #F8FAFF, #EEF2FF);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.95rem 1.25rem;
+            vertical-align: middle;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(52, 121, 205, 0.05);
+            box-shadow: inset 0 0 0 1px rgba(52, 121, 205, 0.15);
+        }
+
+        .data-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .data-table td:last-child,
+        .data-table th:last-child,
+        .data-table td:nth-last-child(2),
+        .data-table th:nth-last-child(2) {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .data-table .btn {
+            border-radius: 12px;
+            padding: 0.35rem 0.75rem;
+            min-width: 2.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.25rem;
+        }
+
+        .data-table .badge-soft {
+            font-size: 0.78rem;
+            padding: 0.3rem 0.65rem;
+            border-radius: 999px;
+        }
+
+        @media (max-width: 992px) {
+            .table-responsive {
+                border-radius: var(--radius-lg);
+                overflow-x: auto;
+            }
+
+            .data-table {
+                min-width: 600px;
+            }
         }
         
         .card {
-            border: none;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 22px 55px rgba(12, 21, 54, 0.12);
         }
         
         .product-card {
@@ -312,18 +467,13 @@
             padding: 1.5rem;
         }
         
-        .stats-card {
-            background: linear-gradient(135deg, var(--primary-color), #4F9BFF);
-            color: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .stats-card h3 {
-            font-size: 2rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
+        .btn-inline {
+            padding: 0.45rem 1.25rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.4);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
         }
         
         .landing-footer {
@@ -562,48 +712,39 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar">
         <div class="container">
             <a class="navbar-brand" href="<?= base_url('index.php') ?>">
-                <i class="fas fa-list-ul" style="color: var(--primary-color);"></i> Lijstje.nl
+                <span class="brand-mark">R</span>
+                Remcom
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <?php if ($isLoggedIn): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('index.php/dashboard') ?>">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('index.php/drawings') ?>">
-                                <i class="fas fa-dice"></i> Loten Trekken
-                            </a>
-                        </li>
-                        <?php if ($user && $user['role'] === 'admin'): ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= base_url('index.php/admin') ?>">
-                                    <i class="fas fa-cog"></i> Admin
-                                </a>
-                            </li>
-                        <?php endif; ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('index.php/logout') ?>">
-                                <i class="fas fa-sign-out-alt"></i> Afmelden
-                            </a>
-                        </li>
-                    <?php else: ?>
-                        <li class="nav-item">
-                            <a class="btn btn-outline-dark btn-sm me-2" href="<?= base_url('index.php/register') ?>">Maak een lijst</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-dark btn-sm" href="<?= base_url('index.php/login') ?>">Inloggen</a>
-                        </li>
+            <div class="nav-utilities">
+                <div class="d-none d-lg-flex gap-2">
+                    <a class="nav-quick-action" href="<?= base_url('index.php/dashboard') ?>">
+                        <i class="fas fa-gauge"></i> Dashboard
+                    </a>
+                    <a class="nav-quick-action" href="<?= base_url('index.php/drawings') ?>">
+                        <i class="fas fa-dice"></i> Loten Trekken
+                    </a>
+                    <?php if ($user && $user['role'] === 'admin'): ?>
+                        <a class="nav-quick-action" href="<?= base_url('index.php/admin') ?>">
+                            <i class="fas fa-cog"></i> Admin
+                        </a>
                     <?php endif; ?>
-                </ul>
+                </div>
+                <div class="nav-actions d-flex flex-wrap gap-2 justify-content-end">
+                    <?php if ($isLoggedIn): ?>
+                        <a class="btn btn-primary" href="<?= base_url('index.php/dashboard/list/create') ?>">
+                            <i class="fas fa-plus me-1"></i> Nieuwe Lijst
+                        </a>
+                        <a class="btn btn-outline-light" href="<?= base_url('index.php/logout') ?>">
+                            Afmelden
+                        </a>
+                    <?php else: ?>
+                        <a class="btn btn-outline-light" href="<?= base_url('index.php/register') ?>">Registreren</a>
+                        <a class="btn btn-primary" href="<?= base_url('index.php/login') ?>">Inloggen</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </nav>

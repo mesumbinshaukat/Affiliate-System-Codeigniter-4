@@ -6,36 +6,28 @@
     <h1 class="mb-4">Analytica</h1>
 
     <!-- Sales & Commissions Section -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="stats-card">
-                <h3><?= $totalClicks ?></h3>
-                <p class="mb-0">Totale Klikken</p>
-            </div>
+    <div class="stats-grid mb-4">
+        <div class="stats-card">
+            <h3><?= $totalClicks ?></h3>
+            <p>Totale Klikken</p>
         </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #10b981, #059669);">
-                <h3><?= $salesStats['total_sales'] ?? 0 ?></h3>
-                <p class="mb-0">Totale Verkopen</p>
-            </div>
+        <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #10b981, #059669);">
+            <h3><?= $salesStats['total_sales'] ?? 0 ?></h3>
+            <p>Totale Verkopen</p>
         </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                <h3><?= $salesStats['approved_sales'] ?? 0 ?></h3>
-                <p class="mb-0">Goedgekeurd</p>
-            </div>
+        <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #f59e0b, #d97706);">
+            <h3><?= $salesStats['approved_sales'] ?? 0 ?></h3>
+            <p>Goedgekeurd</p>
         </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-                <h3>€<?= number_format($salesStats['total_commission'] ?? 0, 2) ?></h3>
-                <p class="mb-0">Commissies</p>
-            </div>
+        <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #8b5cf6, #7c3aed);">
+            <h3>€<?= number_format($salesStats['total_commission'] ?? 0, 2) ?></h3>
+            <p>Commissies</p>
         </div>
     </div>
 
     <!-- Sales Status Breakdown -->
     <?php if (($salesStats['total_sales'] ?? 0) > 0): ?>
-    <div class="card mb-4">
+    <div class="glass-card mb-4">
         <div class="card-body">
             <h5 class="card-title">Verkoopstatus Overzicht</h5>
             <div class="row">
@@ -69,11 +61,11 @@
     <?php endif; ?>
 
     <!-- Sales Table -->
-    <div class="card mb-4">
+    <div class="glass-card mb-4">
         <div class="card-body">
             <h5 class="card-title">Uw Verkopen & Commissies</h5>
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th>Order ID</th>
@@ -89,7 +81,7 @@
                                     <td><code><?= esc($sale['order_id']) ?></code></td>
                                     <td><strong>€<?= number_format($sale['commission'], 2) ?></strong></td>
                                     <td>
-                                        <span class="badge bg-<?= 
+                                        <span class="badge-soft <?= 
                                             $sale['status'] === 'approved' ? 'success' : 
                                             ($sale['status'] === 'pending' ? 'warning' : 'danger')
                                         ?>">
@@ -117,11 +109,11 @@
     </div>
 
     <!-- Clicks Table -->
-    <div class="card">
+    <div class="glass-card">
         <div class="card-body">
             <h5 class="card-title">Recente Klikken</h5>
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th>Product</th>

@@ -7,7 +7,7 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="card">
+            <div class="glass-card">
                 <div class="card-body">
                     <form method="post" action="<?= base_url('index.php/dashboard/list/create') ?>">
                         <div class="mb-3">
@@ -79,7 +79,7 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card">
+            <div class="glass-card">
                 <div class="card-body">
                     <h5 class="card-title">Tips</h5>
                     <ul class="list-unstyled">
@@ -113,15 +113,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const eventDate = document.getElementById('event_date');
     
     function toggleReminderSettings() {
-        if (reminderEnabled.checked && eventDate.value) {
+        if (reminderEnabled && reminderEnabled.checked && eventDate.value) {
             reminderSettings.style.display = 'block';
         } else {
             reminderSettings.style.display = 'none';
         }
     }
     
-    reminderEnabled.addEventListener('change', toggleReminderSettings);
-    eventDate.addEventListener('change', toggleReminderSettings);
+    if (reminderEnabled) reminderEnabled.addEventListener('change', toggleReminderSettings);
+    if (eventDate) eventDate.addEventListener('change', toggleReminderSettings);
     
     // Initial state
     toggleReminderSettings();

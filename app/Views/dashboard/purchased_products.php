@@ -7,34 +7,28 @@
     <p class="text-muted">Overzicht van alle producten die als gekocht zijn gemarkeerd op uw lijsten</p>
 
     <!-- Stats -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="stats-card">
-                <h3><?= $totalPurchased ?></h3>
-                <p class="mb-0">Totaal Gekocht</p>
-            </div>
+    <div class="stats-grid mb-4">
+        <div class="stats-card">
+            <h3><?= $totalPurchased ?></h3>
+            <p>Totaal Gekocht</p>
         </div>
-        <div class="col-md-4">
-            <div class="stats-card" style="background: linear-gradient(135deg, #10b981, #059669);">
-                <h3><?= count($listCounts) ?></h3>
-                <p class="mb-0">Lijsten met Aankopen</p>
-            </div>
+        <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #10b981, #059669);">
+            <h3><?= count($listCounts) ?></h3>
+            <p>Lijsten met Aankopen</p>
         </div>
-        <div class="col-md-4">
-            <div class="stats-card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-                <h3><?= $totalPurchased > 0 ? number_format(($totalPurchased / count($listCounts)), 1) : 0 ?></h3>
-                <p class="mb-0">Gem. per Lijst</p>
-            </div>
+        <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #8b5cf6, #7c3aed);">
+            <h3><?= $totalPurchased > 0 ? number_format(($totalPurchased / count($listCounts)), 1) : 0 ?></h3>
+            <p>Gem. per Lijst</p>
         </div>
     </div>
 
     <!-- Breakdown by List -->
     <?php if (!empty($listCounts)): ?>
-    <div class="card mb-4">
+    <div class="glass-card mb-4">
         <div class="card-body">
             <h5 class="card-title">Aankopen per Lijst</h5>
             <div class="table-responsive">
-                <table class="table table-sm">
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th>Lijst</th>
@@ -48,7 +42,7 @@
                                     <strong><?= esc($data['list_title']) ?></strong>
                                 </td>
                                 <td class="text-end">
-                                    <span class="badge bg-success"><?= $data['count'] ?></span>
+                                    <span class="badge-soft success"><?= $data['count'] ?></span>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -60,12 +54,12 @@
     <?php endif; ?>
 
     <!-- Purchased Products Table -->
-    <div class="card">
+    <div class="glass-card">
         <div class="card-body">
             <h5 class="card-title">Alle Gekochte Producten</h5>
             <?php if (!empty($purchasedProducts)): ?>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="data-table">
                         <thead>
                             <tr>
                                 <th style="width: 80px;">Afbeelding</th>
@@ -118,11 +112,11 @@
                                     <td>
                                         <?php if ($product['claimed_by_subid']): ?>
                                             <?php if (strpos($product['claimed_by_subid'], 'manual_') === 0): ?>
-                                                <span class="badge bg-warning">
+                                                <span class="badge-soft warning">
                                                     <i class="fas fa-hand-pointer"></i> Handmatig
                                                 </span>
                                             <?php else: ?>
-                                                <span class="badge bg-info" title="<?= esc($product['claimed_by_subid']) ?>">
+                                                <span class="badge-soft info" title="<?= esc($product['claimed_by_subid']) ?>">
                                                     <i class="fas fa-link"></i> Affiliate
                                                 </span>
                                             <?php endif; ?>

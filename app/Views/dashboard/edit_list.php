@@ -11,10 +11,10 @@
 
     .personalized-item,
     .search-result-item {
-        border: 1px solid #e6e9ef;
-        border-radius: 18px;
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-        background: #fff;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 10px 24px rgba(9, 12, 34, 0.08);
+        background: var(--card-bg);
         padding: 16px 20px;
         display: flex;
         gap: 18px;
@@ -25,14 +25,14 @@
     .personalized-item:hover,
     .search-result-item:hover {
         transform: translateY(-3px);
-        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+        box-shadow: 0 22px 55px rgba(12, 21, 54, 0.12);
     }
 
     .personalized-item__image,
     .search-result-item__image {
         width: 140px;
         height: 140px;
-        border-radius: 16px;
+        border-radius: var(--radius-lg);
         background: linear-gradient(135deg, #f5f8ff, #eef2ff);
         display: flex;
         align-items: center;
@@ -56,14 +56,14 @@
     .search-result-item__title {
         font-weight: 600;
         font-size: 1rem;
-        color: #0f172a;
+        color: var(--text-dark);
         margin-bottom: 6px;
     }
 
     .personalized-item__description,
     .search-result-item__description {
         font-size: 0.9rem;
-        color: #475569;
+        color: var(--text-muted);
         margin-bottom: 8px;
     }
 
@@ -75,48 +75,24 @@
         align-items: center;
     }
 
-    .personalized-item__actions,
-    .search-result-item__actions {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        min-width: 160px;
-    }
-
     .personalized-pill {
         font-size: 0.75rem;
         padding: 4px 10px;
         border-radius: 999px;
-        background: #ecfeff;
-        color: #0369a1;
-        border: 1px solid #bae6fd;
+        background: rgba(52,121,205,0.15);
+        color: var(--primary-color);
+        border: 1px solid rgba(52,121,205,0.3);
         display: inline-flex;
         gap: 6px;
         align-items: center;
         font-weight: 600;
     }
 
-    .search-result-item__checkbox {
-        margin-right: 10px;
-    }
-
-    @media (max-width: 768px) {
-        .personalized-item,
-        .search-result-item {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .personalized-item__image,
-        .search-result-item__image {
-            width: 100%;
-            height: 200px;
-        }
-
-        .personalized-item__actions,
-        .search-result-item__actions {
-            width: 100%;
-        }
+    .glass-card {
+        background: var(--card-bg);
+        padding: 16px 20px;
+        border-radius: var(--radius-lg);
+        box-shadow: 0 10px 24px rgba(9, 12, 34, 0.08);
     }
 </style>
 
@@ -125,17 +101,17 @@
 
     <ul class="nav nav-tabs mb-4" id="listTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button">
+            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
                 <i class="fas fa-info-circle"></i> Details
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button">
+            <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab" aria-controls="products" aria-selected="false">
                 <i class="fas fa-box"></i> Producten
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="collaborators-tab" data-bs-toggle="tab" data-bs-target="#collaborators" type="button">
+            <button class="nav-link" id="collaborators-tab" data-bs-toggle="tab" data-bs-target="#collaborators" type="button" role="tab" aria-controls="collaborators" aria-selected="false">
                 <i class="fas fa-users"></i> Samenwerken
             </button>
         </li>
@@ -143,10 +119,10 @@
 
     <div class="tab-content" id="listTabsContent">
         <!-- Details Tab -->
-        <div class="tab-pane fade" id="details" role="tabpanel">
+        <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
             <div class="row">
                 <div class="col-lg-8">
-                    <div class="card">
+                    <div class="glass-card">
                         <div class="card-body">
                             <form method="post" action="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>">
                                 <div class="mb-3">
@@ -202,7 +178,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3" id="reminder_settings_edit" style="<?= !empty($list['reminder_enabled']) && !empty($list['event_date']) ? '' : 'display: none;' ?>">
+                                <div class="mb-3" id="reminder_settings" style="<?= !empty($list['reminder_enabled']) && !empty($list['event_date']) ? '' : 'display: none;' ?>">
                                     <label for="reminder_intervals" class="form-label">Herinneringsmomenten (in dagen)</label>
                                     <input type="text" class="form-control" id="reminder_intervals" name="reminder_intervals" value="<?= esc($list['reminder_intervals'] ?? '30,14,7') ?>" placeholder="30,14,7">
                                     <small class="text-muted">Kommagescheiden: bijv. "30,14,7" stuurt herinneringen 30, 14 en 7 dagen voor het evenement</small>
@@ -221,15 +197,41 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-lg-4">
+                    <div class="glass-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Tips</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-lightbulb text-warning"></i>
+                                    Kies een beschrijvende titel
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-lightbulb text-warning"></i>
+                                    Voeg een gedetailleerde beschrijving toe
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-lightbulb text-warning"></i>
+                                    Selecteer de juiste categorie
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-lightbulb text-warning"></i>
+                                    Voeg producten toe na het maken van uw lijst
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Products Tab -->
-        <div class="tab-pane fade show active" id="products" role="tabpanel">
+        <div class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products-tab">
             <div class="row">
                 <div class="col-lg-8">
                     <!-- Section Management Panel -->
-                    <div class="card mb-4">
+                    <div class="glass-card mb-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="card-title mb-0">
@@ -238,38 +240,6 @@
                                 <button class="btn btn-sm btn-primary" onclick="showAddSectionModal()">
                                     <i class="fas fa-plus"></i> Nieuwe Sectie
                                 </button>
-                            </div>
-                            <p class="text-muted small mb-3">
-                                Organiseer je producten in secties zoals "Sieraden", "Tech", "Lifetime Wensen", etc. Secties zijn optioneel.
-                            </p>
-                            
-                            <div id="sectionsList">
-                                <?php if (!empty($sections)): ?>
-                                    <div class="list-group">
-                                        <?php foreach ($sections as $section): ?>
-                                            <div class="list-group-item d-flex justify-content-between align-items-center" data-section-id="<?= $section['id'] ?>">
-                                                <div class="d-flex align-items-center gap-2 flex-grow-1">
-                                                    <i class="fas fa-grip-vertical text-muted" style="cursor: move;"></i>
-                                                    <i class="fas fa-folder text-primary"></i>
-                                                    <span class="section-title-display fw-semibold"><?= esc($section['title']) ?></span>
-                                                    <span class="badge bg-secondary"><?= $section['product_count'] ?? 0 ?> producten</span>
-                                                </div>
-                                                <div class="btn-group btn-group-sm">
-                                                    <button class="btn btn-outline-primary" onclick="editSection(<?= $section['id'] ?>, '<?= esc($section['title'], 'js') ?>')" title="Bewerken">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-danger" onclick="deleteSection(<?= $section['id'] ?>)" title="Verwijderen">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php else: ?>
-                                    <div class="alert alert-info mb-0">
-                                        <i class="fas fa-info-circle"></i> Nog geen secties aangemaakt. Klik op "Nieuwe Sectie" om te beginnen.
-                                    </div>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
