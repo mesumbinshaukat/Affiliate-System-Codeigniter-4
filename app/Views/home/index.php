@@ -55,7 +55,7 @@ $blogImages = [
     }
 
     .hero-heading {
-        font-size: clamp(2.6rem, 4vw, 3.9rem);
+        font-size: 4rem;
         font-weight: 800;
         color: #050C3E;
         line-height: 1.2;
@@ -92,7 +92,7 @@ $blogImages = [
 
     .hero-cta .btn-outline {
         border: 2px solid #3479CD;
-        background: rgba(255,255,255,0.65);
+        /* background: rgba(255,255,255,0.65); */
         color: #3479CD;
     }
 
@@ -139,9 +139,14 @@ $blogImages = [
     }
 
     .stat-band .stat-card h3 {
-        font-size: 2.2rem;
+        font-size: 4rem;
         font-weight: 700;
         margin-bottom: 0.35rem;
+        background: linear-gradient(176.66deg, #FFFFFF 34.27%, rgba(255, 255, 255, 0) 84.49%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        display: inline-block;
     }
 
     .stat-band .stat-card p {
@@ -155,7 +160,7 @@ $blogImages = [
     }
 
     .section-heading {
-        font-size: 2.2rem;
+        font-size: 3rem;
         font-weight: 700;
         color: #071146;
     }
@@ -198,11 +203,16 @@ $blogImages = [
     }
 
     .step-card .number {
-        font-size: 2.5rem;
+        font-size: 4.5rem;
         font-weight: 700;
         color: rgba(255,255,255,0.95);
         margin-right: 0.75rem;
         flex-shrink: 0;
+        background: linear-gradient(176.66deg, #FFFFFF 34.27%, rgba(255, 255, 255, 0) 84.49%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        display: inline-block;
     }
 
     .step-card .heading-line {
@@ -339,8 +349,8 @@ $blogImages = [
     .cta-banner {
         background: #3479CD;
         border-radius: 32px;
-        padding-top: 5.5rem;
-        padding-bottom: 5.5rem;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
         padding-left: 4.5rem;
         color: white;
         margin-top: 4rem;
@@ -374,7 +384,7 @@ $blogImages = [
 
     .cta-text h2 {
         font-weight: 700;
-        font-size: clamp(2rem, 2.8vw, 2.65rem);
+        font-size: 3rem;
         margin-bottom: 0.9rem;
     }
 
@@ -488,7 +498,7 @@ $blogImages = [
 
     .blog-body h5 {
         font-weight: 700;
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         margin-bottom: 0.9rem;
     }
 
@@ -519,6 +529,10 @@ $blogImages = [
         .why-gallery {
             grid-template-columns: 1fr;
         }
+    }
+
+    #waarom-remcom{
+        background: linear-gradient(180deg, #E9F4FF -44.28%, rgba(233, 244, 255, 0) 100%);
     }
 </style>
 <?= $this->endSection() ?>
