@@ -231,6 +231,13 @@
             color: #fff;
         }
 
+        .social-links img {
+            width: 20px;
+            height: 20px;
+            display: block;
+            object-fit: contain;
+        }
+
         .social-links svg {
             width: 18px;
             height: 18px;
@@ -323,16 +330,16 @@
                         <span>Volg ons:</span>
                         <div class="social-links">
                             <a href="https://facebook.com" aria-label="Facebook" target="_blank" rel="noopener">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 8.5V6.75c0-.6.4-.75.7-.75H16V3h-2.3C11.6 3 10 4.7 10 6.7V8.5H8v3h2v9h3.3v-9h2.3l.4-3h-2.5z"/></svg>
+                                <img src="<?= base_url('public/media/braakbal10/facebook.png') ?>" alt="Facebook icon">
                             </a>
                             <a href="https://instagram.com" aria-label="Instagram" target="_blank" rel="noopener">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3h-9C5 3 3 5 3 7.5v9C3 19 5 21 7.5 21h9c2.5 0 4.5-2 4.5-4.5v-9C21 5 19 3 16.5 3zm3 12.5c0 1.7-1.3 3-3 3h-9c-1.7 0-3-1.3-3-3v-9c0-1.7 1.3-3 3-3h9c1.7 0 3 1.3 3 3v9z"/><path d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 1 0 12 8.5zm0 5.5a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/><circle cx="17" cy="7" r="1"/></svg>
+                                <img src="<?= base_url('public/media/braakbal10/instagram.png') ?>" alt="Instagram icon">
                             </a>
                             <a href="https://google.com" aria-label="Google" target="_blank" rel="noopener">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.2c0-.7-.1-1.4-.2-2.1H12v4h5.1c-.2 1.2-.9 2.3-2 3l-.1.1 3.3 2.6.2.1c1.9-1.7 2.5-4.2 2.5-7.7z"/><path d="M12 21c2.7 0 5-1 6.7-2.7l-3.6-2.8c-.8.5-1.8.8-3.1.8-2.4 0-4.5-1.6-5.3-3.8H3.1l-.1.1A9 9 0 0 0 12 21z"/><path d="M6.7 12c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2L6.7 8H3.1a9 9 0 0 0 0 8l3.6-2.8z"/><path d="M12 5.5c1.5 0 2.8.5 3.8 1.4l2.9-2.9A9 9 0 0 0 12 3c-3.5 0-6.6 2-8.2 5l3.7 2.9C8.2 8.1 9.9 5.5 12 5.5z"/></svg>
+                                <img src="<?= base_url('public/media/braakbal10/google.png') ?>" alt="Google icon">
                             </a>
                             <a href="https://youtube.com" aria-label="YouTube" target="_blank" rel="noopener">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 7s-.2-1.4-.8-2c-.8-.8-1.8-.8-2.3-.9C15.2 4 12 4 12 4h-.1s-3.2 0-6.5.1c-.5.1-1.5.1-2.3.9-.6.6-.8 2-.8 2S2 8.7 2 10.4v1.2c0 1.7.2 3.4.2 3.4s.2 1.4.8 2c.8.8 1.9.7 2.4.8 1.8.2 7.6.3 7.6.3s3.2 0 6.5-.1c.5-.1 1.5-.1 2.3-.9.6-.6.8-2 .8-2s.2-1.7.2-3.4v-1.2c0-1.7-.2-3.4-.2-3.4zM10 14.7V7.8l5.6 3.4L10 14.7z"/></svg>
+                                <img src="<?= base_url('public/media/braakbal10/youtube.png') ?>" alt="YouTube icon">
                             </a>
                         </div>
                     </div>
