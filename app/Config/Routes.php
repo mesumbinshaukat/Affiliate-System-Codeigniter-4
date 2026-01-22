@@ -8,6 +8,7 @@ use CodeIgniter\Router\RouteCollection;
 
 // Public Routes
 $routes->get('/', 'Home::index');
+$routes->get('/search/suggestions', 'Home::searchSuggestions');
 $routes->get('/find', 'Home::find');
 $routes->get('/find/(:segment)', 'Home::find/$1');
 $routes->post('/find', 'Home::find');
@@ -41,8 +42,11 @@ $routes->group('collaboration', ['filter' => 'auth'], function($routes) {
 
 // List Routes
 $routes->get('/list/(:segment)', 'Lists::view/$1');
+$routes->post('/list/(:segment)/access', 'Lists::attemptAccess/$1');
+$routes->post('/list/access/(:segment)', 'Lists::attemptAccess/$1');
 $routes->get('/list/(:segment)/share', 'Lists::share/$1');
 $routes->post('/list/claim', 'Lists::claimProduct');
+$routes->post('/list/unclaim', 'Lists::unclaimProduct');
 
 // Contribution Routes
 $routes->post('contribution/add', 'Contribution::add');

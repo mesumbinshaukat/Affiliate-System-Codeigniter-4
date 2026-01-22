@@ -15,7 +15,8 @@ class ListModel extends Model
     protected $allowedFields = [
         'user_id', 'category_id', 'title', 'slug', 'description',
         'status', 'is_featured', 'is_crossable', 'views',
-        'event_date', 'reminder_enabled', 'reminder_intervals'
+        'event_date', 'reminder_enabled', 'reminder_intervals',
+        'protection_type', 'protection_password', 'protection_question', 'protection_answer'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -28,6 +29,7 @@ class ListModel extends Model
 
     // Validation
     protected $validationRules = [
+        'id' => 'permit_empty|integer',
         'user_id' => 'required|integer',
         'title' => 'required|min_length[3]|max_length[255]',
         'slug' => 'required|alpha_dash|is_unique[lists.slug,id,{id}]',

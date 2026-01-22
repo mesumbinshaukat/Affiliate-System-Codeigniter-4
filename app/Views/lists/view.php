@@ -37,6 +37,98 @@
         background: #f8fafc;
     }
 
+    .creator-info {
+        background: linear-gradient(135deg, #101D4A, #1F3B7A);
+        border-radius: 26px;
+        padding: 28px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(9, 12, 34, 0.25);
+    }
+
+    .creator-info::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 45%);
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .creator-info__inner {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        z-index: 2;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .creator-info__details {
+        max-width: 420px;
+    }
+
+    .creator-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.72);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .creator-info__name {
+        font-size: clamp(1.7rem, 3.5vw, 2.2rem);
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .creator-info__username {
+        color: rgba(255,255,255,0.85);
+        font-weight: 600;
+    }
+
+    .creator-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .creator-actions .btn-outline-light {
+        border-radius: 14px;
+        border-width: 2px;
+        font-weight: 600;
+    }
+
+    .creator-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .creator-stat {
+        background: rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 1rem 1.25rem;
+        min-width: 150px;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+    }
+
+    .creator-stat__label {
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 0.25rem;
+    }
+
+    .creator-stat__value {
+        font-size: 1.35rem;
+        font-weight: 700;
+    }
+
     .list-product-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -104,6 +196,10 @@
         min-height: 380px;
         position: relative;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .list-product-card[role="link"] {
+        cursor: pointer;
     }
 
     .list-product-card:hover {
@@ -183,6 +279,8 @@
     .list-product-card__actions .btn {
         border-radius: 12px;
         font-weight: 600;
+        position: relative;
+        z-index: 2;
     }
 
     .list-product-card__actions .btn-primary {
@@ -263,6 +361,11 @@
             padding: 24px;
         }
 
+        .creator-info__inner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
         .view-toggle {
             flex-direction: column;
         }
@@ -304,6 +407,49 @@
 <?= $this->section('content') ?>
 
 <div class="container my-5">
+    <?php if (!empty($requiresAccess)): ?>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-lg border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h2 class="h4 mb-3"><i class="fas fa-lock me-2 text-primary"></i> Deze lijst is beveiligd</h2>
+                        <p class="text-muted mb-4">
+                            De eigenaar heeft deze lijst beschermd. Vul de juiste informatie in om toegang te krijgen tot de producten.
+                        </p>
+
+                        <?php if (!empty($accessError)): ?>
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <?= esc($accessError) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <form action="<?= site_url('list/' . ($accessSlug ?? $list['slug']) . '/access') ?>" method="post" class="mt-3">
+                            <?= csrf_field() ?>
+                            <?php if (($list['protection_type'] ?? 'password') === 'password'): ?>
+                                <div class="mb-3">
+                                    <label for="protection_password" class="form-label">Wachtwoord</label>
+                                    <input type="password" name="protection_password" id="protection_password" class="form-control form-control-lg" required>
+                                </div>
+                            <?php elseif (($list['protection_type'] ?? 'question') === 'question'): ?>
+                                <div class="mb-3">
+                                    <label class="form-label">Beveiligingsvraag</label>
+                                    <div class="p-3 bg-light rounded border mb-3">
+                                        <strong><?= esc($list['protection_question']) ?></strong>
+                                    </div>
+                                    <input type="text" name="protection_answer" class="form-control form-control-lg" placeholder="Uw antwoord" required>
+                                </div>
+                            <?php endif; ?>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-unlock-alt me-1"></i> Toegang aanvragen
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php else: ?>
     <!-- List Header -->
     <div class="row mb-5">
         <div class="col-lg-8">
@@ -311,27 +457,36 @@
             <p class="lead text-muted mb-4"><?= esc($list['description']) ?></p>
             
             <!-- Creator Info -->
-            <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                <div class="me-4">
-                    <a href="<?= base_url('index.php/find/' . urlencode($list['username'])) ?>" class="text-decoration-none">
-                        <i class="fas fa-user-circle fa-2x text-primary me-2"></i>
-                        <div>
-                            <strong class="d-block"><?= esc($list['first_name'] . ' ' . $list['last_name']) ?></strong>
-                            <small class="text-muted">@<?= esc($list['username']) ?></small>
+            <div class="creator-info mb-4">
+                <div class="creator-info__inner">
+                    <div class="creator-info__details">
+                        <div class="creator-eyebrow">Lijst Beheerder</div>
+                        <h2 class="creator-info__name"><?= esc($list['first_name'] . ' ' . $list['last_name']) ?></h2>
+                        <div class="creator-info__username">@<?= esc($list['username']) ?></div>
+                        <div class="creator-actions mt-3">
+                            <a href="<?= base_url('index.php/find/' . urlencode($list['username'])) ?>" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-user"></i> Bekijk profiel
+                            </a>
+                            <a href="<?= base_url('index.php/find/' . urlencode($list['username'])) ?>#lists" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-list"></i> Meer lijsten
+                            </a>
                         </div>
-                    </a>
-                </div>
-                <div class="me-4">
-                    <i class="fas fa-eye text-muted"></i>
-                    <span class="text-muted"><?= number_format($list['views']) ?> weergaven</span>
-                </div>
-                <?php if ($list['category_name']): ?>
-                    <div>
-                        <span class="badge bg-primary">
-                            <i class="fas fa-tag"></i> <?= esc($list['category_name']) ?>
-                        </span>
                     </div>
-                <?php endif; ?>
+                    <div class="creator-stats">
+                        <div class="creator-stat">
+                            <div class="creator-stat__label">Weergaven</div>
+                            <div class="creator-stat__value"><?= number_format($list['views']) ?></div>
+                        </div>
+                        <?php if ($list['category_name']): ?>
+                        <div class="creator-stat">
+                            <div class="creator-stat__label">Categorie</div>
+                            <div class="creator-stat__value" style="font-size:1rem; text-transform:capitalize;">
+                                <?= esc($list['category_name']) ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
             
             <!-- Share Buttons -->
@@ -411,8 +566,15 @@
                         </h3>
                         <div class="list-product-grid">
                             <?php foreach ($section['products'] as $product): ?>
-                                <?php $isClaimed = !empty($product['claimed_at']); ?>
-                                <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>" data-list-product-id="<?= $product['list_product_id'] ?>">
+                                <?php 
+                                    $isClaimed = !empty($product['claimed_at']);
+                                    $productUrl = base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']);
+                                ?>
+                                <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>"
+                                     data-list-product-id="<?= $product['list_product_id'] ?>"
+                                     data-affiliate-url="<?= esc($productUrl) ?>"
+                                     role="link"
+                                     tabindex="0">
                         <?php if ($isClaimed): ?>
                             <span class="claimed-badge">
                                 <i class="fas fa-check-circle"></i> Gekocht
@@ -458,7 +620,7 @@
                             <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
                             
                             <div class="list-product-card__actions d-grid gap-2">
-                                <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
+                                <a href="<?= $productUrl ?>" 
                                    class="btn btn-primary btn-sm" 
                                    target="_blank"
                                    title="Bekijk product in winkel">
@@ -466,8 +628,10 @@
                                 </a>
                                 <?php if (!empty($list['is_crossable'])): ?>
                                     <?php if ($isClaimed): ?>
-                                        <button class="btn btn-outline-success btn-sm" disabled>
-                                            <i class="fas fa-check-circle"></i> Al Gekocht
+                                        <button class="btn btn-outline-success btn-sm"
+                                                onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                title="Maak dit item opnieuw beschikbaar">
+                                            <i class="fas fa-undo"></i> Ongedaan maken
                                         </button>
                                     <?php else: ?>
                                         <button class="btn btn-outline-warning btn-sm"
@@ -478,7 +642,7 @@
                                     <?php endif; ?>
                                 <?php endif; ?>
                                 <button class="btn btn-outline-secondary btn-sm"
-                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
+                                        onclick="copyAffiliateLink('<?= $productUrl ?>')"
                                         title="Kopieer affiliate link om te delen">
                                     <i class="fas fa-share-alt"></i> Link Delen
                                 </button>
@@ -494,8 +658,15 @@
                     <div class="section-group mb-5">
                         <div class="list-product-grid">
                             <?php foreach ($noSectionProducts as $product): ?>
-                                <?php $isClaimed = !empty($product['claimed_at']); ?>
-                                <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>" data-list-product-id="<?= $product['list_product_id'] ?>">
+                                <?php 
+                                    $isClaimed = !empty($product['claimed_at']);
+                                    $productUrl = base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']);
+                                ?>
+                                <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>"
+                                     data-list-product-id="<?= $product['list_product_id'] ?>"
+                                     data-affiliate-url="<?= esc($productUrl) ?>"
+                                     role="link"
+                                     tabindex="0">
                         <?php if ($isClaimed): ?>
                             <span class="claimed-badge">
                                 <i class="fas fa-check-circle"></i> Gekocht
@@ -549,8 +720,10 @@
                                 </a>
                                 <?php if (!empty($list['is_crossable'])): ?>
                                     <?php if ($isClaimed): ?>
-                                        <button class="btn btn-outline-success btn-sm" disabled>
-                                            <i class="fas fa-check-circle"></i> Al Gekocht
+                                        <button class="btn btn-outline-success btn-sm"
+                                                onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                title="Maak dit item opnieuw beschikbaar">
+                                            <i class="fas fa-undo"></i> Ongedaan maken
                                         </button>
                                     <?php else: ?>
                                         <button class="btn btn-outline-warning btn-sm"
@@ -583,15 +756,21 @@
             <?php endif; ?>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
-<!-- Contribution Modal -->
-<?= view('partials/contribution_modal') ?>
+<?php if (empty($requiresAccess)): ?>
+    <!-- Contribution Modal -->
+    <?= view('partials/contribution_modal') ?>
+<?php endif; ?>
 
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
+<?php if (!empty($requiresAccess)): ?>
+// No additional scripts needed when access is required
+<?php else: ?>
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(function() {
         showToast('Lijklink gekopieerd naar klembord!', 'success');
@@ -647,24 +826,39 @@ function switchView(viewType) {
 }
 
 // Restore user's view preference on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const savedView = localStorage.getItem('listViewPreference') || 'grid';
-    if (savedView === 'list') {
-        switchView('list');
-    }
-});
-
 function markAsPurchased(listProductId, listId) {
     if (!confirm('Weet je zeker dat je dit item als gekocht wilt markeren? Dit laat anderen weten dat dit cadeau al is gekocht.')) {
         return;
     }
 
+    togglePurchaseState({
+        endpoint: '<?= base_url('index.php/list/claim') ?>',
+        listProductId,
+        listId,
+        loadingLabel: 'Markeren...'
+    });
+}
+
+function undoPurchase(listProductId, listId) {
+    if (!confirm('Zeker weten dat je deze aankoop wilt terugdraaien? Anderen kunnen het cadeau dan weer kopen.')) {
+        return;
+    }
+
+    togglePurchaseState({
+        endpoint: '<?= base_url('index.php/list/unclaim') ?>',
+        listProductId,
+        listId,
+        loadingLabel: 'Herstellen...'
+    });
+}
+
+function togglePurchaseState({ endpoint, listProductId, listId, loadingLabel }) {
     const btn = event.target.closest('button');
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Markeren...';
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> ${loadingLabel}`;
 
-    fetch('<?= base_url('index.php/list/claim') ?>', {
+    fetch(endpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -678,20 +872,55 @@ function markAsPurchased(listProductId, listId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Reload page to show updated state
+            showToast(data.message || 'Status bijgewerkt', 'success');
             location.reload();
         } else {
-            alert(data.message || 'Er is een fout opgetreden. Probeer het opnieuw.');
+            showToast(data.message || 'Er is een fout opgetreden. Probeer het opnieuw.', 'error');
             btn.disabled = false;
             btn.innerHTML = originalHtml;
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Er is een fout opgetreden. Probeer het opnieuw.');
+        showToast('Er is een fout opgetreden. Probeer het opnieuw.', 'error');
         btn.disabled = false;
         btn.innerHTML = originalHtml;
     });
 }
+
+function initProductCardLinks() {
+    const productCards = document.querySelectorAll('.list-product-card[role="link"]');
+
+    productCards.forEach(card => {
+        const affiliateUrl = card.dataset.affiliateUrl;
+        if (!affiliateUrl) return;
+
+        card.addEventListener('click', (e) => {
+            if (shouldIgnoreCardClick(e)) return;
+            openAffiliateLink(affiliateUrl, e);
+        });
+
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                if (shouldIgnoreCardClick(e)) return;
+                e.preventDefault();
+                openAffiliateLink(affiliateUrl, e);
+            }
+        });
+    });
+}
+
+function shouldIgnoreCardClick(event) {
+    return Boolean(event.target.closest('button, a, input, textarea, select'));
+}
+
+function openAffiliateLink(url, event) {
+    if (event.ctrlKey || event.metaKey) {
+        window.open(url, '_blank');
+    } else {
+        window.open(url, '_blank', 'noopener');
+    }
+}
+<?php endif; ?>
 </script>
 <?= $this->endSection() ?>

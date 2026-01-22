@@ -62,19 +62,25 @@
                     <div class="card mb-4" style="border-top: 4px dashed #E31E24;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5 class="card-title mb-0" style="color: #E31E24;">Add participants</h5>
+                                <h5 class="card-title mb-0" style="color: #E31E24;">Deelnemers toevoegen</h5>
                                 <i class="fas fa-trash" style="color: #ccc; cursor: pointer;"></i>
                             </div>
                             
                             <?php if ($drawing['status'] === 'pending'): ?>
-                                <!-- Add by Username Form -->
+                                <!-- Add by Email Form -->
                                 <form method="post" action="<?= base_url('index.php/drawings/add-participant/' . $drawing['id']) ?>" class="mb-4">
                                     <div class="mb-3">
-                                        <label class="form-label">Username</label>
-                                        <input type="text" class="form-control" name="username" placeholder="Voer gebruikersnaam in..." required>
+                                        <label class="form-label">Naam van de deelnemer</label>
+                                        <input type="text" class="form-control" name="invite_name" placeholder="Bijv. Jan Jansen">
+                                        <small class="text-muted">Optioneel, maar helpt om te verifiëren wie je toevoegt.</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">E-mailadres *</label>
+                                        <input type="email" class="form-control" name="invite_email" placeholder="naam@voorbeeld.nl" required>
+                                        <small class="text-muted">Dit moet overeenkomen met het e-mailadres waarmee de persoon inlogt. Ze ontvangen hierop de uitnodiging.</small>
                                     </div>
                                     <button class="btn btn-danger" type="submit" style="background-color: #E31E24; border-color: #E31E24;">
-                                        <i class="fas fa-plus"></i> Add Participant
+                                        <i class="fas fa-plus"></i> Uitnodiging versturen
                                     </button>
                                 </form>
                             <?php else: ?>
@@ -84,7 +90,7 @@
                             <?php endif; ?>
 
                             <!-- Current Participants List -->
-                            <h6 class="mb-3"><strong><?= count($participants) ?> participant<?= count($participants) !== 1 ? 's' : '' ?></strong></h6>
+                            <h6 class="mb-3"><strong><?= count($participants) ?> <?= count($participants) === 1 ? 'deelnemer' : 'deelnemers' ?></strong></h6>
                             
                             <?php if (!empty($participants)): ?>
                                 <div class="mb-4">
@@ -103,8 +109,8 @@
                                         <div class="p-3 bg-light rounded mb-2">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div>
-                                                    <h6 class="mb-0"><?= esc($creatorUser['first_name'] . ' ' . $creatorUser['last_name']) ?> <span style="color: #999;">(this is you)</span></h6>
-                                                    <small class="text-muted"><?= esc($creatorUser['username']) ?></small>
+                                                    <h6 class="mb-0"><?= esc($creatorUser['first_name'] . ' ' . $creatorUser['last_name']) ?> <span style="color: #999;">(dit ben jij)</span></h6>
+                                                    <small class="text-muted"><?= esc($creatorUser['email'] ?? $creatorUser['username']) ?></small>
                                                 </div>
                                             </div>
                                         </div>
@@ -117,7 +123,7 @@
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <h6 class="mb-0"><?= esc($participant['first_name'] . ' ' . $participant['last_name']) ?></h6>
-                                                        <small class="text-muted"><?= esc($participant['username']) ?></small>
+                                                        <small class="text-muted"><?= esc($participant['email'] ?? $participant['username']) ?></small>
                                                         <br>
                                                         <small>
                                                             <?php 
@@ -180,16 +186,16 @@
                     <div class="card">
                         <div class="card-body">
                             <p class="text-muted mb-3">
-                                <em>Or invite people, for example via WhatsApp. So they can add themselves to this draw. You can see it directly in the list above.</em>
+                                <em>Nodig mensen uit, bijvoorbeeld via WhatsApp. Zo kunnen zij zichzelf toevoegen aan deze loting en ziet u het direct in de lijst hierboven.</em>
                             </p>
                             
                             <!-- Display the invitation link -->
                             <div class="mb-3 p-3 bg-light rounded">
-                                <small class="text-muted d-block mb-2">Invitation Link:</small>
+                                <small class="text-muted d-block mb-2">Uitnodigingslink:</small>
                                 <div class="d-flex align-items-center gap-2">
                                     <input type="text" class="form-control form-control-sm" id="invitationLink" value="<?= base_url('index.php/drawings/view/' . $drawing['id']) ?>" readonly>
                                     <button class="btn btn-sm btn-danger" style="background-color: #E31E24; border-color: #E31E24; white-space: nowrap;" onclick="copyInvitationLink(this)">
-                                        <i class="fas fa-copy"></i> Copy
+                                        <i class="fas fa-copy"></i> Kopieer
                                     </button>
                                 </div>
                             </div>
@@ -197,7 +203,7 @@
                             <!-- Share buttons -->
                             <div class="d-flex gap-2">
                                 <a href="https://wa.me/?text=<?= urlencode('Join my drawing "' . esc($drawing['title']) . '": ' . base_url('index.php/drawings/view/' . $drawing['id'])) ?>" target="_blank" class="btn btn-success flex-grow-1">
-                                    <i class="fab fa-whatsapp"></i> Share via WhatsApp
+                                    <i class="fab fa-whatsapp"></i> Deel via WhatsApp
                                 </a>
                             </div>
                         </div>
@@ -219,7 +225,7 @@ function copyInvitationLink(button) {
     navigator.clipboard.writeText(link).then(() => {
         // Show success message
         const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.innerHTML = '<i class="fas fa-check"></i> Gekopieerd!';
         button.style.backgroundColor = '#28a745';
         
         setTimeout(() => {
@@ -236,7 +242,7 @@ function copyInvitationLink(button) {
         document.body.removeChild(textarea);
         
         const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.innerHTML = '<i class="fas fa-check"></i> Gekopieerd!';
         button.style.backgroundColor = '#28a745';
         
         setTimeout(() => {

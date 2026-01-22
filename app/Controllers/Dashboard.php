@@ -11,6 +11,7 @@ use App\Models\SalesModel;
 use App\Models\ContributionModel;
 use App\Libraries\ProductScraper;
 use App\Libraries\BolComAPI;
+use App\Libraries\ListProtection;
 use Config\Services;
 
 class Dashboard extends BaseController
@@ -18,6 +19,53 @@ class Dashboard extends BaseController
     public function __construct()
     {
         helper('text');
+    }
+
+    private function parseProtectionRequest(): array
+    {
+        $type = $this->request->getPost('protection_type') ?? 'none';
+        $type = in_array($type, ['none', 'password', 'question'], true) ? $type : 'none';
+
+        $password = null;
+        $question = null;
+        $answer = null;
+
+        if ($type === 'password') {
+            $plain = trim((string) $this->request->getPost('protection_password'));
+            if ($plain === '') {
+                return [
+                    'error' => 'Voer een wachtwoord in om de lijst te beveiligen of kies "Geen beveiliging".',
+                    'type' => 'none',
+                    'password' => null,
+                    'question' => null,
+                    'answer' => null,
+                ];
+            }
+            $password = ListProtection::encrypt($plain);
+        } elseif ($type === 'question') {
+            $question = trim((string) $this->request->getPost('protection_question'));
+            $plainAnswer = trim((string) $this->request->getPost('protection_answer'));
+
+            if ($question === '' || $plainAnswer === '') {
+                return [
+                    'error' => 'Vul zowel een beveiligingsvraag als antwoord in of kies een andere beveiligingsmethode.',
+                    'type' => 'none',
+                    'password' => null,
+                    'question' => null,
+                    'answer' => null,
+                ];
+            }
+
+            $answer = ListProtection::encrypt($plainAnswer);
+        }
+
+        return [
+            'error' => null,
+            'type' => $type,
+            'password' => $password,
+            'question' => $question,
+            'answer' => $answer,
+        ];
     }
 
     public function index()
@@ -99,6 +147,14 @@ class Dashboard extends BaseController
                 $slug = $slug . '-' . time();
             }
 
+            $protection = $this->parseProtectionRequest();
+            if ($protection['error']) {
+                return redirect()->back()
+                    ->with('error', $protection['error'])
+                    ->with('protection_error', $protection['error'])
+                    ->withInput();
+            }
+
             $data = [
                 'user_id' => $this->session->get('user_id'),
                 'category_id' => $this->request->getPost('category_id'),
@@ -110,6 +166,10 @@ class Dashboard extends BaseController
                 'event_date' => $this->request->getPost('event_date') ?: null,
                 'reminder_enabled' => $this->request->getPost('reminder_enabled') ? 1 : 0,
                 'reminder_intervals' => $this->request->getPost('reminder_intervals') ?: '30,14,7',
+                'protection_type' => $protection['type'],
+                'protection_password' => $protection['password'],
+                'protection_question' => $protection['question'],
+                'protection_answer' => $protection['answer'],
             ];
 
             if ($listModel->insert($data)) {
@@ -159,6 +219,11 @@ class Dashboard extends BaseController
         $this->data['is_owner'] = $listModel->isUserOwner($listId, $userId);
 
         $this->data['list'] = $list;
+        $this->data['decryptedProtection'] = [
+            'password' => ListProtection::decrypt($list['protection_password'] ?? null),
+            'question' => $list['protection_question'] ?? null,
+            'answer' => ListProtection::decrypt($list['protection_answer'] ?? null),
+        ];
         $this->data['categories'] = $categoryModel->getActiveCategories();
         $this->data['products'] = $listProductModel->getListProducts($listId);
         $this->data['sections'] = $listSectionModel->getListSectionsWithCounts($listId);
@@ -259,7 +324,16 @@ class Dashboard extends BaseController
                 $slug = $slug . '-' . time();
             }
 
+            $protection = $this->parseProtectionRequest();
+            if ($protection['error']) {
+                return redirect()->back()
+                    ->with('error', $protection['error'])
+                    ->with('protection_error', $protection['error'])
+                    ->withInput();
+            }
+
             $data = [
+                'id' => $listId,
                 'category_id' => $this->request->getPost('category_id'),
                 'title' => $title,
                 'slug' => $slug,
@@ -268,9 +342,17 @@ class Dashboard extends BaseController
                 'event_date' => $this->request->getPost('event_date') ?: null,
                 'reminder_enabled' => $this->request->getPost('reminder_enabled') ? 1 : 0,
                 'reminder_intervals' => $this->request->getPost('reminder_intervals') ?: '30,14,7',
+                'protection_type' => $protection['type'],
+                'protection_password' => $protection['password'],
+                'protection_question' => $protection['question'],
+                'protection_answer' => $protection['answer'],
             ];
 
-            if ($listModel->update($listId, $data)) {
+            $listModel->protect(false);
+            $updated = $listModel->update($listId, $data);
+            $listModel->protect(true);
+
+            if ($updated) {
                 // Check if reminder settings changed
                 $oldEventDate = $list['event_date'] ?? null;
                 $newEventDate = $data['event_date'];
@@ -380,6 +462,9 @@ class Dashboard extends BaseController
             $productId = $this->request->getPost('product_id');
             $productData = $this->request->getPost('product');
             $sectionId = $this->request->getPost('section_id');
+            if ($sectionId === '' || $sectionId === false) {
+                $sectionId = null;
+            }
 
             // Validate required fields
             if (empty($listId) || (empty($productId) && empty($productData))) {
@@ -453,7 +538,7 @@ class Dashboard extends BaseController
 
             // Get next position (within section if specified)
             $positionQuery = $listProductModel->where('list_id', $listId);
-            if ($sectionId) {
+            if ($sectionId !== null) {
                 $positionQuery->where('section_id', $sectionId);
             }
             $maxPosition = $positionQuery->selectMax('position')->first();

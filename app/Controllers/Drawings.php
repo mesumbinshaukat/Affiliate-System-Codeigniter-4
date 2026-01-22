@@ -107,11 +107,17 @@ class Drawings extends BaseController
 
         if (strtolower($this->request->getMethod()) === 'post') {
             $userModel = new UserModel();
-            $username = $this->request->getPost('username');
-            $user = $userModel->where('username', $username)->first();
+            $email = trim((string) $this->request->getPost('invite_email'));
+            $inviteName = trim((string) $this->request->getPost('invite_name'));
+
+            if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return redirect()->back()->with('error', 'Voer een geldig e-mailadres in.')->withInput();
+            }
+
+            $user = $userModel->where('email', $email)->first();
 
             if (!$user) {
-                return redirect()->back()->with('error', 'User not found')->withInput();
+                return redirect()->back()->with('error', 'Er bestaat geen gebruiker met dit e-mailadres. Vraag hen om een account te maken of gebruik een ander adres.')->withInput();
             }
 
             $participantModel = new DrawingParticipantModel();
@@ -144,7 +150,22 @@ class Drawings extends BaseController
             }
 
             if ($participantModel->insert($participantData)) {
-                return redirect()->back()->with('success', 'Participant added successfully');
+                // Optionally update missing name info from invite form if provided
+                if ($inviteName && (empty($user['first_name']) || empty($user['last_name']))) {
+                    [$firstName, $lastName] = array_pad(explode(' ', $inviteName, 2), 2, '');
+                    $updateData = [];
+                    if ($firstName && empty($user['first_name'])) {
+                        $updateData['first_name'] = $firstName;
+                    }
+                    if ($lastName && empty($user['last_name'])) {
+                        $updateData['last_name'] = $lastName;
+                    }
+                    if (!empty($updateData)) {
+                        $userModel->update($user['id'], $updateData);
+                    }
+                }
+
+                return redirect()->back()->with('success', 'Uitnodiging verstuurd naar ' . esc($email));
             }
 
             $errors = $participantModel->errors();

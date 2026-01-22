@@ -124,6 +124,14 @@
                 <div class="col-lg-8">
                     <div class="glass-card">
                         <div class="card-body">
+                            <?php
+                                $selectedProtection = old('protection_type', $list['protection_type'] ?? 'none');
+                                $protectionPassword = old('protection_password', $decryptedProtection['password'] ?? '');
+                                $protectionQuestion = old('protection_question', $decryptedProtection['question'] ?? '');
+                                $protectionAnswer = old('protection_answer', $decryptedProtection['answer'] ?? '');
+                                $showPasswordFields = $selectedProtection === 'password';
+                                $showQuestionFields = $selectedProtection === 'question';
+                            ?>
                             <form method="post" action="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>">
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Lijsttitel *</label>
@@ -145,6 +153,52 @@
                                 <div class="mb-3">
                                     <label for="description" class="form-label">Beschrijving</label>
                                     <textarea class="form-control" id="description" name="description" rows="4"><?= esc($list['description']) ?></textarea>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h5 class="mb-2"><i class="fas fa-lock text-primary"></i> Lijstbeveiliging</h5>
+                                    <p class="text-muted small">Kies of deze lijst publiek blijft of beschermd wordt met een wachtwoord of beveiligingsvraag.</p>
+
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="protection_type" id="protection_none" value="none" <?= $selectedProtection === 'none' ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="protection_none">
+                                                Geen beveiliging (iedereen met de link kan de lijst bekijken)
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="protection_type" id="protection_password" value="password" <?= $selectedProtection === 'password' ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="protection_password">
+                                                Wachtwoordbescherming
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="protection_type" id="protection_question" value="question" <?= $selectedProtection === 'question' ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="protection_question">
+                                                Beveiligingsvraag + antwoord
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" id="protection_password_fields" style="display: <?= $showPasswordFields ? 'block' : 'none' ?>;">
+                                        <div class="col-12">
+                                            <label for="protection_password_input" class="form-label">Wachtwoord</label>
+                                            <input type="text" class="form-control" id="protection_password_input" name="protection_password" value="<?= esc($protectionPassword) ?>" placeholder="Bijv. 'cadeau2024'">
+                                            <small class="text-muted">Deel dit wachtwoord met de personen die toegang mogen hebben.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3" id="protection_question_fields" style="display: <?= $showQuestionFields ? 'flex' : 'none' ?>;">
+                                        <div class="col-12">
+                                            <label for="protection_question_input" class="form-label">Beveiligingsvraag</label>
+                                            <input type="text" class="form-control" id="protection_question_input" name="protection_question" value="<?= esc($protectionQuestion) ?>" placeholder="Bijv. 'Wat is de favoriete kleur van Lisa?'">
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="protection_answer_input" class="form-label">Antwoord</label>
+                                            <input type="text" class="form-control" id="protection_answer_input" name="protection_answer" value="<?= esc($protectionAnswer) ?>" placeholder="Voer het juiste antwoord in">
+                                            <small class="text-muted">Het antwoord wordt versleuteld opgeslagen.</small>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
@@ -178,7 +232,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3" id="reminder_settings" style="<?= !empty($list['reminder_enabled']) && !empty($list['event_date']) ? '' : 'display: none;' ?>">
+                                <div class="mb-3" id="reminder_settings_edit" style="<?= !empty($list['reminder_enabled']) && !empty($list['event_date']) ? '' : 'display: none;' ?>">
                                     <label for="reminder_intervals" class="form-label">Herinneringsmomenten (in dagen)</label>
                                     <input type="text" class="form-control" id="reminder_intervals" name="reminder_intervals" value="<?= esc($list['reminder_intervals'] ?? '30,14,7') ?>" placeholder="30,14,7">
                                     <small class="text-muted">Kommagescheiden: bijv. "30,14,7" stuurt herinneringen 30, 14 en 7 dagen voor het evenement</small>
@@ -1696,6 +1750,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const reminderEnabled = document.getElementById('reminder_enabled');
     const reminderSettings = document.getElementById('reminder_settings_edit');
     const eventDate = document.getElementById('event_date');
+    const protectionRadios = document.querySelectorAll('input[name="protection_type"]');
+    const passwordFields = document.getElementById('protection_password_fields');
+    const questionFields = document.getElementById('protection_question_fields');
     
     function toggleReminderSettings() {
         if (reminderEnabled && reminderEnabled.checked && eventDate && eventDate.value) {
@@ -1704,9 +1761,27 @@ document.addEventListener('DOMContentLoaded', function() {
             reminderSettings.style.display = 'none';
         }
     }
+
+    function toggleProtectionFields() {
+        const selected = document.querySelector('input[name="protection_type"]:checked');
+        const type = selected ? selected.value : 'none';
+
+        if (passwordFields) {
+            passwordFields.style.display = type === 'password' ? 'block' : 'none';
+        }
+        if (questionFields) {
+            questionFields.style.display = type === 'question' ? 'flex' : 'none';
+        }
+    }
     
     if (reminderEnabled) reminderEnabled.addEventListener('change', toggleReminderSettings);
     if (eventDate) eventDate.addEventListener('change', toggleReminderSettings);
+    if (protectionRadios.length) {
+        protectionRadios.forEach(radio => radio.addEventListener('change', toggleProtectionFields));
+    }
+
+    toggleReminderSettings();
+    toggleProtectionFields();
 });
 </script>
 

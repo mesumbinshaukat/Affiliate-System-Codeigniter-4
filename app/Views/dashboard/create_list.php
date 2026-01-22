@@ -8,7 +8,8 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="glass-card">
-                <div class="card-body">
+                <div class="card-body p-4 p-lg-5">
+                    <?php $selectedProtection = old('protection_type', 'none'); ?>
                     <form method="post" action="<?= base_url('index.php/dashboard/list/create') ?>">
                         <div class="mb-3">
                             <label for="title" class="form-label">Lijsttitel *</label>
@@ -30,6 +31,52 @@
                         <div class="mb-3">
                             <label for="description" class="form-label">Beschrijving</label>
                             <textarea class="form-control" id="description" name="description" rows="4"><?= old('description') ?></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-2"><i class="fas fa-lock text-primary"></i> Lijstbeveiliging</h5>
+                            <p class="text-muted small">Kies of je je lijst publiek wilt houden, met een wachtwoord wilt beveiligen of een controlevraag wilt gebruiken.</p>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="protection_type" id="protection_none" value="none" <?= $selectedProtection === 'none' ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="protection_none">
+                                        Geen beveiliging (iedereen met de link kan de lijst bekijken)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="protection_type" id="protection_password" value="password" <?= $selectedProtection === 'password' ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="protection_password">
+                                        Wachtwoordbescherming
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="protection_type" id="protection_question" value="question" <?= $selectedProtection === 'question' ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="protection_question">
+                                        Beveiligingsvraag + antwoord
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row" id="protection_password_fields" style="display: none;">
+                                <div class="col-12">
+                                    <label for="protection_password_input" class="form-label">Wachtwoord</label>
+                                    <input type="text" class="form-control" id="protection_password_input" name="protection_password" value="<?= old('protection_password') ?>" placeholder="Bijv. 'cadeau2024'">
+                                    <small class="text-muted">Deel dit wachtwoord met iedereen die de lijst mag bekijken.</small>
+                                </div>
+                            </div>
+
+                            <div class="row g-3" id="protection_question_fields" style="display: none;">
+                                <div class="col-12">
+                                    <label for="protection_question_input" class="form-label">Beveiligingsvraag</label>
+                                    <input type="text" class="form-control" id="protection_question_input" name="protection_question" value="<?= old('protection_question') ?>" placeholder="Bijv. 'Wat is de favoriete kleur van Lisa?'">
+                                </div>
+                                <div class="col-12">
+                                    <label for="protection_answer_input" class="form-label">Antwoord</label>
+                                    <input type="text" class="form-control" id="protection_answer_input" name="protection_answer" value="<?= old('protection_answer') ?>" placeholder="Voer het juiste antwoord in">
+                                    <small class="text-muted">Je antwoord wordt versleuteld opgeslagen.</small>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -80,7 +127,7 @@
 
         <div class="col-lg-4">
             <div class="glass-card">
-                <div class="card-body">
+                <div class="card-body p-4">
                     <h5 class="card-title">Tips</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2">
@@ -111,7 +158,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const reminderEnabled = document.getElementById('reminder_enabled');
     const reminderSettings = document.getElementById('reminder_settings');
     const eventDate = document.getElementById('event_date');
-    
+    const protectionRadios = document.querySelectorAll('input[name="protection_type"]');
+    const passwordFields = document.getElementById('protection_password_fields');
+    const questionFields = document.getElementById('protection_question_fields');
+    const passwordInput = document.getElementById('protection_password_input');
+    const questionInput = document.getElementById('protection_question_input');
+    const answerInput = document.getElementById('protection_answer_input');
+
     function toggleReminderSettings() {
         if (reminderEnabled && reminderEnabled.checked && eventDate.value) {
             reminderSettings.style.display = 'block';
@@ -119,12 +172,41 @@ document.addEventListener('DOMContentLoaded', function() {
             reminderSettings.style.display = 'none';
         }
     }
-    
+
+    function toggleProtectionFields() {
+        const selected = document.querySelector('input[name="protection_type"]:checked');
+        const type = selected ? selected.value : 'none';
+
+        if (passwordFields) {
+            passwordFields.style.display = type === 'password' ? 'block' : 'none';
+        }
+        if (questionFields) {
+            questionFields.style.display = type === 'question' ? 'flex' : 'none';
+        }
+
+        if (passwordInput) {
+            passwordInput.required = type === 'password';
+            if (type !== 'password') {
+                passwordInput.value = passwordInput.value;
+            }
+        }
+        if (questionInput) {
+            questionInput.required = type === 'question';
+        }
+        if (answerInput) {
+            answerInput.required = type === 'question';
+        }
+    }
+
     if (reminderEnabled) reminderEnabled.addEventListener('change', toggleReminderSettings);
     if (eventDate) eventDate.addEventListener('change', toggleReminderSettings);
-    
+    if (protectionRadios.length) {
+        protectionRadios.forEach(radio => radio.addEventListener('change', toggleProtectionFields));
+    }
+
     // Initial state
     toggleReminderSettings();
+    toggleProtectionFields();
 });
 </script>
 

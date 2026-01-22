@@ -107,6 +107,55 @@
             width: 100%;
         }
 
+        .nav-search-dropdown {
+            position: absolute;
+            top: calc(100% + 0.4rem);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 18px 45px rgba(3, 10, 61, 0.28);
+            padding: 0.35rem 0;
+            z-index: 30;
+            border: 1px solid rgba(4, 11, 60, 0.08);
+            display: none;
+        }
+
+        .nav-search-dropdown.active {
+            display: block;
+        }
+
+        .nav-search-result {
+            padding: 0.6rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .nav-search-result strong {
+            color: #05021F;
+            font-size: 0.95rem;
+        }
+
+        .nav-search-result small {
+            color: #5f6295;
+            font-size: 0.82rem;
+        }
+
+        .nav-search-result + .nav-search-result {
+            border-top: 1px solid rgba(7,17,70,0.08);
+        }
+
+        .nav-search-result:hover {
+            background: rgba(43,73,241,0.08);
+        }
+
+        .nav-search-empty {
+            padding: 0.75rem 1rem;
+            color: #5f6295;
+            font-size: 0.85rem;
+        }
+
         .nav-search svg {
             position: absolute;
             top: 50%;
@@ -302,7 +351,10 @@
                     <a href="<?= base_url('index.php/register') ?>" class="nav-link-cta">Maak Een Verlanglijstje Aan</a>
                     <label class="nav-search">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6 6 0 1 0 14 15.5l.27.28v.79L20 21.5 21.5 20l-6-6zm-5.5 0a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="currentColor"/></svg>
-                        <input type="text" placeholder="Zoekopdracht...">
+                        <input type="text" id="navSearchInput" placeholder="Zoekopdracht..." autocomplete="off">
+                        <div class="nav-search-dropdown" id="navSearchDropdown">
+                            <div class="nav-search-empty">Typ om lijsten te zoeken…</div>
+                        </div>
                     </label>
                 </div>
                 <div class="nav-actions">
@@ -365,6 +417,107 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('navSearchInput');
+            const dropdown = document.getElementById('navSearchDropdown');
+            const emptyState = '<div class="nav-search-empty">Geen resultaten gevonden</div>';
+            const idleState = '<div class="nav-search-empty">Typ om lijsten te zoeken…</div>';
+            const loadingState = '<div class="nav-search-empty">Zoeken…</div>';
+            const endpoint = "<?= base_url('index.php/search/suggestions') ?>";
+            const listBase = "<?= base_url('index.php/list/') ?>";
+            const minChars = 2;
+            let abortController = null;
+
+            if (!input || !dropdown) {
+                return;
+            }
+
+            function hideDropdown() {
+                dropdown.classList.remove('active');
+            }
+
+            function showDropdown() {
+                dropdown.classList.add('active');
+            }
+
+            function renderResults(results) {
+                if (!results || results.length === 0) {
+                    dropdown.innerHTML = emptyState;
+                    return;
+                }
+
+                dropdown.innerHTML = results.map(result => {
+                    const subtitleParts = [];
+                    if (result.username) subtitleParts.push('@' + result.username);
+                    if (result.category) subtitleParts.push(result.category);
+                    const subtitle = subtitleParts.join(' • ');
+                    const description = result.description ? result.description.substring(0, 80) : '';
+
+                    return `
+                        <a class="nav-search-result" href="${listBase}${encodeURIComponent(result.slug)}">
+                            <strong>${result.title ?? ''}</strong>
+                            ${subtitle ? `<small>${subtitle}</small>` : ''}
+                            ${description ? `<small>${description}</small>` : ''}
+                        </a>
+                    `;
+                }).join('');
+            }
+
+            function performSearch(query) {
+                if (abortController) {
+                    abortController.abort();
+                }
+
+                abortController = new AbortController();
+                dropdown.innerHTML = loadingState;
+                showDropdown();
+
+                fetch(`${endpoint}?q=${encodeURIComponent(query)}`, { signal: abortController.signal })
+                    .then(response => response.ok ? response.json() : Promise.reject(response))
+                    .then(data => {
+                        renderResults(data.results);
+                        showDropdown();
+                    })
+                    .catch(error => {
+                        if (error.name === 'AbortError') return;
+                        dropdown.innerHTML = '<div class="nav-search-empty">Er is iets misgegaan</div>';
+                        showDropdown();
+                    });
+            }
+
+            input.addEventListener('input', () => {
+                const value = input.value.trim();
+
+                if (value.length < minChars) {
+                    dropdown.innerHTML = idleState;
+                    hideDropdown();
+                    return;
+                }
+
+                performSearch(value);
+            });
+
+            input.addEventListener('focus', () => {
+                if (input.value.trim().length >= minChars && dropdown.innerHTML.trim() !== '') {
+                    showDropdown();
+                }
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    hideDropdown();
+                    input.blur();
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!event.target.closest('.nav-search')) {
+                    hideDropdown();
+                }
+            });
+        });
+    </script>
     <?= $this->renderSection('scripts') ?>
 </body>
 </html>

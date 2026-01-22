@@ -51,7 +51,7 @@ class DrawingModel extends Model
     {
         $participantModel = new DrawingParticipantModel();
         return $participantModel->select('drawing_participants.*, 
-                                         users.username, users.first_name, users.last_name,
+                                         users.username, users.email, users.first_name, users.last_name,
                                          assigned_users.username as assigned_username, assigned_users.first_name as assigned_first_name, assigned_users.last_name as assigned_last_name,
                                          lists.title as list_title')
             ->join('users', 'users.id = drawing_participants.user_id')

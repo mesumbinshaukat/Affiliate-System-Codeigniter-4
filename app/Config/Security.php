@@ -7,6 +7,11 @@ use CodeIgniter\Config\BaseConfig;
 class Security extends BaseConfig
 {
     /**
+     * Enable or disable CSRF protection globally.
+     */
+    public bool $csrfProtection = true;
+
+    /**
      * --------------------------------------------------------------------------
      * CSRF Token Name
      * --------------------------------------------------------------------------
@@ -14,6 +19,11 @@ class Security extends BaseConfig
      * Token name for Cross Site Request Forgery protection.
      */
     public string $tokenName = 'csrf_token_name';
+
+    /**
+     * Randomize the token for each request (CI4.5+ compatibility).
+     */
+    public bool $tokenRandomize = false;
 
     /**
      * --------------------------------------------------------------------------

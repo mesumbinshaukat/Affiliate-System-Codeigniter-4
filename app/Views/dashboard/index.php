@@ -8,11 +8,23 @@
             <h1>Welkom terug, <?= esc($user['first_name']) ?>!</h1>
             <p>Overzicht van uw lijsten, verkoopcijfers en recente activiteiten.</p>
             <div class="hero-actions">
-                <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i> Nieuwe Lijst
+                <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="hero-btn hero-btn-primary">
+                    <span class="hero-btn-icon">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    <div>
+                        <strong>Nieuwe Lijst</strong>
+                        <small>Start direct en deel hem meteen</small>
+                    </div>
                 </a>
-                <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="btn btn-outline-light btn-inline">
-                    <i class="fas fa-chart-line me-1"></i> Bekijk Analytics
+                <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="hero-btn hero-btn-ghost">
+                    <span class="hero-btn-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </span>
+                    <div>
+                        <strong>Bekijk Analytics</strong>
+                        <small>Ontdek trends en prestaties</small>
+                    </div>
                 </a>
             </div>
         </div>
@@ -27,10 +39,6 @@
         <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #3479CD, #2B63BB);">
             <h3><?= $totalClicks ?></h3>
             <p>Totale Klikken</p>
-        </div>
-        <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #3479CD, #4F9BFF);">
-            <h3>€<?= number_format($salesStats['total_commission'] ?? 0, 2) ?></h3>
-            <p>Commissies</p>
         </div>
         <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #2957A8, #3479CD);">
             <h3>€<?= number_format($contributionStats['total_amount'] ?? 0, 2) ?></h3>
@@ -76,7 +84,7 @@
 
     <!-- Second Row -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3 col-6">
+        <div class="col-md-6 col-6">
             <a href="<?= base_url('index.php/dashboard/purchased') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <i class="fas fa-shopping-cart fa-3x mb-3" style="color: var(--primary-color);"></i>
@@ -84,7 +92,7 @@
                 </div>
             </a>
         </div>
-        <div class="col-md-3 col-6">
+        <div class="col-md-6 col-6">
             <a href="<?= base_url('index.php/dashboard/invitations') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <i class="fas fa-envelope fa-3x mb-3" style="color: var(--primary-color);"></i>

@@ -176,6 +176,79 @@
             flex-wrap: wrap;
             gap: 0.75rem;
         }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.35rem;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            text-decoration: none;
+            min-width: 260px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .hero-btn strong {
+            display: block;
+            font-size: 1.05rem;
+        }
+
+        .hero-btn small {
+            display: block;
+            color: rgba(255,255,255,0.75);
+            font-size: 0.85rem;
+        }
+
+        .hero-btn-primary {
+            background: linear-gradient(120deg, #4F8CFF, #2B63BB);
+            border-color: transparent;
+            box-shadow: 0 20px 45px rgba(17, 36, 94, 0.45);
+        }
+
+        .hero-btn-ghost {
+            background: rgba(16, 29, 74, 0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(5, 10, 30, 0.35);
+        }
+
+        .hero-btn-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.18);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+        }
+
+        .hero-btn-primary .hero-btn-icon {
+            background: rgba(255,255,255,0.2);
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.25);
+        }
+
+        .hero-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .hero-btn:hover::after {
+            opacity: 1;
+        }
         
         .btn-make-list {
             background-color: var(--primary-color);
@@ -310,8 +383,8 @@
         /* Stats Section */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
         }
         
         .stats-card {

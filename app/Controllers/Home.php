@@ -93,4 +93,39 @@ class Home extends BaseController
 
         return view('home/search', $this->data);
     }
+
+    public function searchSuggestions()
+    {
+        $query = trim($this->request->getGet('q') ?? '');
+        $listModel = new ListModel();
+
+        if ($query === '') {
+            return $this->response->setJSON(['results' => []]);
+        }
+
+        $results = $listModel->select('lists.title, lists.slug, lists.description, users.username, categories.name as category_name')
+            ->join('users', 'users.id = lists.user_id')
+            ->join('categories', 'categories.id = lists.category_id', 'left')
+            ->where('lists.status', 'published')
+            ->groupStart()
+                ->like('lists.title', $query)
+                ->orLike('lists.description', $query)
+            ->groupEnd()
+            ->orderBy('lists.created_at', 'DESC')
+            ->findAll(8);
+
+        $payload = array_map(static function ($item) {
+            return [
+                'title' => $item['title'],
+                'slug' => $item['slug'],
+                'username' => $item['username'] ?? null,
+                'category' => $item['category_name'] ?? null,
+                'description' => $item['description'] ?? '',
+            ];
+        }, $results ?? []);
+
+        return $this->response->setJSON([
+            'results' => $payload,
+        ]);
+    }
 }

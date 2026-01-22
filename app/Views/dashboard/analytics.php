@@ -5,7 +5,7 @@
 <div class="container my-5">
     <h1 class="mb-4">Analytica</h1>
 
-    <!-- Sales & Commissions Section -->
+    <!-- Sales Overview Section -->
     <div class="stats-grid mb-4">
         <div class="stats-card">
             <h3><?= $totalClicks ?></h3>
@@ -17,11 +17,7 @@
         </div>
         <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #f59e0b, #d97706);">
             <h3><?= $salesStats['approved_sales'] ?? 0 ?></h3>
-            <p>Goedgekeurd</p>
-        </div>
-        <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #8b5cf6, #7c3aed);">
-            <h3>€<?= number_format($salesStats['total_commission'] ?? 0, 2) ?></h3>
-            <p>Commissies</p>
+            <p>Goedgekeurde Bestellingen</p>
         </div>
     </div>
 
@@ -49,27 +45,21 @@
                         <p class="text-muted mb-0">Afgewezen</p>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="text-center">
-                        <h4 class="text-info">€<?= number_format($salesStats['total_commission'] ?? 0, 2) ?></h4>
-                        <p class="text-muted mb-0">Totale Commissie</p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
     <?php endif; ?>
 
     <!-- Sales Table -->
-    <div class="glass-card mb-4">
+    <div class="glass-card mb-4 p-3">
         <div class="card-body">
-            <h5 class="card-title">Uw Verkopen & Commissies</h5>
+            <h5 class="card-title">Uw Verkopen</h5>
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Order ID</th>
-                            <th>Commissie</th>
+                            <th>Bedrag</th>
                             <th>Status</th>
                             <th>Datum</th>
                         </tr>
@@ -109,7 +99,7 @@
     </div>
 
     <!-- Clicks Table -->
-    <div class="glass-card">
+    <div class="glass-card p-3">
         <div class="card-body">
             <h5 class="card-title">Recente Klikken</h5>
             <div class="table-responsive">
