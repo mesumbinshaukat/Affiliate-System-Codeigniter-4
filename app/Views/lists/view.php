@@ -283,18 +283,93 @@
         z-index: 2;
     }
 
-    .list-product-card__actions .btn-primary {
-        background: linear-gradient(135deg, #2563eb, #0ea5e9);
-        border: none;
+    .list-product-card__actions {
+        gap: 10px;
     }
 
-    .list-product-card__actions .btn-outline-secondary {
-        border-color: #d0d7eb;
-        color: #475569;
+    .btn-product-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: none;
+        border-radius: 14px;
+        padding: 10px 14px;
+        font-weight: 700;
+        text-transform: none;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.15);
+    }
+
+    .btn-product-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(15, 23, 42, 0.18);
+    }
+
+    .btn-product-action--primary {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #fff;
+    }
+
+    .btn-product-action--primary:hover {
+        color: #fff;
+        background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+    }
+
+    .btn-product-action--purchase {
+        background: linear-gradient(135deg, #f97316, #facc15);
+        color: #7c2d12;
+        border: 1px solid rgba(249, 115, 22, 0.4);
+        box-shadow: 0 8px 18px rgba(249, 115, 22, 0.3);
+    }
+
+    .btn-product-action--undo {
+        background: linear-gradient(135deg, #10b981, #22c55e);
+        color: #064e3b;
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        box-shadow: 0 10px 22px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-product-action--link {
+        background: #fff;
+        color: #1f2937;
+        border: 1px solid #d1d5db;
+    }
+
+    .btn-product-action--link:hover {
+        background: #f8fafc;
+    }
+
+    .list-product-card__actions-secondary {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .list-product-card__actions-secondary .btn-product-action {
+        flex: 1;
+        width: 100%;
+    }
+
+    @media (max-width: 576px) {
+        .list-product-card__actions-secondary {
+            flex-direction: column;
+        }
+    }
+
+    .list-product-card--claimed .btn-product-action {
+        opacity: 1;
+        filter: none;
+    }
+    .list-product-card--claimed .list-product-card__media {
+        opacity: 0.55;
+    }
+
+    .list-product-card--claimed .list-product-card__body > *:not(.list-product-card__actions) {
+        opacity: 0.55;
     }
 
     .list-product-card--claimed {
-        opacity: 0.6;
         position: relative;
     }
 
@@ -401,6 +476,10 @@
             grid-template-columns: 1fr;
         }
     }
+
+     .sm-font{
+        font-size: 10px;
+     }
 </style>
 <?= $this->endSection() ?>
 
@@ -619,33 +698,39 @@
                             <!-- Group Gift Contribution UI -->
                             <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
                             
-                            <div class="list-product-card__actions d-grid gap-2">
+                            <div class="list-product-card__actions d-grid">
                                 <a href="<?= $productUrl ?>" 
-                                   class="btn btn-primary btn-sm" 
+                                   class="btn-product-action btn-product-action--primary w-100" 
                                    target="_blank"
                                    title="Bekijk product in winkel">
-                                    <i class="fas fa-external-link-alt"></i> Product Bekijken
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Product Bekijken</span>
                                 </a>
-                                <?php if (!empty($list['is_crossable'])): ?>
-                                    <?php if ($isClaimed): ?>
-                                        <button class="btn btn-outline-success btn-sm"
-                                                onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
-                                                title="Maak dit item opnieuw beschikbaar">
-                                            <i class="fas fa-undo"></i> Ongedaan maken
-                                        </button>
-                                    <?php else: ?>
-                                        <button class="btn btn-outline-warning btn-sm"
-                                                onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
-                                                title="Markeer als gekocht">
-                                            <i class="fas fa-shopping-cart"></i> Ik Kocht Dit
-                                        </button>
+                                <div class="list-product-card__actions-secondary">
+                                    <?php if (!empty($list['is_crossable'])): ?>
+                                        <?php if ($isClaimed): ?>
+                                            <button class="btn-product-action btn-product-action--undo sm-font"
+                                                    onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                    title="Maak dit item opnieuw beschikbaar">
+                                                <i class="fas fa-undo"></i>
+                                                <span>Ongedaan Maken</span>
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="btn-product-action btn-product-action--purchase sm-font"
+                                                    onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                    title="Markeer als gekocht">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                <span>Ik Kocht Dit</span>
+                                            </button>
+                                        <?php endif; ?>
                                     <?php endif; ?>
-                                <?php endif; ?>
-                                <button class="btn btn-outline-secondary btn-sm"
-                                        onclick="copyAffiliateLink('<?= $productUrl ?>')"
-                                        title="Kopieer affiliate link om te delen">
-                                    <i class="fas fa-share-alt"></i> Link Delen
-                                </button>
+                                    <button class="btn-product-action btn-product-action--link sm-font"
+                                            onclick="copyAffiliateLink('<?= $productUrl ?>')"
+                                            title="Kopieer affiliate link om te delen">
+                                        <i class="fas fa-share-alt"></i>
+                                        <span>Link Delen</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -711,33 +796,39 @@
                             <!-- Group Gift Contribution UI -->
                             <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
                             
-                            <div class="list-product-card__actions d-grid gap-2">
+                            <div class="list-product-card__actions d-grid">
                                 <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
-                                   class="btn btn-primary btn-sm" 
+                                   class="btn-product-action btn-product-action--primary w-100" 
                                    target="_blank"
                                    title="Bekijk product in winkel">
-                                    <i class="fas fa-external-link-alt"></i> Product Bekijken
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Product Bekijken</span>
                                 </a>
-                                <?php if (!empty($list['is_crossable'])): ?>
-                                    <?php if ($isClaimed): ?>
-                                        <button class="btn btn-outline-success btn-sm"
-                                                onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
-                                                title="Maak dit item opnieuw beschikbaar">
-                                            <i class="fas fa-undo"></i> Ongedaan maken
-                                        </button>
-                                    <?php else: ?>
-                                        <button class="btn btn-outline-warning btn-sm"
-                                                onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
-                                                title="Markeer als gekocht">
-                                            <i class="fas fa-shopping-cart"></i> Ik Kocht Dit
-                                        </button>
+                                <div class="list-product-card__actions-secondary">
+                                    <?php if (!empty($list['is_crossable'])): ?>
+                                        <?php if ($isClaimed): ?>
+                                            <button class="btn-product-action btn-product-action--undo"
+                                                    onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                    title="Maak dit item opnieuw beschikbaar">
+                                                <i class="fas fa-undo"></i>
+                                                <span>Ongedaan Maken</span>
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="btn-product-action btn-product-action--purchase"
+                                                    onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                    title="Markeer als gekocht">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                <span>Ik Kocht Dit</span>
+                                            </button>
+                                        <?php endif; ?>
                                     <?php endif; ?>
-                                <?php endif; ?>
-                                <button class="btn btn-outline-secondary btn-sm"
-                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
-                                        title="Kopieer affiliate link om te delen">
-                                    <i class="fas fa-share-alt"></i> Link Delen
-                                </button>
+                                    <button class="btn-product-action btn-product-action--link"
+                                            onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
+                                            title="Kopieer affiliate link om te delen">
+                                        <i class="fas fa-share-alt"></i>
+                                        <span>Link Delen</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -921,6 +1012,10 @@ function openAffiliateLink(url, event) {
         window.open(url, '_blank', 'noopener');
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    initProductCardLinks();
+});
 <?php endif; ?>
 </script>
 <?= $this->endSection() ?>
