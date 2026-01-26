@@ -690,14 +690,14 @@
                                 <?php if (!empty($list['is_crossable'])): ?>
                                     <?php if ($isClaimed): ?>
                                         <button class="btn-product-action btn-product-action--undo w-100"
-                                                onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                onclick="undoPurchase(event, <?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
                                                 title="Maak dit item opnieuw beschikbaar">
                                             <i class="fas fa-undo"></i>
                                             <span>Ongedaan Maken</span>
                                         </button>
                                     <?php else: ?>
                                         <button class="btn-product-action btn-product-action--purchase w-100"
-                                                onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                onclick="markAsPurchased(event, <?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
                                                 title="Markeer als gekocht">
                                             <i class="fas fa-shopping-cart"></i>
                                             <span>Ik Kocht Dit</span>
@@ -786,14 +786,14 @@
                                 <?php if (!empty($list['is_crossable'])): ?>
                                     <?php if ($isClaimed): ?>
                                         <button class="btn-product-action btn-product-action--undo w-100"
-                                                onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                onclick="undoPurchase(event, <?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
                                                 title="Maak dit item opnieuw beschikbaar">
                                             <i class="fas fa-undo"></i>
                                             <span>Ongedaan Maken</span>
                                         </button>
                                     <?php else: ?>
                                         <button class="btn-product-action btn-product-action--purchase w-100"
-                                                onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                onclick="markAsPurchased(event, <?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
                                                 title="Markeer als gekocht">
                                             <i class="fas fa-shopping-cart"></i>
                                             <span>Ik Kocht Dit</span>
@@ -894,34 +894,40 @@ function switchView(viewType) {
 }
 
 // Restore user's view preference on page load
-function markAsPurchased(listProductId, listId) {
+function markAsPurchased(evt, listProductId, listId) {
     if (!confirm('Weet je zeker dat je dit item als gekocht wilt markeren? Dit laat anderen weten dat dit cadeau al is gekocht.')) {
         return;
     }
 
     togglePurchaseState({
+        event: evt,
         endpoint: '<?= base_url('index.php/list/claim') ?>',
         listProductId,
         listId,
-        loadingLabel: 'Markeren...'
+        loadingLabel: 'Markeren...',
+        shouldReload: true
     });
 }
 
-function undoPurchase(listProductId, listId) {
+function undoPurchase(evt, listProductId, listId) {
     if (!confirm('Zeker weten dat je deze aankoop wilt terugdraaien? Anderen kunnen het cadeau dan weer kopen.')) {
         return;
     }
 
     togglePurchaseState({
+        event: evt,
         endpoint: '<?= base_url('index.php/list/unclaim') ?>',
         listProductId,
         listId,
-        loadingLabel: 'Herstellen...'
+        loadingLabel: 'Herstellen...',
+        shouldReload: false,
+        onSuccess: (btn) => restoreProductCardState(btn, listProductId, listId)
     });
 }
 
-function togglePurchaseState({ endpoint, listProductId, listId, loadingLabel }) {
-    const btn = event.target.closest('button');
+function togglePurchaseState({ event, endpoint, listProductId, listId, loadingLabel, shouldReload = false, onSuccess = null }) {
+    const btn = event?.target?.closest('button');
+    if (!btn) return;
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> ${loadingLabel}`;
@@ -941,7 +947,15 @@ function togglePurchaseState({ endpoint, listProductId, listId, loadingLabel }) 
     .then(data => {
         if (data.success) {
             showToast(data.message || 'Status bijgewerkt', 'success');
-            location.reload();
+            if (shouldReload) {
+                location.reload();
+                return;
+            }
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            if (typeof onSuccess === 'function') {
+                onSuccess(btn);
+            }
         } else {
             showToast(data.message || 'Er is een fout opgetreden. Probeer het opnieuw.', 'error');
             btn.disabled = false;
@@ -954,6 +968,27 @@ function togglePurchaseState({ endpoint, listProductId, listId, loadingLabel }) 
         btn.disabled = false;
         btn.innerHTML = originalHtml;
     });
+}
+
+function restoreProductCardState(btn, listProductId, listId) {
+    const card = btn.closest('.list-product-card');
+    if (card) {
+        card.classList.remove('list-product-card--claimed');
+        const claimedBadge = card.querySelector('.claimed-badge');
+        if (claimedBadge) {
+            claimedBadge.remove();
+        }
+        const title = card.querySelector('.list-product-card__title');
+        title?.classList.remove('list-product-card__title--claimed');
+    }
+
+    const newButton = document.createElement('button');
+    newButton.className = 'btn-product-action btn-product-action--purchase w-100';
+    newButton.setAttribute('title', 'Markeer als gekocht');
+    newButton.innerHTML = '<i class="fas fa-shopping-cart"></i><span>Ik Kocht Dit</span>';
+    newButton.addEventListener('click', (ev) => markAsPurchased(ev, listProductId, listId));
+
+    btn.replaceWith(newButton);
 }
 
 function initProductCardLinks() {

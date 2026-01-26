@@ -36,12 +36,15 @@ class Drawings extends BaseController
             $drawingModel = new DrawingModel();
             $userId = $this->session->get('user_id');
 
+            $inviteToken = bin2hex(random_bytes(16));
+
             $data = [
                 'creator_id' => $userId,
                 'title' => $this->request->getPost('title'),
                 'description' => $this->request->getPost('description'),
                 'event_date' => $this->request->getPost('event_date'),
                 'status' => 'pending',
+                'invite_token' => $inviteToken,
             ];
 
             if ($drawingModel->insert($data)) {
@@ -68,12 +71,21 @@ class Drawings extends BaseController
             return redirect()->to('/drawings')->with('error', 'Drawing not found or access denied');
         }
 
+        if (empty($drawing['invite_token'])) {
+            $drawing['invite_token'] = bin2hex(random_bytes(16));
+            $drawingModel->update($drawingId, ['invite_token' => $drawing['invite_token']]);
+        }
+
         if (strtolower($this->request->getMethod()) === 'post') {
             $data = [
                 'title' => $this->request->getPost('title'),
                 'description' => $this->request->getPost('description'),
                 'event_date' => $this->request->getPost('event_date'),
             ];
+
+            if (empty($drawing['invite_token'])) {
+                $data['invite_token'] = bin2hex(random_bytes(16));
+            }
 
             if ($drawingModel->update($drawingId, $data)) {
                 return redirect()->back()->with('success', 'Drawing updated successfully');
@@ -85,8 +97,61 @@ class Drawings extends BaseController
 
         $this->data['drawing'] = $drawing;
         $this->data['participants'] = $drawingModel->getDrawingParticipants($drawingId);
+        $this->data['inviteLink'] = base_url('index.php/drawings/invite/' . $drawing['invite_token']);
 
         return view('drawings/edit', $this->data);
+    }
+
+    public function invite($token)
+    {
+        $drawingModel = new DrawingModel();
+        $drawing = $drawingModel->where('invite_token', $token)->first();
+
+        if (!$drawing) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $this->data['drawing'] = $drawing;
+        $this->data['token'] = $token;
+
+        return view('drawings/invite', $this->data);
+    }
+
+    public function joinViaToken($token)
+    {
+        $redirect = $this->requireLogin();
+        if ($redirect) return $redirect;
+
+        $drawingModel = new DrawingModel();
+        $drawing = $drawingModel->where('invite_token', $token)->first();
+
+        if (!$drawing) {
+            return redirect()->to('/drawings')->with('error', 'Uitnodiging ongeldig of verlopen');
+        }
+
+        $drawingId = $drawing['id'];
+        $participantModel = new DrawingParticipantModel();
+        $userId = $this->session->get('user_id');
+
+        $existing = $participantModel->where('drawing_id', $drawingId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($existing) {
+            if (($existing['status'] ?? 'pending') === 'pending') {
+                return redirect()->to('/drawings')->with('info', 'Je hebt al een uitnodiging voor deze loting.');
+            }
+
+            return redirect()->to('/drawings/view/' . $drawingId)->with('info', 'Je neemt al deel aan deze loting.');
+        }
+
+        $participantModel->insert([
+            'drawing_id' => $drawingId,
+            'user_id' => $userId,
+            'status' => 'pending',
+        ]);
+
+        return redirect()->to('/drawings')->with('success', 'Uitnodiging ontvangen! Je vindt deze loting bij je uitnodigingen.');
     }
 
     public function addParticipant($drawingId)

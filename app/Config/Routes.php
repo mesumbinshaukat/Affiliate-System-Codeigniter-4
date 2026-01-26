@@ -8,6 +8,7 @@ use CodeIgniter\Router\RouteCollection;
 
 // Public Routes
 $routes->get('/', 'Home::index');
+$routes->get('/search', 'Home::search');
 $routes->get('/search/suggestions', 'Home::searchSuggestions');
 $routes->get('/find', 'Home::find');
 $routes->get('/find/(:segment)', 'Home::find/$1');
@@ -68,9 +69,9 @@ $routes->group('drawings', ['filter' => 'auth'], function($routes) {
     $routes->get('decline-invitation/(:num)', 'Drawings::declineInvitation/$1');
 });
 
-// Public Drawings View (without auth) - for invitation links
-$routes->get('/drawings/view/(:num)', 'Drawings::view/$1');
-$routes->get('drawings/view/(:num)', 'Drawings::view/$1');
+// Public invitation landing page (no auth required)
+$routes->get('drawings/invite/(:segment)', 'Drawings::invite/$1');
+$routes->get('drawings/join/(:segment)', 'Drawings::joinViaToken/$1');
 
 // Affiliate Tracking
 $routes->get('/out/(:num)', 'Tracker::redirect/$1');

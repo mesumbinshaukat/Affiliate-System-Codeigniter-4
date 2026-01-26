@@ -60,7 +60,7 @@ class Admin extends BaseController
         $user = $userModel->find($userId);
 
         if (!$user) {
-            return redirect()->to('index.php/admin/users')->with('error', 'User not found');
+            return redirect()->to('index.php/admin/users')->with('error', 'Gebruiker niet gevonden');
         }
 
         if (strtolower($this->request->getMethod()) === 'post') {
@@ -102,7 +102,7 @@ class Admin extends BaseController
 
             // If no changes, return success message
             if (empty($data)) {
-                return redirect()->back()->with('success', 'No changes made');
+                return redirect()->back()->with('success', 'Geen wijzigingen aangebracht');
             }
 
             // Set validation rules only for fields being updated
@@ -132,7 +132,7 @@ class Admin extends BaseController
 
             // Update user
             if ($userModel->update($userId, $data)) {
-                return redirect()->back()->with('success', 'User updated successfully');
+                return redirect()->back()->with('success', 'Gebruiker succesvol bijgewerkt');
             }
 
             $errors = $userModel->errors();
@@ -150,15 +150,15 @@ class Admin extends BaseController
 
         // Prevent deleting own account
         if ($userId == $this->session->get('user_id')) {
-            return redirect()->to('index.php/admin/users')->with('error', 'Cannot delete your own account');
+            return redirect()->to('index.php/admin/users')->with('error', 'Je kunt je eigen account niet verwijderen');
         }
 
         $userModel = new UserModel();
         if ($userModel->delete($userId)) {
-            return redirect()->to('index.php/admin/users')->with('success', 'User deleted successfully');
+            return redirect()->to('index.php/admin/users')->with('success', 'Gebruiker succesvol verwijderd');
         }
 
-        return redirect()->back()->with('error', 'Failed to delete user');
+        return redirect()->back()->with('error', 'Gebruiker verwijderen mislukt');
     }
 
     // List Management
@@ -191,7 +191,7 @@ class Admin extends BaseController
             ]);
         }
 
-        return redirect()->back()->with('success', 'List updated successfully');
+        return redirect()->back()->with('success', 'Lijst succesvol bijgewerkt');
     }
 
     public function deleteListAdmin($listId)
@@ -201,10 +201,10 @@ class Admin extends BaseController
 
         $listModel = new ListModel();
         if ($listModel->delete($listId)) {
-            return redirect()->to('/admin/lists')->with('success', 'List deleted successfully');
+            return redirect()->to('/admin/lists')->with('success', 'Lijst succesvol verwijderd');
         }
 
-        return redirect()->back()->with('error', 'Failed to delete list');
+        return redirect()->back()->with('error', 'Lijst verwijderen mislukt');
     }
 
     // Category Management
@@ -236,7 +236,7 @@ class Admin extends BaseController
             ];
 
             if ($categoryModel->insert($data)) {
-                return redirect()->to('/admin/categories')->with('success', 'Category created successfully');
+                return redirect()->to('/admin/categories')->with('success', 'Categorie succesvol aangemaakt');
             }
 
             $errors = $categoryModel->errors();
@@ -255,7 +255,7 @@ class Admin extends BaseController
         $category = $categoryModel->find($categoryId);
 
         if (!$category) {
-            return redirect()->to('/admin/categories')->with('error', 'Category not found');
+            return redirect()->to('/admin/categories')->with('error', 'Categorie niet gevonden');
         }
 
         if (strtolower($this->request->getMethod()) === 'post') {
@@ -268,7 +268,7 @@ class Admin extends BaseController
             ];
 
             if ($categoryModel->update($categoryId, $data)) {
-                return redirect()->back()->with('success', 'Category updated successfully');
+                return redirect()->back()->with('success', 'Categorie succesvol bijgewerkt');
             }
 
             $errors = $categoryModel->errors();
@@ -286,10 +286,10 @@ class Admin extends BaseController
 
         $categoryModel = new CategoryModel();
         if ($categoryModel->delete($categoryId)) {
-            return redirect()->to('/admin/categories')->with('success', 'Category deleted successfully');
+            return redirect()->to('/admin/categories')->with('success', 'Categorie succesvol verwijderd');
         }
 
-        return redirect()->back()->with('error', 'Failed to delete category');
+        return redirect()->back()->with('error', 'Categorie verwijderen mislukt');
     }
 
     // Analytics
@@ -347,7 +347,7 @@ class Admin extends BaseController
             ]);
         }
 
-        return redirect()->back()->with('success', 'Source updated successfully');
+        return redirect()->back()->with('success', 'Bron succesvol bijgewerkt');
     }
 
     // Settings
@@ -365,7 +365,7 @@ class Admin extends BaseController
                 $settingModel->setSetting($key, $value);
             }
 
-            return redirect()->back()->with('success', 'Settings updated successfully');
+            return redirect()->back()->with('success', 'Instellingen succesvol bijgewerkt');
         }
 
         $this->data['settings'] = $settingModel->getAllSettings();
@@ -394,7 +394,7 @@ class Admin extends BaseController
         $drawing = $drawingModel->getDrawingStats($drawingId);
 
         if (!$drawing) {
-            return redirect()->to('admin/drawings')->with('error', 'Drawing not found');
+            return redirect()->to('admin/drawings')->with('error', 'Trekking niet gevonden');
         }
 
         $participants = $drawingModel->getDrawingParticipants($drawingId);
@@ -424,9 +424,9 @@ class Admin extends BaseController
 
         // Delete the drawing
         if ($drawingModel->delete($drawingId)) {
-            return redirect()->to('admin/drawings')->with('success', 'Drawing deleted successfully');
+            return redirect()->to('admin/drawings')->with('success', 'Trekking succesvol verwijderd');
         }
 
-        return redirect()->back()->with('error', 'Failed to delete drawing');
+        return redirect()->back()->with('error', 'Trekking verwijderen mislukt');
     }
 }

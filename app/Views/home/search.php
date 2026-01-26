@@ -21,14 +21,10 @@
             <?php if (!empty($lists)): ?>
                 <?php foreach ($lists as $list): ?>
                     <div class="col-md-4 mb-4">
-                        <div class="card list-card">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
-                                        <?= esc($list['title']) ?>
-                                    </a>
-                                </h5>
-                                <p class="card-text text-muted"><?= esc(character_limiter($list['description'], 100)) ?></p>
+                        <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="card list-card h-100 text-decoration-none text-dark">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title mb-2"><?= esc($list['title']) ?></h5>
+                                <p class="card-text text-muted flex-grow-1"><?= esc(character_limiter($list['description'], 100)) ?></p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         <i class="fas fa-user"></i> <?= esc($list['username'] ?? 'Onbekend') ?>
@@ -38,7 +34,7 @@
                                     </small>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>

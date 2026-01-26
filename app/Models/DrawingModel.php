@@ -12,7 +12,7 @@ class DrawingModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
-    protected $allowedFields = ['creator_id', 'title', 'description', 'event_date', 'status'];
+    protected $allowedFields = ['creator_id', 'title', 'description', 'event_date', 'status', 'invite_token'];
 
     protected bool $allowEmptyInserts = false;
 
