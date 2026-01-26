@@ -340,23 +340,6 @@
         background: #f8fafc;
     }
 
-    .list-product-card__actions-secondary {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .list-product-card__actions-secondary .btn-product-action {
-        flex: 1;
-        width: 100%;
-    }
-
-    @media (max-width: 576px) {
-        .list-product-card__actions-secondary {
-            flex-direction: column;
-        }
-    }
-
     .list-product-card--claimed .btn-product-action {
         opacity: 1;
         filter: none;
@@ -477,9 +460,7 @@
         }
     }
 
-     .sm-font{
-        font-size: 10px;
-     }
+    
 </style>
 <?= $this->endSection() ?>
 
@@ -698,7 +679,7 @@
                             <!-- Group Gift Contribution UI -->
                             <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
                             
-                            <div class="list-product-card__actions d-grid">
+                            <div class="list-product-card__actions d-grid gap-2">
                                 <a href="<?= $productUrl ?>" 
                                    class="btn-product-action btn-product-action--primary w-100" 
                                    target="_blank"
@@ -706,31 +687,29 @@
                                     <i class="fas fa-external-link-alt"></i>
                                     <span>Product Bekijken</span>
                                 </a>
-                                <div class="list-product-card__actions-secondary">
-                                    <?php if (!empty($list['is_crossable'])): ?>
-                                        <?php if ($isClaimed): ?>
-                                            <button class="btn-product-action btn-product-action--undo sm-font"
-                                                    onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
-                                                    title="Maak dit item opnieuw beschikbaar">
-                                                <i class="fas fa-undo"></i>
-                                                <span>Ongedaan Maken</span>
-                                            </button>
-                                        <?php else: ?>
-                                            <button class="btn-product-action btn-product-action--purchase sm-font"
-                                                    onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
-                                                    title="Markeer als gekocht">
-                                                <i class="fas fa-shopping-cart"></i>
-                                                <span>Ik Kocht Dit</span>
-                                            </button>
-                                        <?php endif; ?>
+                                <?php if (!empty($list['is_crossable'])): ?>
+                                    <?php if ($isClaimed): ?>
+                                        <button class="btn-product-action btn-product-action--undo w-100"
+                                                onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                title="Maak dit item opnieuw beschikbaar">
+                                            <i class="fas fa-undo"></i>
+                                            <span>Ongedaan Maken</span>
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn-product-action btn-product-action--purchase w-100"
+                                                onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                title="Markeer als gekocht">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            <span>Ik Kocht Dit</span>
+                                        </button>
                                     <?php endif; ?>
-                                    <button class="btn-product-action btn-product-action--link sm-font"
-                                            onclick="copyAffiliateLink('<?= $productUrl ?>')"
-                                            title="Kopieer affiliate link om te delen">
-                                        <i class="fas fa-share-alt"></i>
-                                        <span>Link Delen</span>
-                                    </button>
-                                </div>
+                                <?php endif; ?>
+                                <button class="btn-product-action btn-product-action--link w-100"
+                                        onclick="copyAffiliateLink('<?= $productUrl ?>')"
+                                        title="Kopieer affiliate link om te delen">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span>Link Delen</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -796,7 +775,7 @@
                             <!-- Group Gift Contribution UI -->
                             <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
                             
-                            <div class="list-product-card__actions d-grid">
+                            <div class="list-product-card__actions d-grid gap-2">
                                 <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
                                    class="btn-product-action btn-product-action--primary w-100" 
                                    target="_blank"
@@ -804,31 +783,29 @@
                                     <i class="fas fa-external-link-alt"></i>
                                     <span>Product Bekijken</span>
                                 </a>
-                                <div class="list-product-card__actions-secondary">
-                                    <?php if (!empty($list['is_crossable'])): ?>
-                                        <?php if ($isClaimed): ?>
-                                            <button class="btn-product-action btn-product-action--undo"
-                                                    onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
-                                                    title="Maak dit item opnieuw beschikbaar">
-                                                <i class="fas fa-undo"></i>
-                                                <span>Ongedaan Maken</span>
-                                            </button>
-                                        <?php else: ?>
-                                            <button class="btn-product-action btn-product-action--purchase"
-                                                    onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
-                                                    title="Markeer als gekocht">
-                                                <i class="fas fa-shopping-cart"></i>
-                                                <span>Ik Kocht Dit</span>
-                                            </button>
-                                        <?php endif; ?>
+                                <?php if (!empty($list['is_crossable'])): ?>
+                                    <?php if ($isClaimed): ?>
+                                        <button class="btn-product-action btn-product-action--undo w-100"
+                                                onclick="undoPurchase(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                title="Maak dit item opnieuw beschikbaar">
+                                            <i class="fas fa-undo"></i>
+                                            <span>Ongedaan Maken</span>
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn-product-action btn-product-action--purchase w-100"
+                                                onclick="markAsPurchased(<?= $product['list_product_id'] ?>, <?= $list['id'] ?>)"
+                                                title="Markeer als gekocht">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            <span>Ik Kocht Dit</span>
+                                        </button>
                                     <?php endif; ?>
-                                    <button class="btn-product-action btn-product-action--link"
-                                            onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
-                                            title="Kopieer affiliate link om te delen">
-                                        <i class="fas fa-share-alt"></i>
-                                        <span>Link Delen</span>
-                                    </button>
-                                </div>
+                                <?php endif; ?>
+                                <button class="btn-product-action btn-product-action--link w-100"
+                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
+                                        title="Kopieer affiliate link om te delen">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span>Link Delen</span>
+                                </button>
                             </div>
                         </div>
                     </div>
