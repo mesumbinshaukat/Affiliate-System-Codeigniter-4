@@ -414,6 +414,39 @@
         color: #3b82f6;
     }
 
+    .mobile-utility-bar {
+        display: none;
+        gap: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .mobile-utility-bar__btn {
+        flex: 1;
+        border-radius: 50px;
+        border: 1px solid #e2e8f0;
+        padding: 10px 16px;
+        font-weight: 600;
+        background: #fff;
+        box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .mobile-section-picker {
+        display: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .mobile-section-picker label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #334155;
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+
     @media (max-width: 767px) {
         .list-hero {
             padding: 24px;
@@ -457,6 +490,20 @@
 
         .list-product-grid {
             grid-template-columns: 1fr;
+        }
+
+        .mobile-utility-bar,
+        .mobile-section-picker {
+            display: flex;
+        }
+
+        .mobile-section-picker {
+            flex-direction: column;
+        }
+
+        .mobile-section-picker select {
+            border-radius: 12px;
+            padding: 10px 14px;
         }
     }
 
@@ -577,13 +624,29 @@
 
     <!-- Products Section -->
     <div class="mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="mobile-utility-bar">
+            <button class="mobile-utility-bar__btn" onclick="scrollToTop()">
+                <i class="fas fa-arrow-left"></i> Terug naar boven
+            </button>
+            <button class="mobile-utility-bar__btn" onclick="scrollToListPicker()">
+                <i class="fas fa-stream"></i> Naar secties
+            </button>
+        </div>
+
+        <div class="mobile-section-picker" id="sectionPicker">
+            <label for="sectionSelect"><i class="fas fa-map-marker-alt me-1"></i> Ga naar sectie</label>
+            <select id="sectionSelect" class="form-select" onchange="jumpToSection(this.value)">
+                <option value="">Selecteer een sectie...</option>
+            </select>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <h3 class="mb-0"><i class="fas fa-gift"></i> Producten in deze lijst</h3>
             <div class="view-toggle">
-                <button class="btn active" onclick="switchView('grid')" id="gridViewBtn" title="Rasterweergave">
+                <button class="btn active" onclick="switchView('grid')" id="gridViewBtn" title="Rasterweergave" aria-pressed="true" aria-label="Rasterweergave">
                     <i class="fas fa-th"></i> Raster
                 </button>
-                <button class="btn" onclick="switchView('list')" id="listViewBtn" title="Lijstweergave">
+                <button class="btn" onclick="switchView('list')" id="listViewBtn" title="Lijstweergave" aria-pressed="false" aria-label="Lijstweergave">
                     <i class="fas fa-list"></i> Lijst
                 </button>
             </div>
@@ -619,7 +682,7 @@
                 ?>
                 
                 <?php foreach ($groupedProducts as $sectionId => $section): ?>
-                    <div class="section-group mb-5">
+                    <div class="section-group mb-5" id="section-<?= esc($sectionId) ?>" data-section-title="<?= esc($section['title']) ?>">
                         <h3 class="section-title">
                             <i class="fas fa-folder-open me-2"></i>
                             <?= esc($section['title']) ?>

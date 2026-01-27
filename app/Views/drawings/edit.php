@@ -191,20 +191,26 @@
                             
                             <!-- Display the invitation link -->
                             <div class="mb-3 p-3 bg-light rounded">
-                                <small class="text-muted d-block mb-2">Uitnodigingslink:</small>
-                                <div class="d-flex align-items-center gap-2">
-                                    <input type="text" class="form-control form-control-sm" id="invitationLink" value="<?= base_url('index.php/drawings/view/' . $drawing['id']) ?>" readonly>
+                                <small class="text-muted d-block mb-2">Uitnodigingslink (veilig token):</small>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <input type="text" class="form-control form-control-sm" id="invitationLink" value="<?= esc($inviteLink) ?>" readonly>
                                     <button class="btn btn-sm btn-danger" style="background-color: #E31E24; border-color: #E31E24; white-space: nowrap;" onclick="copyInvitationLink(this)">
                                         <i class="fas fa-copy"></i> Kopieer
                                     </button>
                                 </div>
+                                <small class="text-muted d-block mt-2">
+                                    Deel deze link met geregistreerde gebruikers. Zij moeten inloggen en zien de loting direct.
+                                </small>
                             </div>
                             
                             <!-- Share buttons -->
-                            <div class="d-flex gap-2">
-                                <a href="https://wa.me/?text=<?= urlencode('Join my drawing "' . esc($drawing['title']) . '": ' . base_url('index.php/drawings/view/' . $drawing['id'])) ?>" target="_blank" class="btn btn-success flex-grow-1">
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="https://wa.me/?text=<?= urlencode('Doe mee aan mijn loting "' . esc($drawing['title']) . '" via: ' . $inviteLink) ?>" target="_blank" class="btn btn-success flex-grow-1">
                                     <i class="fab fa-whatsapp"></i> Deel via WhatsApp
                                 </a>
+                                <button type="button" class="btn btn-outline-secondary flex-grow-1" onclick="shareInviteNative()">
+                                    <i class="fas fa-share-alt"></i> Deel via apparaat
+                                </button>
                             </div>
                         </div>
                     </div>

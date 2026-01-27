@@ -113,6 +113,7 @@ class Drawings extends BaseController
 
         $this->data['drawing'] = $drawing;
         $this->data['token'] = $token;
+        $this->data['inviteLink'] = base_url('index.php/drawings/invite/' . $token);
 
         return view('drawings/invite', $this->data);
     }
@@ -341,6 +342,9 @@ class Drawings extends BaseController
 
     public function view($drawingId)
     {
+        $redirect = $this->requireLogin();
+        if ($redirect) return $redirect;
+
         $drawingModel = new DrawingModel();
         $drawing = $drawingModel->getDrawingWithParticipants($drawingId);
 
@@ -348,11 +352,18 @@ class Drawings extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        // Check if user is creator or participant
-        $userId = $this->isLoggedIn() ? $this->session->get('user_id') : null;
-        $isCreator = $userId && $drawing['creator_id'] == $userId;
+        $userId = $this->session->get('user_id');
+        $isCreator = $drawing['creator_id'] == $userId;
 
         $participantModel = new DrawingParticipantModel();
+        $isParticipant = $participantModel->where('drawing_id', $drawingId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$isCreator && !$isParticipant) {
+            return redirect()->to('/drawings')->with('error', 'Je hebt geen toegang tot deze loting');
+        }
+
         $participants = $participantModel->select('drawing_participants.*, 
                                                    users.username, users.first_name, users.last_name,
                                                    assigned_users.username as assigned_username, assigned_users.first_name as assigned_first_name, assigned_users.last_name as assigned_last_name,
@@ -363,7 +374,6 @@ class Drawings extends BaseController
             ->where('drawing_participants.drawing_id', $drawingId)
             ->findAll();
 
-        // If drawing is drawn, only show assignments to creator and assigned person
         if ($drawing['status'] === 'drawn') {
             $participants = array_filter($participants, function($p) use ($userId, $isCreator) {
                 return $isCreator || $p['user_id'] == $userId;

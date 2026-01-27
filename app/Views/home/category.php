@@ -16,7 +16,7 @@
     <div class="row">
         <?php if (!empty($lists)): ?>
             <?php foreach ($lists as $list): ?>
-                <div class="col-md-4 mb-4">
+                <div class="col-sm-6 col-lg-4 mb-4">
                     <div class="card list-card">
                         <div class="card-body">
                             <h5 class="card-title">

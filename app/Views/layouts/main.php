@@ -54,6 +54,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
+            flex-wrap: wrap;
         }
         
         .navbar-brand {
@@ -76,10 +77,39 @@
             justify-content: center;
         }
         
+        .nav-shell {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
         .nav-utilities {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        .nav-shortcuts {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-toggle {
+            display: none;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: transparent;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.4rem 0.9rem;
+            line-height: 1;
+        }
+
+        .nav-collapse {
+            width: 100%;
         }
         
         .nav-quick-action {
@@ -622,6 +652,113 @@
             gap: 1rem;
             font-size: 0.9rem;
         }
+
+        @media (max-width: 991.98px) {
+            .nav-toggle {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+            .nav-collapse.collapse:not(.show) {
+                display: none;
+            }
+
+            .nav-collapse.collapse.show {
+                display: block;
+            }
+
+            .nav-utilities {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                margin-top: 0.5rem;
+            }
+
+            .nav-shortcuts {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-shortcuts .nav-quick-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-actions {
+                width: 100%;
+                justify-content: stretch;
+                gap: 0.75rem !important;
+            }
+
+            .nav-actions .btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .nav-collapse {
+                display: flex !important;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .nav-toggle {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+            .nav-collapse.collapse:not(.show) {
+                display: none;
+            }
+
+            .nav-collapse.collapse.show {
+                display: block;
+            }
+
+            .nav-utilities {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 1rem;
+                margin-top: 0.5rem;
+            }
+
+            .nav-shortcuts {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .nav-shortcuts .nav-quick-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-actions {
+                width: 100%;
+                justify-content: stretch;
+                gap: 0.75rem !important;
+            }
+
+            .nav-actions .btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .nav-collapse {
+                display: flex !important;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 1.5rem;
+            }
+        }
         
         .alert {
             border-radius: 0.5rem;
@@ -787,36 +924,43 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="container">
-            <a class="navbar-brand" href="<?= base_url('index.php') ?>">
-                <span class="brand-mark">R</span>
-                Remcom
-            </a>
-            <div class="nav-utilities">
-                <div class="d-none d-lg-flex gap-2">
-                    <a class="nav-quick-action" href="<?= base_url('index.php/dashboard') ?>">
-                        <i class="fas fa-gauge"></i> Dashboard
-                    </a>
-                    <a class="nav-quick-action" href="<?= base_url('index.php/drawings') ?>">
-                        <i class="fas fa-dice"></i> Loten Trekken
-                    </a>
-                    <?php if ($user && $user['role'] === 'admin'): ?>
-                        <a class="nav-quick-action" href="<?= base_url('index.php/admin') ?>">
-                            <i class="fas fa-cog"></i> Admin
+            <div class="nav-shell">
+                <a class="navbar-brand" href="<?= base_url('index.php') ?>">
+                    <span class="brand-mark">R</span>
+                    Remcom
+                </a>
+                <button class="nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavCollapse" aria-controls="mainNavCollapse" aria-expanded="false" aria-label="Navigatie wisselen">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="nav-collapse collapse" id="mainNavCollapse">
+                <div class="nav-utilities">
+                    <div class="nav-shortcuts flex-wrap">
+                        <a class="nav-quick-action" href="<?= base_url('index.php/dashboard') ?>">
+                            <i class="fas fa-gauge"></i> Dashboard
                         </a>
-                    <?php endif; ?>
-                </div>
-                <div class="nav-actions d-flex flex-wrap gap-2 justify-content-end">
-                    <?php if ($isLoggedIn): ?>
-                        <a class="btn btn-primary" href="<?= base_url('index.php/dashboard/list/create') ?>">
-                            <i class="fas fa-plus me-1"></i> Nieuwe Lijst
+                        <a class="nav-quick-action" href="<?= base_url('index.php/drawings') ?>">
+                            <i class="fas fa-dice"></i> Loten Trekken
                         </a>
-                        <a class="btn btn-outline-light" href="<?= base_url('index.php/logout') ?>">
-                            Afmelden
-                        </a>
-                    <?php else: ?>
-                        <a class="btn btn-outline-light" href="<?= base_url('index.php/register') ?>">Registreren</a>
-                        <a class="btn btn-primary" href="<?= base_url('index.php/login') ?>">Inloggen</a>
-                    <?php endif; ?>
+                        <?php if ($user && $user['role'] === 'admin'): ?>
+                            <a class="nav-quick-action" href="<?= base_url('index.php/admin') ?>">
+                                <i class="fas fa-cog"></i> Admin
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                    <div class="nav-actions d-flex flex-wrap gap-2 justify-content-end">
+                        <?php if ($isLoggedIn): ?>
+                            <a class="btn btn-primary" href="<?= base_url('index.php/dashboard/list/create') ?>">
+                                <i class="fas fa-plus me-1"></i> Nieuwe Lijst
+                            </a>
+                            <a class="btn btn-outline-light" href="<?= base_url('index.php/logout') ?>">
+                                Afmelden
+                            </a>
+                        <?php else: ?>
+                            <a class="btn btn-outline-light" href="<?= base_url('index.php/register') ?>">Registreren</a>
+                            <a class="btn btn-primary" href="<?= base_url('index.php/login') ?>">Inloggen</a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>

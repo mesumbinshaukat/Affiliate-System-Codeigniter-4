@@ -285,15 +285,79 @@
             font-size: 0.9rem;
         }
 
+        .landing-nav-toggle {
+            display: none;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: transparent;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.35rem 0.9rem;
+        }
+
+        .landing-nav-collapse {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
         @media (max-width: 992px) {
-            .nav-middle {
-                display: none;
-            }
             .landing-nav-inner {
                 flex-wrap: wrap;
             }
+
+            .landing-nav-toggle {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .landing-nav-collapse {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                display: none;
+            }
+
+            .landing-nav-collapse.show {
+                display: flex;
+            }
+
             .nav-right {
-                margin-left: 0;
+                flex-direction: column;
+                width: 100%;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .nav-middle {
+                width: 100%;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-middle .nav-link-cta {
+                text-align: center;
+                width: 100%;
+                display: block;
+                padding: 0.75rem;
+                border-radius: 999px;
+                background: rgba(255,255,255,0.08);
+            }
+
+            .nav-search {
+                width: 100%;
+                max-width: none;
+            }
+
+            .nav-actions {
+                width: 100%;
+                justify-content: stretch;
+                gap: 0.75rem;
+            }
+
+            .nav-actions .btn-nav-primary {
+                flex: 1;
+                text-align: center;
             }
         }
 
@@ -301,18 +365,13 @@
             .landing-top-bar {
                 text-align: center;
             }
+
+            .landing-nav-inner {
+                gap: 0.75rem;
+            }
+
             .nav-right {
-                width: 100%;
-                justify-content: space-between;
-            }
-            .nav-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-            .nav-actions .btn-nav-outline,
-            .nav-actions .btn-nav-primary {
-                flex: 1;
-                text-align: center;
+                gap: 0.75rem;
             }
         }
     </style>
@@ -322,27 +381,34 @@
   
     <nav class="landing-nav">
         <div class="container landing-nav-inner">
-            <a href="<?= base_url('index.php') ?>" class="brand">Remcom</a>
-            <div class="nav-right">
-                <div class="nav-middle">
-                    <a href="<?= base_url('index.php/register') ?>" class="nav-link-cta">Maak Een Verlanglijstje Aan</a>
-                    <form class="nav-search" action="<?= base_url('index.php/search') ?>" method="get">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6 6 0 1 0 14 15.5l.27.28v.79L20 21.5 21.5 20l-6-6zm-5.5 0a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="currentColor"/></svg>
-                        <input type="text" name="q" placeholder="Zoek lijsten..." autocomplete="off" value="<?= esc($query ?? '') ?>">
-                        <button type="submit">
-                            <span>Zoeken</span>
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor" />
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-                <div class="nav-actions">
-                    <?php if ($isLoggedIn ?? false): ?>
-                        <a class="btn-nav-primary" href="<?= base_url('index.php/dashboard') ?>">Dashboard</a>
-                    <?php else: ?>
-                        <a class="btn-nav-primary" href="<?= base_url('index.php/login') ?>">Login</a>
-                    <?php endif; ?>
+            <div class="d-flex align-items-center gap-2">
+                <a href="<?= base_url('index.php') ?>" class="brand">Remcom</a>
+                <button class="landing-nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#landingNavCollapse" aria-controls="landingNavCollapse" aria-expanded="false" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="landing-nav-collapse collapse" id="landingNavCollapse">
+                <div class="nav-right">
+                    <div class="nav-middle">
+                        <a href="<?= base_url('index.php/register') ?>" class="nav-link-cta">Maak Een Verlanglijstje Aan</a>
+                        <form class="nav-search" action="<?= base_url('index.php/search') ?>" method="get">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6 6 0 1 0 14 15.5l.27.28v.79L20 21.5 21.5 20l-6-6zm-5.5 0a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="currentColor"/></svg>
+                            <input type="text" name="q" placeholder="Zoek lijsten..." autocomplete="off" value="<?= esc($query ?? '') ?>">
+                            <button type="submit">
+                                <span>Zoeken</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="nav-actions">
+                        <?php if ($isLoggedIn ?? false): ?>
+                            <a class="btn-nav-primary" href="<?= base_url('index.php/dashboard') ?>">Dashboard</a>
+                        <?php else: ?>
+                            <a class="btn-nav-primary" href="<?= base_url('index.php/login') ?>">Login</a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
