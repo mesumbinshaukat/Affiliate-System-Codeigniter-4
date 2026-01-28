@@ -97,7 +97,7 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h3 class="text-info">€<?= number_format($salesStats['total_commission'] ?? 0, 2) ?></h3>
+                    <h3 class="text-info">€<?= number_format($salesStats['total_commission'] ?? 0, 2, ',', '') ?></h3>
                     <p class="text-muted mb-0">Totale Commissie</p>
                 </div>
             </div>
@@ -131,7 +131,7 @@
                                     </td>
                                     <td><?= $user['total_sales'] ?? 0 ?></td>
                                     <td><?= $user['approved_sales'] ?? 0 ?></td>
-                                    <td><strong>€<?= number_format($user['total_commission'] ?? 0, 2) ?></strong></td>
+                                    <td><strong>€<?= number_format($user['total_commission'] ?? 0, 2, ',', '') ?></strong></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -178,7 +178,7 @@
                                     </td>
                                     <td><?= esc($sale['product_id'] ?? 'N/A') ?></td>
                                     <td><?= $sale['quantity'] ?? 1 ?></td>
-                                    <td>€<?= number_format($sale['commission'], 2) ?></td>
+                                    <td>€<?= number_format($sale['commission'], 2, ',', '') ?></td>
                                     <td>
                                         <span class="badge bg-<?= 
                                             $sale['status'] === 'approved' ? 'success' : 

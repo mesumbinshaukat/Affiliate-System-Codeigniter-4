@@ -182,11 +182,11 @@ class Auth extends BaseController
                         log_message('info', 'Default list created for user ' . $userId . ' with list ID: ' . $listId);
                         
                         return redirect()->to('/dashboard/list/edit/' . $listId . '?tab=products')
-                            ->with('success', 'Welkom bij Lijstje.nl, ' . $data['first_name'] . '! Maak nu uw eerste lijst.');
+                            ->with('success', 'Welkom bij Maakjelijstje.nl, ' . $data['first_name'] . '! Maak nu uw eerste lijst.');
                     } else {
                         log_message('error', 'Failed to create default list for user ' . $userId . '. Errors: ' . json_encode($listModel->errors()));
                         return redirect()->to('/dashboard')
-                            ->with('success', 'Welkom bij Lijstje.nl, ' . $data['first_name'] . '! Maak nu uw eerste lijst.');
+                            ->with('success', 'Welkom bij Maakjelijstje.nl, ' . $data['first_name'] . '! Maak nu uw eerste lijst.');
                     }
                 }
 

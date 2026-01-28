@@ -76,10 +76,10 @@
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <a href="<?= base_url('index.php/admin/drawing/details/' . $drawing['id']) ?>" class="btn btn-sm btn-info" title="View Details">
+                                <a href="<?= base_url('admin/drawing/details/' . $drawing['id']) ?>" class="btn btn-sm btn-info" title="View Details">
                                     <i class="fas fa-eye"></i> Details
                                 </a>
-                                <a href="<?= base_url('index.php/admin/drawing/delete/' . $drawing['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this drawing event and all its participants?');" title="Delete">
+                                <a href="<?= base_url('admin/drawing/delete/' . $drawing['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this drawing event and all its participants?');" title="Delete">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>
                             </td>

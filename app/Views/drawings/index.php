@@ -9,7 +9,7 @@
             <p class="lead text-muted">Maak een groep en trek loten om cadeaus uit te wisselen</p>
         </div>
         <div class="col-auto">
-            <a href="<?= base_url('index.php/drawings/create') ?>" class="btn btn-primary">
+            <a href="<?= base_url('drawings/create') ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Nieuwe Loting
             </a>
         </div>
@@ -43,10 +43,10 @@
                                 <?php endif; ?>
                                 
                                 <div class="d-flex gap-2">
-                                    <a href="<?= base_url('index.php/drawings/view/' . $drawing['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                    <a href="<?= base_url('drawings/view/' . $drawing['id']) ?>" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-eye"></i> Bekijken
                                     </a>
-                                    <a href="<?= base_url('index.php/drawings/edit/' . $drawing['id']) ?>" class="btn btn-sm btn-outline-secondary">
+                                    <a href="<?= base_url('drawings/edit/' . $drawing['id']) ?>" class="btn btn-sm btn-outline-secondary">
                                         <i class="fas fa-edit"></i> Bewerken
                                     </a>
                                 </div>
@@ -58,7 +58,7 @@
         <?php else: ?>
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i> U heeft nog geen lotingen aangemaakt. 
-                <a href="<?= base_url('index.php/drawings/create') ?>">Maak er nu een aan</a>
+                <a href="<?= base_url('drawings/create') ?>">Maak er nu een aan</a>
             </div>
         <?php endif; ?>
     </div>
@@ -114,10 +114,10 @@
                                 <?php endif; ?>
                                 
                                 <div class="d-flex gap-2">
-                                    <a href="<?= base_url('index.php/drawings/accept-invitation/' . $invitation['id']) ?>" class="btn btn-sm btn-success flex-grow-1">
+                                    <a href="<?= base_url('drawings/accept-invitation/' . $invitation['id']) ?>" class="btn btn-sm btn-success flex-grow-1">
                                         <i class="fas fa-check"></i> Accepteren
                                     </a>
-                                    <a href="<?= base_url('index.php/drawings/decline-invitation/' . $invitation['id']) ?>" class="btn btn-sm btn-danger flex-grow-1">
+                                    <a href="<?= base_url('drawings/decline-invitation/' . $invitation['id']) ?>" class="btn btn-sm btn-danger flex-grow-1">
                                         <i class="fas fa-times"></i> Weigeren
                                     </a>
                                 </div>
@@ -181,7 +181,7 @@
                                         <?= esc($participation['assigned_first_name'] . ' ' . $participation['assigned_last_name']) ?>
                                     </p>
                                     <?php if ($participation['list_id']): ?>
-                                        <a href="<?= base_url('index.php/list/' . $participation['list_slug']) ?>" class="btn btn-sm btn-primary">
+                                        <a href="<?= base_url('list/' . $participation['list_slug']) ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-gift"></i> Bekijk Verlanglijst
                                         </a>
                                     <?php endif; ?>

@@ -97,7 +97,7 @@ class Drawings extends BaseController
 
         $this->data['drawing'] = $drawing;
         $this->data['participants'] = $drawingModel->getDrawingParticipants($drawingId);
-        $this->data['inviteLink'] = base_url('index.php/drawings/invite/' . $drawing['invite_token']);
+        $this->data['inviteLink'] = base_url('drawings/invite/' . $drawing['invite_token']);
 
         return view('drawings/edit', $this->data);
     }
@@ -113,7 +113,7 @@ class Drawings extends BaseController
 
         $this->data['drawing'] = $drawing;
         $this->data['token'] = $token;
-        $this->data['inviteLink'] = base_url('index.php/drawings/invite/' . $token);
+        $this->data['inviteLink'] = base_url('drawings/invite/' . $token);
 
         return view('drawings/invite', $this->data);
     }

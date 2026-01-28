@@ -89,7 +89,7 @@
                                         <strong><?= esc($product['product_title']) ?></strong>
                                     </td>
                                     <td>
-                                        <a href="<?= base_url('index.php/list/' . $product['list_slug']) ?>" 
+                                        <a href="<?= base_url('list/' . $product['list_slug']) ?>" 
                                            target="_blank"
                                            class="text-decoration-none">
                                             <?= esc($product['list_title']) ?>
@@ -101,7 +101,7 @@
                                     </td>
                                     <td>
                                         <?php if ($product['price']): ?>
-                                            <strong>€<?= number_format($product['price'], 2) ?></strong>
+                                            <strong>€<?= number_format($product['price'], 2, ',', '') ?></strong>
                                         <?php else: ?>
                                             <span class="text-muted">-</span>
                                         <?php endif; ?>

@@ -69,7 +69,7 @@
                             <?php foreach ($sales as $sale): ?>
                                 <tr>
                                     <td><code><?= esc($sale['order_id']) ?></code></td>
-                                    <td><strong>€<?= number_format($sale['commission'], 2) ?></strong></td>
+                                    <td><strong>€<?= number_format($sale['commission'], 2, ',', '') ?></strong></td>
                                     <td>
                                         <span class="badge-soft <?= 
                                             $sale['status'] === 'approved' ? 'success' : 

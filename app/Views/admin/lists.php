@@ -35,7 +35,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="<?= base_url('index.php/admin/featured/' . $list['id']) ?>" class="btn btn-sm btn-<?= $list['is_featured'] ? 'warning' : 'outline-secondary' ?>">
+                                    <a href="<?= base_url('admin/featured/' . $list['id']) ?>" class="btn btn-sm btn-<?= $list['is_featured'] ? 'warning' : 'outline-secondary' ?>">
                                         <i class="fas fa-star"></i>
                                     </a>
                                 </td>
@@ -44,11 +44,11 @@
                                 <td>
                                     <div class="btn-group" role="group">
                                         <?php if ($list['status'] === 'published'): ?>
-                                            <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info" target="_blank">
+                                            <a href="<?= base_url('list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info" target="_blank">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         <?php endif; ?>
-                                        <a href="<?= base_url('index.php/admin/list/delete/' . $list['id']) ?>" 
+                                        <a href="<?= base_url('admin/list/delete/' . $list['id']) ?>" 
                                            class="btn btn-sm btn-outline-danger"
                                            onclick="return confirm('Weet u zeker dat u deze lijst wilt verwijderen?')">
                                             <i class="fas fa-trash"></i>

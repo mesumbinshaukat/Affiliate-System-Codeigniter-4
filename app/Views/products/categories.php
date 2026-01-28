@@ -12,7 +12,7 @@
 
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
-            <a href="<?= base_url('index.php/products') ?>" class="card text-center text-decoration-none h-100">
+            <a href="<?= base_url('products') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body">
                     <i class="fas fa-th fa-4x text-primary mb-3"></i>
                     <h4>All Products</h4>
@@ -24,7 +24,7 @@
         <?php if (!empty($categories)): ?>
             <?php foreach ($categories as $category): ?>
                 <div class="col-md-4 mb-3">
-                    <a href="<?= base_url('index.php/products/category/' . $category['slug']) ?>" 
+                    <a href="<?= base_url('products/category/' . $category['slug']) ?>" 
                        class="card text-center text-decoration-none h-100">
                         <div class="card-body">
                             <?php if ($category['icon']): ?>

@@ -17,7 +17,7 @@
                     <div class="card list-card h-100">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
+                                <a href="<?= base_url('list/' . $list['slug']) ?>" class="text-decoration-none text-dark">
                                     <?= esc($list['title']) ?>
                                 </a>
                             </h5>
@@ -26,7 +26,7 @@
                                 <small class="text-muted">
                                     <i class="fas fa-calendar"></i> <?= date('M d, Y', strtotime($list['created_at'])) ?>
                                 </small>
-                                <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-sm btn-primary">
+                                <a href="<?= base_url('list/' . $list['slug']) ?>" class="btn btn-sm btn-primary">
                                     Bekijk Lijst
                                 </a>
                             </div>

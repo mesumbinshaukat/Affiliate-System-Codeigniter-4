@@ -456,7 +456,7 @@ For bugs or feature requests:
 
 ## 📄 License
 
-This feature is part of Lijstje.nl Affiliate System and follows the same MIT License.
+This feature is part of Maakjelijstje.nl Affiliate System and follows the same MIT License.
 
 ---
 

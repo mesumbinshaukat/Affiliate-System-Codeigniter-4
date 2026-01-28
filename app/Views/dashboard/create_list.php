@@ -10,7 +10,7 @@
             <div class="glass-card">
                 <div class="card-body p-4 p-lg-5">
                     <?php $selectedProtection = old('protection_type', 'none'); ?>
-                    <form method="post" action="<?= base_url('index.php/dashboard/list/create') ?>">
+                    <form method="post" action="<?= base_url('dashboard/list/create') ?>">
                         <div class="mb-3">
                             <label for="title" class="form-label">Lijsttitel *</label>
                             <input type="text" class="form-control" id="title" name="title" value="<?= old('title') ?>" required>
@@ -118,7 +118,7 @@
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Lijst Maken</button>
-                            <a href="<?= base_url('index.php/dashboard/lists') ?>" class="btn btn-secondary">Annuleren</a>
+                            <a href="<?= base_url('dashboard/lists') ?>" class="btn btn-secondary">Annuleren</a>
                         </div>
                     </form>
                 </div>

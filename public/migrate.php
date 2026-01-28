@@ -245,7 +245,7 @@ $password = $env['database.default.password'] ?? '';
         $row = $result->fetch_assoc();
         
         if ($row['count'] == 0) {
-            $adminEmail = $env['ADMIN_EMAIL'] ?? 'admin@lijstje.nl';
+            $adminEmail = $env['ADMIN_EMAIL'] ?? 'admin@Maakjelijstje.nl';
             $adminPassword = password_hash($env['ADMIN_PASSWORD'] ?? 'Admin@123', PASSWORD_DEFAULT);
             $now = date('Y-m-d H:i:s');
             

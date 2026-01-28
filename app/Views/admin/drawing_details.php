@@ -7,7 +7,7 @@
             <h1><i class="fas fa-dice"></i> Drawing Event Details</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="<?= base_url('index.php/admin/drawings') ?>" class="btn btn-secondary">
+            <a href="<?= base_url('admin/drawings') ?>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Drawings
             </a>
         </div>
@@ -229,7 +229,7 @@
                     <h5 class="mb-0"><i class="fas fa-cog"></i> Actions</h5>
                 </div>
                 <div class="card-body">
-                    <a href="<?= base_url('index.php/admin/drawing/delete/' . $drawing['id']) ?>" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to delete this drawing event and all its participants? This action cannot be undone.');">
+                    <a href="<?= base_url('admin/drawing/delete/' . $drawing['id']) ?>" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to delete this drawing event and all its participants? This action cannot be undone.');">
                         <i class="fas fa-trash"></i> Delete Drawing Event
                     </a>
                 </div>

@@ -8,7 +8,7 @@
             <h1>Welkom terug, <?= esc($user['first_name']) ?>!</h1>
             <p>Overzicht van uw lijsten, verkoopcijfers en recente activiteiten.</p>
             <div class="hero-actions">
-                <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="hero-btn hero-btn-primary">
+                <a href="<?= base_url('dashboard/list/create') ?>" class="hero-btn hero-btn-primary">
                     <span class="hero-btn-icon">
                         <i class="fas fa-plus"></i>
                     </span>
@@ -17,7 +17,7 @@
                         <small>Start direct en deel hem meteen</small>
                     </div>
                 </a>
-                <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="hero-btn hero-btn-ghost">
+                <a href="<?= base_url('dashboard/analytics') ?>" class="hero-btn hero-btn-ghost">
                     <span class="hero-btn-icon">
                         <i class="fas fa-chart-line"></i>
                     </span>
@@ -41,7 +41,7 @@
             <p>Totale Klikken</p>
         </div>
         <div class="stats-card" style="background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.25), transparent 40%), linear-gradient(135deg, #2957A8, #3479CD);">
-            <h3>€<?= number_format($contributionStats['total_amount'] ?? 0, 2) ?></h3>
+            <h3>€<?= number_format($contributionStats['total_amount'] ?? 0, 2, ',', '') ?></h3>
             <p>Groepscadeaus (<?= $contributionStats['count'] ?? 0 ?>)</p>
         </div>
     </div>
@@ -49,7 +49,7 @@
     <!-- Quick Links -->
     <div class="row g-3 mb-4">
         <div class="col-md-3 col-6">
-            <a href="<?= base_url('index.php/dashboard/lists') ?>" class="card text-center text-decoration-none h-100">
+            <a href="<?= base_url('dashboard/lists') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <i class="fas fa-list fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Mijn Lijsten</h5>
@@ -57,7 +57,7 @@
             </a>
         </div>
         <div class="col-md-3 col-6">
-            <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="card text-center text-decoration-none h-100">
+            <a href="<?= base_url('dashboard/list/create') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <i class="fas fa-plus-circle fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Lijst Maken</h5>
@@ -65,7 +65,7 @@
             </a>
         </div>
         <div class="col-md-3 col-6">
-            <a href="<?= base_url('index.php/drawings') ?>" class="card text-center text-decoration-none h-100">
+            <a href="<?= base_url('drawings') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <i class="fas fa-dice fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Loten Trekken</h5>
@@ -73,7 +73,7 @@
             </a>
         </div>
         <div class="col-md-3 col-6">
-            <a href="<?= base_url('index.php/dashboard/analytics') ?>" class="card text-center text-decoration-none h-100">
+            <a href="<?= base_url('dashboard/analytics') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <i class="fas fa-chart-line fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Analytica</h5>
@@ -85,7 +85,7 @@
     <!-- Second Row -->
     <div class="row g-3 mb-4">
         <div class="col-md-6 col-6">
-            <a href="<?= base_url('index.php/dashboard/purchased') ?>" class="card text-center text-decoration-none h-100">
+            <a href="<?= base_url('dashboard/purchased') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <i class="fas fa-shopping-cart fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Gekochte Producten</h5>
@@ -93,7 +93,7 @@
             </a>
         </div>
         <div class="col-md-6 col-6">
-            <a href="<?= base_url('index.php/dashboard/invitations') ?>" class="card text-center text-decoration-none h-100">
+            <a href="<?= base_url('dashboard/invitations') ?>" class="card text-center text-decoration-none h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <i class="fas fa-envelope fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h5>Lijstuitnodigingen</h5>
@@ -137,11 +137,11 @@
                                 <td><?= $list['product_count'] ?? 0 ?></td>
                                 <td><?= number_format($list['views']) ?></td>
                                 <td>
-                                    <a href="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>" class="btn btn-sm btn-outline-primary" title="Bewerken">
+                                    <a href="<?= base_url('dashboard/list/edit/' . $list['id']) ?>" class="btn btn-sm btn-outline-primary" title="Bewerken">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <?php if ($list['status'] === 'published'): ?>
-                                        <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info ms-1" target="_blank" title="Bekijken">
+                                        <a href="<?= base_url('list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info ms-1" target="_blank" title="Bekijken">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     <?php endif; ?>
@@ -151,7 +151,7 @@
                     <?php else: ?>
                         <tr>
                             <td colspan="6" class="text-center text-muted py-4">
-                                Nog geen lijsten. <a href="<?= base_url('index.php/dashboard/list/create') ?>">Maak uw eerste lijst</a>
+                                Nog geen lijsten. <a href="<?= base_url('dashboard/list/create') ?>">Maak uw eerste lijst</a>
                             </td>
                         </tr>
                     <?php endif; ?>

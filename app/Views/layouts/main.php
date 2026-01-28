@@ -42,6 +42,10 @@
             color: var(--text-dark);
             min-height: 100vh;
         }
+
+        body.nav-open {
+            overflow: hidden;
+        }
         
         .navbar {
             background: linear-gradient(120deg, #09123A, #0D1F52);
@@ -54,7 +58,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
         
         .navbar-brand {
@@ -82,20 +86,20 @@
             align-items: center;
             justify-content: space-between;
             gap: 0.75rem;
-            width: 100%;
+            width: auto;
         }
 
         .nav-utilities {
             display: flex;
             align-items: center;
             gap: 1.25rem;
-            width: 100%;
         }
 
         .nav-shortcuts {
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .nav-toggle {
@@ -109,7 +113,18 @@
         }
 
         .nav-collapse {
-            width: 100%;
+            width: auto;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-backdrop {
+            display: none;
         }
         
         .nav-quick-action {
@@ -654,46 +669,87 @@
         }
 
         @media (max-width: 991.98px) {
+            .navbar .container {
+                flex-wrap: wrap;
+            }
+
+            .nav-shell {
+                width: 100%;
+            }
+
             .nav-toggle {
                 display: inline-flex;
                 align-items: center;
                 gap: 0.4rem;
             }
 
-            .nav-collapse.collapse:not(.show) {
-                display: none;
+            .nav-collapse {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 80vw;
+                max-width: 360px;
+                height: 100vh;
+                background: linear-gradient(145deg, #0B1533, #101D4A);
+                border-left: 1px solid rgba(255,255,255,0.08);
+                padding: 4.25rem 1.5rem 2rem;
+                overflow-y: auto;
+                box-shadow: -18px 0 50px rgba(5, 9, 26, 0.6);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                z-index: 1051;
+                width: 80vw;
             }
 
-            .nav-collapse.collapse.show {
-                display: block;
+            .nav-collapse.collapsing,
+            .nav-collapse.show {
+                display: block !important;
+                transform: translateX(0);
             }
 
             .nav-utilities {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 1rem;
-                margin-top: 0.5rem;
+                gap: 1.25rem;
+                margin-top: 0;
+                width: 100%;
             }
 
             .nav-shortcuts {
                 flex-direction: column;
                 width: 100%;
+                gap: 0.85rem;
+                flex-wrap: wrap;
             }
 
             .nav-shortcuts .nav-quick-action {
                 width: 100%;
                 justify-content: center;
+                background: rgba(255,255,255,0.15);
             }
 
             .nav-actions {
                 width: 100%;
                 justify-content: stretch;
                 gap: 0.75rem !important;
+                flex-direction: column;
+                flex-wrap: nowrap;
             }
 
             .nav-actions .btn {
                 flex: 1;
                 text-align: center;
+            }
+
+            .nav-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(5, 10, 30, 0.65);
+                z-index: 1050;
+            }
+
+            .nav-backdrop:not(.active) {
+                display: none;
             }
         }
 
@@ -703,6 +759,40 @@
                 align-items: center;
                 justify-content: flex-end;
                 gap: 1.5rem;
+                position: static;
+                width: auto;
+                height: auto;
+                background: transparent;
+                border: none;
+                padding: 0;
+                box-shadow: none;
+                transform: none;
+            }
+
+            .nav-utilities {
+                flex-direction: row;
+                align-items: center;
+                gap: 1.25rem;
+                width: auto;
+            }
+
+            .nav-shortcuts {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 0.75rem;
+                width: auto;
+            }
+
+            .nav-shortcuts.flex-wrap {
+                flex-wrap: nowrap !important;
+            }
+
+            .nav-actions {
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                width: auto;
+                gap: 0.75rem !important;
+                justify-content: flex-end;
             }
         }
 
@@ -925,7 +1015,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="nav-shell">
-                <a class="navbar-brand" href="<?= base_url('index.php') ?>">
+                <a class="navbar-brand" href="<?= base_url('') ?>">
                     <span class="brand-mark">R</span>
                     Remcom
                 </a>
@@ -934,37 +1024,43 @@
                 </button>
             </div>
             <div class="nav-collapse collapse" id="mainNavCollapse">
+                <div class="d-lg-none d-flex justify-content-end mb-4">
+                    <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavCollapse" aria-label="Sluiten">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
                 <div class="nav-utilities">
                     <div class="nav-shortcuts flex-wrap">
-                        <a class="nav-quick-action" href="<?= base_url('index.php/dashboard') ?>">
+                        <a class="nav-quick-action" href="<?= base_url('dashboard') ?>">
                             <i class="fas fa-gauge"></i> Dashboard
                         </a>
-                        <a class="nav-quick-action" href="<?= base_url('index.php/drawings') ?>">
+                        <a class="nav-quick-action" href="<?= base_url('drawings') ?>">
                             <i class="fas fa-dice"></i> Loten Trekken
                         </a>
                         <?php if ($user && $user['role'] === 'admin'): ?>
-                            <a class="nav-quick-action" href="<?= base_url('index.php/admin') ?>">
+                            <a class="nav-quick-action" href="<?= base_url('admin') ?>">
                                 <i class="fas fa-cog"></i> Admin
                             </a>
                         <?php endif; ?>
                     </div>
                     <div class="nav-actions d-flex flex-wrap gap-2 justify-content-end">
                         <?php if ($isLoggedIn): ?>
-                            <a class="btn btn-primary" href="<?= base_url('index.php/dashboard/list/create') ?>">
+                            <a class="btn btn-primary" href="<?= base_url('dashboard/list/create') ?>">
                                 <i class="fas fa-plus me-1"></i> Nieuwe Lijst
                             </a>
-                            <a class="btn btn-outline-light" href="<?= base_url('index.php/logout') ?>">
+                            <a class="btn btn-outline-light" href="<?= base_url('logout') ?>">
                                 Afmelden
                             </a>
                         <?php else: ?>
-                            <a class="btn btn-outline-light" href="<?= base_url('index.php/register') ?>">Registreren</a>
-                            <a class="btn btn-primary" href="<?= base_url('index.php/login') ?>">Inloggen</a>
+                            <a class="btn btn-outline-light" href="<?= base_url('register') ?>">Registreren</a>
+                            <a class="btn btn-primary" href="<?= base_url('login') ?>">Inloggen</a>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
+    <div class="nav-backdrop" id="mainNavBackdrop"></div>
 
     <!-- Flash Messages -->
     <?php if (session()->has('success')): ?>
@@ -1053,6 +1149,30 @@
     
     <!-- Toast Notification System -->
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navCollapse = document.getElementById('mainNavCollapse');
+            const navBackdrop = document.getElementById('mainNavBackdrop');
+
+            if (navCollapse && navBackdrop) {
+                navCollapse.addEventListener('shown.bs.collapse', function () {
+                    navBackdrop.classList.add('active');
+                    document.body.classList.add('nav-open');
+                });
+
+                navCollapse.addEventListener('hidden.bs.collapse', function () {
+                    navBackdrop.classList.remove('active');
+                    document.body.classList.remove('nav-open');
+                });
+
+                navBackdrop.addEventListener('click', function () {
+                    const instance = bootstrap.Collapse.getInstance(navCollapse);
+                    if (instance) {
+                        instance.hide();
+                    }
+                });
+            }
+        });
+
         function showToast(message, type = 'success') {
             const toastEl = document.getElementById('liveToast');
             const toastBody = document.getElementById('toastMessage');

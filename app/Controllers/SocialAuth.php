@@ -269,7 +269,7 @@ class SocialAuth extends BaseController
 
             // For new users, redirect to list creation
             if ($isNewUser) {
-                return redirect()->to($redirectUrl)->with('success', 'Welkom bij Lijstje.nl, ' . $user['first_name'] . '! Your account has been created.');
+                return redirect()->to($redirectUrl)->with('success', 'Welkom bij Maakjelijstje.nl, ' . $user['first_name'] . '! Your account has been created.');
             }
 
             return redirect()->to($redirectUrl)->with('success', 'Welcome back, ' . $user['username'] . '!');

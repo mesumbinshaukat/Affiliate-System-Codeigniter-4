@@ -52,7 +52,7 @@ php spark db:seed InitialSeeder
 ```
 
 This creates:
-- Admin user (admin@lijstje.nl / Admin@123)
+- Admin user (admin@Maakjelijstje.nl / Admin@123)
 - 8 default categories
 - Bol.com affiliate source
 - Default settings
@@ -87,7 +87,7 @@ Or configure a virtual host to point to the `public` folder.
 Navigate to http://localhost:8080/login
 
 **Default Admin Credentials:**
-- Email: admin@lijstje.nl
+- Email: admin@Maakjelijstje.nl
 - Password: Admin@123
 
 **IMPORTANT:** Change these credentials immediately after first login!

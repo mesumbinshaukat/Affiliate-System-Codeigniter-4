@@ -1,6 +1,6 @@
 # Admin User Seeder
 
-This file allows you to create an admin user for the Lijstje.nl application via a web interface.
+This file allows you to create an admin user for the Maakjelijstje.nl application via a web interface.
 
 ## How to Use
 
@@ -22,7 +22,7 @@ The seeder will:
 
 ### 3. Admin Credentials
 After successful creation, use these credentials to login:
-- **Email:** `admin@lijstje.nl`
+- **Email:** `admin@Maakjelijstje.nl`
 - **Password:** `admin123`
 
 ### 4. Change Password
@@ -71,7 +71,7 @@ After creating the admin user, **DELETE THIS FILE IMMEDIATELY** for security rea
 
 1. Visit: `http://lijst.wmcdev.nl/seed_admin.php`
 2. Wait for the seeder to complete
-3. Login with `admin@lijstje.nl` / `admin123`
+3. Login with `admin@Maakjelijstje.nl` / `admin123`
 4. Change the password immediately
 5. Delete the seeder file
 

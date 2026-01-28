@@ -121,7 +121,7 @@ class ReminderService
     {
         $email = \Config\Services::email();
         
-        $listUrl = base_url('index.php/list/' . $reminder['slug']);
+        $listUrl = base_url('list/' . $reminder['slug']);
         $ownerName = trim($reminder['first_name'] . ' ' . $reminder['last_name']);
         $eventDate = date('d F Y', strtotime($reminder['event_date']));
         $daysText = $reminder['days_before'] == 1 ? 'morgen' : $reminder['days_before'] . ' dagen';

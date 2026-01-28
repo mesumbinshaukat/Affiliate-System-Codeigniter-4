@@ -8,7 +8,7 @@
             <h1>Categorieën Beheren</h1>
         </div>
         <div class="col-auto">
-            <a href="<?= base_url('index.php/admin/category/create') ?>" class="btn btn-primary">
+            <a href="<?= base_url('admin/category/create') ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Categorie Maken
             </a>
         </div>
@@ -44,10 +44,10 @@
                                 <td><?= $category['list_count'] ?? 0 ?></td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="<?= base_url('index.php/admin/category/edit/' . $category['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                        <a href="<?= base_url('admin/category/edit/' . $category['id']) ?>" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="<?= base_url('index.php/admin/category/delete/' . $category['id']) ?>" 
+                                        <a href="<?= base_url('admin/category/delete/' . $category['id']) ?>" 
                                            class="btn btn-sm btn-outline-danger"
                                            onclick="return confirm('Weet u zeker dat u deze categorie wilt verwijderen?')">
                                             <i class="fas fa-trash"></i>

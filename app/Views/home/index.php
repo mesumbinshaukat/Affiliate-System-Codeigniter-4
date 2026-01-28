@@ -419,18 +419,6 @@ $blogImages = [
         padding-bottom: 1.5rem;
     }
 
-    /* .cta-illustration::before {
-        content: '';
-        position: absolute;
-        width: 92%;
-        height: 78%;
-        background: #fdfdff;
-        border-radius: 60% 40% 55% 45%;
-        box-shadow: 0 25px 65px rgba(5, 18, 54, 0.25);
-        top: 8%;
-        z-index: 1;
-    } */
-
     .cta-illustration::after {
         content: '';
         position: absolute;
@@ -533,6 +521,67 @@ $blogImages = [
         .why-gallery {
             grid-template-columns: 1fr;
         }
+        .why-section {
+            text-align: center;
+        }
+        .why-section .col-lg-6:first-child {
+            order: 2;
+        }
+        .why-section .col-lg-6:last-child {
+            order: 1;
+        }
+        .why-stack {
+            max-width: 300px;
+            min-height: 280px;
+        }
+        .photo-card.back {
+            right: -20%;
+            top: -20px;
+        }
+        .cta-banner {
+            padding: 2rem;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .cta-content {
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .cta-text {
+            flex: 1 1 auto;
+        }
+        .cta-text h2,
+        .cta-copy {
+            text-align: center;
+        }
+        .cta-illustration {
+            width: 100%;
+            justify-content: center;
+            padding-bottom: 0;
+            min-height: unset;
+        }
+        .cta-illustration img {
+            max-width: 260px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .why-stack {
+            max-width: 250px;
+            min-height: 240px;
+        }
+        .photo-card.back {
+            right: 0;
+            top: -10px;
+        }
+        .photo-card.front {
+            transform: rotate(-3deg);
+        }
+        .photo-card.back {
+            transform: rotate(5deg);
+        }
     }
 
     #waarom-remcom{
@@ -549,8 +598,8 @@ $blogImages = [
             <h1 class="hero-heading">Maak Cadeaus Geven Leuk, Eerlijk en Gemakkelijk.</h1>
             <p class="hero-text">Maak online een verlanglijstje of verloot met familie en vrienden. Geen stress. Geen verwarring. Volledig privé.</p>
             <div class="d-flex hero-cta flex-wrap">
-                <a href="<?= base_url('index.php/register') ?>" class="btn btn-primary">Maak Een Verlanglijstje Aan</a>
-                <a href="<?= base_url('index.php/drawings') ?>" class="btn btn-outline">Begin Met Lootjes Trekken</a>
+                <a href="<?= base_url('register') ?>" class="btn btn-primary">Maak Een Verlanglijstje Aan</a>
+                <a href="<?= base_url('drawings') ?>" class="btn btn-outline">Begin Met Lootjes Trekken</a>
             </div>
             <!-- <div class="hero-art">
                 <div class="hero-character">Illustratie placeholder<br>karakter</div>
@@ -628,7 +677,7 @@ $blogImages = [
                 </div>
             </div>
         </div>
-        <a href="<?= base_url('index.php/register') ?>" class="steps-cta mt-4">Maak Een Verlanglijstje Aan</a>
+        <a href="<?= base_url('register') ?>" class="steps-cta mt-4">Maak Een Verlanglijstje Aan</a>
     </div>
 </section>
 
@@ -639,7 +688,7 @@ $blogImages = [
                 <h2 class="section-heading">Waarom Mensen Graag Remcom Gebruiken</h2>
                 <p class="why-copy">Remcom gebruikt een volledig willekeurig systeem om mensen binnen je groep te matchen, waardoor elke trekking eerlijk en onpartijdig is. Zodra iedereen zich heeft aangemeld, worden de lotingen automatisch uitgevoerd, waardoor er geen handmatige selectie plaatsvindt en er geen kans is op voorkeursbeleid.</p>
                 <p class="why-copy mt-3">Aan elke deelnemer wordt willekeurig één persoon toegewezen, waardoor het proces eenvoudig en transparant blijft. Privacy staat centraal. Elke match wordt alleen getoond aan de persoon die deze moet zien.</p>
-                <a href="<?= base_url('index.php/register') ?>" class="why-cta mt-3">Maak Een Verlanglijstje Aan</a>
+                <a href="<?= base_url('register') ?>" class="why-cta mt-3">Maak Een Verlanglijstje Aan</a>
             </div>
             <div class="col-lg-6">
                 <div class="why-stack">
@@ -662,7 +711,7 @@ $blogImages = [
                 <div class="cta-text">
                     <h2>Begin Vandaag Nog</h2>
                     <p class="cta-copy">Maak verlanglijstjes, verloot en geniet van eerlijke en besloten cadeausuitwisselingen in slechts een paar stappen.</p>
-                    <a href="<?= base_url('index.php/register') ?>" class="btn cta-btn">Begin nu met het maken van uw lijst</a>
+                    <a href="<?= base_url('register') ?>" class="btn cta-btn">Begin nu met het maken van uw lijst</a>
                 </div>
                 <div class="cta-illustration">
                     <img src="<?= $ctaIllustration ?>" alt="Illustratie Begin Vandaag Nog">

@@ -571,10 +571,10 @@
                         <h2 class="creator-info__name"><?= esc($list['first_name'] . ' ' . $list['last_name']) ?></h2>
                         <div class="creator-info__username">@<?= esc($list['username']) ?></div>
                         <div class="creator-actions mt-3">
-                            <a href="<?= base_url('index.php/find/' . urlencode($list['username'])) ?>" class="btn btn-outline-light btn-sm">
+                            <a href="<?= base_url('find/' . urlencode($list['username'])) ?>" class="btn btn-outline-light btn-sm">
                                 <i class="fas fa-user"></i> Bekijk profiel
                             </a>
-                            <a href="<?= base_url('index.php/find/' . urlencode($list['username'])) ?>#lists" class="btn btn-outline-light btn-sm">
+                            <a href="<?= base_url('find/' . urlencode($list['username'])) ?>#lists" class="btn btn-outline-light btn-sm">
                                 <i class="fas fa-list"></i> Meer lijsten
                             </a>
                         </div>
@@ -691,7 +691,7 @@
                             <?php foreach ($section['products'] as $product): ?>
                                 <?php 
                                     $isClaimed = !empty($product['claimed_at']);
-                                    $productUrl = base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']);
+                                    $productUrl = base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']);
                                 ?>
                                 <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>"
                                      data-list-product-id="<?= $product['list_product_id'] ?>"
@@ -726,7 +726,7 @@
                             </p>
                             <?php if ($product['price']): ?>
                                 <div class="list-product-card__price">
-                                    €<?= number_format($product['price'], 2) ?>
+                                    €<?= number_format($product['price'], 2, ',', '') ?>
                                 </div>
                             <?php endif; ?>
                             <?php if ($product['custom_note']): ?>
@@ -787,7 +787,7 @@
                             <?php foreach ($noSectionProducts as $product): ?>
                                 <?php 
                                     $isClaimed = !empty($product['claimed_at']);
-                                    $productUrl = base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']);
+                                    $productUrl = base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']);
                                 ?>
                                 <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>"
                                      data-list-product-id="<?= $product['list_product_id'] ?>"
@@ -822,7 +822,7 @@
                             </p>
                             <?php if ($product['price']): ?>
                                 <div class="list-product-card__price">
-                                    €<?= number_format($product['price'], 2) ?>
+                                    €<?= number_format($product['price'], 2, ',', '') ?>
                                 </div>
                             <?php endif; ?>
                             <?php if ($product['custom_note']): ?>
@@ -839,7 +839,7 @@
                             <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
                             
                             <div class="list-product-card__actions d-grid gap-2">
-                                <a href="<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
+                                <a href="<?= base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
                                    class="btn-product-action btn-product-action--primary w-100" 
                                    target="_blank"
                                    title="Bekijk product in winkel">
@@ -864,7 +864,7 @@
                                     <?php endif; ?>
                                 <?php endif; ?>
                                 <button class="btn-product-action btn-product-action--link w-100"
-                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
+                                        onclick="copyAffiliateLink('<?= base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
                                         title="Kopieer affiliate link om te delen">
                                     <i class="fas fa-share-alt"></i>
                                     <span>Link Delen</span>
@@ -964,7 +964,7 @@ function markAsPurchased(evt, listProductId, listId) {
 
     togglePurchaseState({
         event: evt,
-        endpoint: '<?= base_url('index.php/list/claim') ?>',
+        endpoint: '<?= base_url('list/claim') ?>',
         listProductId,
         listId,
         loadingLabel: 'Markeren...',
@@ -979,7 +979,7 @@ function undoPurchase(evt, listProductId, listId) {
 
     togglePurchaseState({
         event: evt,
-        endpoint: '<?= base_url('index.php/list/unclaim') ?>',
+        endpoint: '<?= base_url('list/unclaim') ?>',
         listProductId,
         listId,
         loadingLabel: 'Herstellen...',

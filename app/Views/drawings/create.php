@@ -9,7 +9,7 @@
 
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="<?= base_url('index.php/drawings/create') ?>">
+                    <form method="post" action="<?= base_url('drawings/create') ?>">
                         <div class="mb-3">
                             <label for="title" class="form-label">Titel *</label>
                             <input type="text" class="form-control" id="title" name="title" 
@@ -33,7 +33,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Loting Aanmaken
                             </button>
-                            <a href="<?= base_url('index.php/drawings') ?>" class="btn btn-secondary">
+                            <a href="<?= base_url('drawings') ?>" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Terug
                             </a>
                         </div>

@@ -1,4 +1,4 @@
-# Lijstje.nl Clone - Affiliate List Platform
+# Maakjelijstje.nl Clone - Affiliate List Platform
 
 A complete affiliate marketing platform built with CodeIgniter 4, allowing users to create and share curated product lists with integrated Bol.com affiliate tracking and commission management.
 
@@ -189,7 +189,7 @@ Or configure Apache/Nginx to point to the `public` folder.
 
 After running the seeder, you can login with:
 
-- **Email**: admin@lijstje.nl
+- **Email**: admin@Maakjelijstje.nl
 - **Password**: Admin@123
 
 **Important**: Change these credentials immediately after first login!

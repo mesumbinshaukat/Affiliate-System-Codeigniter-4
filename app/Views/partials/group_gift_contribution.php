@@ -24,8 +24,8 @@
             <!-- Progress Bar -->
             <div class="mb-3">
                 <div class="d-flex justify-content-between mb-1">
-                    <small class="text-muted">Verzameld: <strong>€<?= number_format($totalContributed, 2) ?></strong></small>
-                    <small class="text-muted">Doel: <strong>€<?= number_format($targetAmount, 2) ?></strong></small>
+                    <small class="text-muted">Verzameld: <strong>€<?= number_format($totalContributed, 2, ',', '') ?></strong></small>
+                    <small class="text-muted">Doel: <strong>€<?= number_format($targetAmount, 2, ',', '') ?></strong></small>
                 </div>
                 <div class="progress" style="height: 25px;">
                     <div class="progress-bar bg-success" role="progressbar" 
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <?php if (!$isComplete): ?>
-                    <small class="text-muted">Nog €<?= number_format($remaining, 2) ?> te gaan</small>
+                    <small class="text-muted">Nog €<?= number_format($remaining, 2, ',', '') ?> te gaan</small>
                 <?php endif; ?>
             </div>
 
@@ -77,7 +77,7 @@
                                                 <br><small class="text-muted fst-italic">"<?= esc($contribution['message']) ?>"</small>
                                             <?php endif; ?>
                                         </div>
-                                        <span class="badge bg-success">€<?= number_format($contribution['amount'], 2) ?></span>
+                                        <span class="badge bg-success">€<?= number_format($contribution['amount'], 2, ',', '') ?></span>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

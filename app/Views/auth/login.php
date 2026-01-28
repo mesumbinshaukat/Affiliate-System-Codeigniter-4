@@ -102,17 +102,17 @@
                     <?php endif; ?>
 
                     <div class="mb-4">
-                        <a href="<?= base_url('index.php/auth/social/facebook') ?>" class="social-button facebook w-100 mb-3">
+                        <a href="<?= base_url('auth/social/facebook') ?>" class="social-button facebook w-100 mb-3">
                             <i class="fab fa-facebook-f me-2"></i> Inloggen met Facebook
                         </a>
-                        <a href="<?= base_url('index.php/auth/social/google') ?>" class="social-button google w-100">
+                        <a href="<?= base_url('auth/social/google') ?>" class="social-button google w-100">
                             <i class="fab fa-google me-2"></i> Inloggen met Google
                         </a>
                     </div>
 
                     <div class="text-center my-3 auth-divider">of</div>
 
-                    <form method="post" action="<?= base_url('index.php/login') ?>" id="loginForm" class="auth-form">
+                    <form method="post" action="<?= base_url('login') ?>" id="loginForm" class="auth-form">
                         <div class="mb-3">
                             <label for="email" class="form-label">E-mailadres</label>
                             <input type="email" class="form-control <?= session('errors.email') ? 'is-invalid' : '' ?>" id="email" name="email" value="<?= old('email') ?>" required autofocus>
@@ -133,7 +133,7 @@
                     </form>
 
                     <div class="text-center mt-4">
-                        <p class="mb-0">Nog geen account? <a class="auth-link" href="<?= base_url('index.php/register') ?>">Registreer hier</a></p>
+                        <p class="mb-0">Nog geen account? <a class="auth-link" href="<?= base_url('register') ?>">Registreer hier</a></p>
                     </div>
                 </div>
             </div>

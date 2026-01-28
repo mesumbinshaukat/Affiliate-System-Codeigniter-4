@@ -3,7 +3,7 @@
 // Dutch translations for Home/Public pages
 return [
     // Home page
-    'home_title' => 'Welkom bij Lijstje.nl',
+    'home_title' => 'Welkom bij Maakjelijstje.nl',
     'home_subtitle' => 'Maak en deel uw persoonlijke lijsten',
     'home_search_placeholder' => 'Zoeken naar lijsten...',
     'home_search_button' => 'Zoeken',

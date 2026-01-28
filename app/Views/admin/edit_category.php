@@ -9,7 +9,7 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="<?= base_url('index.php/admin/category/edit/' . $category['id']) ?>">
+                    <form method="post" action="<?= base_url('admin/category/edit/' . $category['id']) ?>">
                         <div class="mb-3">
                             <label for="name" class="form-label">Categorienaam *</label>
                             <input type="text" class="form-control" id="name" name="name" value="<?= esc($category['name']) ?>" required>
@@ -36,7 +36,7 @@
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Categorie Bijwerken</button>
-                            <a href="<?= base_url('index.php/admin/categories') ?>" class="btn btn-secondary">Annuleren</a>
+                            <a href="<?= base_url('admin/categories') ?>" class="btn btn-secondary">Annuleren</a>
                         </div>
                     </form>
                 </div>

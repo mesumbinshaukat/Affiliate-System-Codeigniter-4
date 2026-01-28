@@ -109,7 +109,7 @@ function submitContribution() {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Verwerken...';
     
-    fetch('<?= base_url('index.php/contribution/add') ?>', {
+    fetch('<?= base_url('contribution/add') ?>', {
         method: 'POST',
         body: new URLSearchParams(formData)
     })

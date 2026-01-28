@@ -9,10 +9,10 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="<?= base_url('index.php/admin/settings') ?>">
+                    <form method="post" action="<?= base_url('admin/settings') ?>">
                         <div class="mb-3">
                             <label for="site_name" class="form-label">Sitenaam</label>
-                            <input type="text" class="form-control" id="site_name" name="settings[site_name]" value="<?= esc($settings['site_name'] ?? 'Lijstje.nl') ?>">
+                            <input type="text" class="form-control" id="site_name" name="settings[site_name]" value="<?= esc($settings['site_name'] ?? 'Maakjelijstje.nl') ?>">
                         </div>
 
                         <div class="mb-3">

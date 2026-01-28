@@ -94,7 +94,7 @@
                 <div class="card-body p-4">
                     <h4 class="mb-3"><i class="fas fa-user-plus me-2 text-primary"></i> Meedoen</h4>
                     <p class="text-muted">Log in (of maak een account) en bevestig om deze loting te bekijken. Je komt daarna terecht op je dashboard met de uitnodiging.</p>
-                    <a href="<?= base_url('index.php/drawings/join/' . $token) ?>" class="btn btn-primary w-100">
+                    <a href="<?= base_url('drawings/join/' . $token) ?>" class="btn btn-primary w-100">
                         <i class="fas fa-sign-in-alt me-2"></i> Meld me aan
                     </a>
                     <div class="alert alert-info mt-3 mb-0">

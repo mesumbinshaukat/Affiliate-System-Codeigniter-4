@@ -7,7 +7,7 @@
         <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= base_url('index.php/products/categories') ?>">Categories</a></li>
+                    <li class="breadcrumb-item"><a href="<?= base_url('products/categories') ?>">Categories</a></li>
                     <li class="breadcrumb-item active" aria-current="page"><?= esc($category['name']) ?></li>
                 </ol>
             </nav>
@@ -41,16 +41,16 @@
                             <p class="card-text text-muted"><?= esc(character_limiter($product['description'], 100)) ?></p>
                             
                             <?php if ($product['price']): ?>
-                                <p class="h4 text-primary">€<?= number_format($product['price'], 2) ?></p>
+                                <p class="h4 text-primary">€<?= number_format($product['price'], 2, ',', '') ?></p>
                             <?php endif; ?>
                             
                             <div class="d-flex gap-2 mb-2">
-                                <a href="<?= base_url('index.php/out/' . $product['id']) ?>" 
+                                <a href="<?= base_url('out/' . $product['id']) ?>" 
                                    class="btn btn-primary flex-grow-1" target="_blank">
                                     View Product <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 <button class="btn btn-outline-secondary" 
-                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['id']) ?>')"
+                                        onclick="copyAffiliateLink('<?= base_url('out/' . $product['id']) ?>')"
                                         title="Copy Affiliate Link">
                                     <i class="fas fa-copy"></i>
                                 </button>

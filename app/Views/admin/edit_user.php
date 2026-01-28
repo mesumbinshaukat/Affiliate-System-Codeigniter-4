@@ -9,7 +9,7 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="<?= base_url('index.php/admin/user/edit/' . $editUser['id']) ?>">
+                    <form method="post" action="<?= base_url('admin/user/edit/' . $editUser['id']) ?>">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="first_name" class="form-label">Voornaam</label>
@@ -55,7 +55,7 @@
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Gebruiker Bijwerken</button>
-                            <a href="<?= base_url('index.php/admin/users') ?>" class="btn btn-secondary">Annuleren</a>
+                            <a href="<?= base_url('admin/users') ?>" class="btn btn-secondary">Annuleren</a>
                         </div>
                     </form>
                 </div>

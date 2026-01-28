@@ -11,7 +11,7 @@ class InitialSeeder extends Seeder
         // Create admin user
         $this->db->table('users')->insert([
             'username' => 'admin',
-            'email' => getenv('ADMIN_EMAIL') ?: 'admin@lijstje.nl',
+            'email' => getenv('ADMIN_EMAIL') ?: 'admin@maakjelijstje.nl',
             'password' => password_hash(getenv('ADMIN_PASSWORD') ?: 'Admin@123', PASSWORD_DEFAULT),
             'first_name' => 'Admin',
             'last_name' => 'User',
@@ -56,7 +56,7 @@ class InitialSeeder extends Seeder
 
         // Create default settings
         $settings = [
-            ['key' => 'site_name', 'value' => 'Lijstje.nl', 'type' => 'string'],
+            ['key' => 'site_name', 'value' => 'Maakjelijstje.nl', 'type' => 'string'],
             ['key' => 'site_description', 'value' => 'Create and share product lists', 'type' => 'string'],
             ['key' => 'items_per_page', 'value' => '12', 'type' => 'integer'],
             ['key' => 'enable_registration', 'value' => '1', 'type' => 'boolean'],

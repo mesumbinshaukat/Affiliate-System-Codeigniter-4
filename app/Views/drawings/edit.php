@@ -25,7 +25,7 @@
                 <div class="tab-pane fade show active" id="details" role="tabpanel">
                     <div class="card mb-4">
                         <div class="card-body">
-                            <form method="post" action="<?= base_url('index.php/drawings/edit/' . $drawing['id']) ?>">
+                            <form method="post" action="<?= base_url('drawings/edit/' . $drawing['id']) ?>">
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Titel *</label>
                                     <input type="text" class="form-control" id="title" name="title" 
@@ -47,7 +47,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-save"></i> Opslaan
                                     </button>
-                                    <a href="<?= base_url('index.php/drawings') ?>" class="btn btn-secondary">
+                                    <a href="<?= base_url('drawings') ?>" class="btn btn-secondary">
                                         <i class="fas fa-arrow-left"></i> Terug
                                     </a>
                                 </div>
@@ -68,7 +68,7 @@
                             
                             <?php if ($drawing['status'] === 'pending'): ?>
                                 <!-- Add by Email Form -->
-                                <form method="post" action="<?= base_url('index.php/drawings/add-participant/' . $drawing['id']) ?>" class="mb-4">
+                                <form method="post" action="<?= base_url('drawings/add-participant/' . $drawing['id']) ?>" class="mb-4">
                                     <div class="mb-3">
                                         <label class="form-label">Naam van de deelnemer</label>
                                         <input type="text" class="form-control" name="invite_name" placeholder="Bijv. Jan Jansen">
@@ -139,7 +139,7 @@
                                                         </small>
                                                     </div>
                                                     <?php if ($drawing['status'] === 'pending'): ?>
-                                                        <a href="<?= base_url('index.php/drawings/remove-participant/' . $drawing['id'] . '/' . $participant['id']) ?>" 
+                                                        <a href="<?= base_url('drawings/remove-participant/' . $drawing['id'] . '/' . $participant['id']) ?>" 
                                                            class="btn btn-sm btn-outline-danger"
                                                            onclick="return confirm('Zeker weten?')">
                                                             <i class="fas fa-trash"></i>
@@ -162,7 +162,7 @@
                                             <i class="fas fa-check-circle"></i> <?= $acceptedCount ?> van <?= $totalCount ?> deelnemers hebben geaccepteerd. U kunt nu loten trekken.
                                         </div>
                                         <div class="mt-3">
-                                            <a href="<?= base_url('index.php/drawings/draw/' . $drawing['id']) ?>" 
+                                            <a href="<?= base_url('drawings/draw/' . $drawing['id']) ?>" 
                                                class="btn btn-success btn-lg w-100"
                                                onclick="return confirm('Weet u zeker? Dit kan niet ongedaan gemaakt worden.')">
                                                 <i class="fas fa-dice"></i> Trek Loten

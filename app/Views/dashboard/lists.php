@@ -9,7 +9,7 @@
             <p class="text-muted">Lijsten die u bezit en lijsten waar u aan meewerkt</p>
         </div>
         <div class="col-auto">
-            <a href="<?= base_url('index.php/dashboard/list/create') ?>" class="btn btn-primary">
+            <a href="<?= base_url('dashboard/list/create') ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Nieuwe Lijst
             </a>
         </div>
@@ -64,16 +64,16 @@
                                 <td><?= date('M d, Y', strtotime($list['created_at'])) ?></td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>" class="btn btn-sm btn-outline-primary" title="Bewerken">
+                                        <a href="<?= base_url('dashboard/list/edit/' . $list['id']) ?>" class="btn btn-sm btn-outline-primary" title="Bewerken">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <?php if ($list['status'] === 'published'): ?>
-                                            <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info" target="_blank" title="Bekijken">
+                                            <a href="<?= base_url('list/' . $list['slug']) ?>" class="btn btn-sm btn-outline-info" target="_blank" title="Bekijken">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         <?php endif; ?>
                                         <?php if (empty($list['is_collaboration'])): ?>
-                                            <a href="<?= base_url('index.php/dashboard/list/delete/' . $list['id']) ?>" 
+                                            <a href="<?= base_url('dashboard/list/delete/' . $list['id']) ?>" 
                                                class="btn btn-sm btn-outline-danger"
                                                onclick="return confirm('Weet u zeker dat u deze lijst wilt verwijderen?')"
                                                title="Verwijderen">
@@ -93,7 +93,7 @@
                     <?php else: ?>
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">
-                                Nog geen lijsten. <a href="<?= base_url('index.php/dashboard/list/create') ?>">Maak uw eerste lijst</a>
+                                Nog geen lijsten. <a href="<?= base_url('dashboard/list/create') ?>">Maak uw eerste lijst</a>
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -109,7 +109,7 @@ function leaveCollaboration(listId) {
         return;
     }
     
-    fetch('<?= base_url('index.php/collaboration/leave') ?>', {
+    fetch('<?= base_url('collaboration/leave') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -26,7 +26,7 @@
         </div>
         <?php if ($isCreator): ?>
             <div class="col-auto">
-                <a href="<?= base_url('index.php/drawings/edit/' . $drawing['id']) ?>" class="btn btn-outline-secondary">
+                <a href="<?= base_url('drawings/edit/' . $drawing['id']) ?>" class="btn btn-outline-secondary">
                     <i class="fas fa-edit"></i> Bewerken
                 </a>
             </div>
@@ -57,7 +57,7 @@
                                                 </div>
                                                 
                                                 <?php if ($participant['list_id']): ?>
-                                                    <a href="<?= base_url('index.php/list/' . $participant['list_slug']) ?>" 
+                                                    <a href="<?= base_url('list/' . $participant['list_slug']) ?>" 
                                                        class="btn btn-sm btn-primary w-100">
                                                         <i class="fas fa-gift"></i> Bekijk Verlanglijst
                                                     </a>

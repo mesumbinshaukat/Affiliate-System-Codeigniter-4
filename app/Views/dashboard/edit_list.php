@@ -132,7 +132,7 @@
                                 $showPasswordFields = $selectedProtection === 'password';
                                 $showQuestionFields = $selectedProtection === 'question';
                             ?>
-                            <form method="post" action="<?= base_url('index.php/dashboard/list/edit/' . $list['id']) ?>">
+                            <form method="post" action="<?= base_url('dashboard/list/edit/' . $list['id']) ?>">
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Lijsttitel *</label>
                                     <input type="text" class="form-control" id="title" name="title" value="<?= esc($list['title']) ?>" required>
@@ -240,9 +240,9 @@
 
                                 <div class="d-flex gap-2">
                                     <button type="submit" class="btn btn-primary">Lijst Bijwerken</button>
-                                    <a href="<?= base_url('index.php/dashboard/lists') ?>" class="btn btn-secondary">Terug naar Lijsten</a>
+                                    <a href="<?= base_url('dashboard/lists') ?>" class="btn btn-secondary">Terug naar Lijsten</a>
                                     <?php if ($list['status'] === 'published'): ?>
-                                        <a href="<?= base_url('index.php/list/' . $list['slug']) ?>" class="btn btn-info" target="_blank">
+                                        <a href="<?= base_url('list/' . $list['slug']) ?>" class="btn btn-info" target="_blank">
                                             <i class="fas fa-eye"></i> Openbare Weergave
                                         </a>
                                     <?php endif; ?>
@@ -453,7 +453,7 @@
                                                 <p class="personalized-item__description"><?= esc(character_limiter($product['description'] ?? 'Aanbevolen voor jouw leeftijdsgroep.', 95)) ?></p>
                                                 <div class="personalized-item__meta">
                                                     <?php if (!empty($product['price'])): ?>
-                                                        <span class="badge bg-primary-subtle text-primary fw-semibold">€<?= number_format($product['price'], 2) ?></span>
+                                                        <span class="badge bg-primary-subtle text-primary fw-semibold">€<?= number_format($product['price'], 2, ',', '') ?></span>
                                                     <?php endif; ?>
                                                     <?php if (!empty($product['source'])): ?>
                                                         <span class="badge bg-light text-muted"><i class="fas fa-store"></i> <?= esc($product['source']) ?></span>
@@ -506,7 +506,7 @@
                                                         <h6><?= esc($product['title']) ?></h6>
                                                         <p class="text-muted mb-1 small"><?= esc(character_limiter($product['description'], 100)) ?></p>
                                                         <?php if ($product['price']): ?>
-                                                            <strong class="text-primary">€<?= number_format($product['price'], 2) ?></strong>
+                                                            <strong class="text-primary">€<?= number_format($product['price'], 2, ',', '') ?></strong>
                                                         <?php endif; ?>
                                                         
                                                         <!-- Section Assignment -->
@@ -689,7 +689,7 @@ function searchProducts(page = 1) {
     document.getElementById('searchResults').innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Laden...</span></div><p class="mt-2 text-muted">Bol.com doorzoeken...</p></div>';
 
     // Build URL without filters - fetch all results for client-side filtering
-    let url = `<?= base_url('index.php/dashboard/products/search') ?>?q=${encodeURIComponent(query)}&limit=${limit}&page=1`;
+    let url = `<?= base_url('dashboard/products/search') ?>?q=${encodeURIComponent(query)}&limit=${limit}&page=1`;
 
     fetch(url)
         .then(response => response.json())
@@ -862,7 +862,7 @@ function scrapeProductViaUrl() {
         </div>
     `;
 
-    fetch('<?= base_url('index.php/dashboard/product/scrape') ?>', {
+    fetch('<?= base_url('dashboard/product/scrape') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -888,7 +888,7 @@ function scrapeProductViaUrl() {
         renderScrapeResult(body.product);
     })
     .catch(error => {
-        console.error(error);
+        console.error('Error:', error);
         scrapeBtn.disabled = false;
         scrapeBtn.innerHTML = originalHtml;
         document.getElementById('scrapeResult').innerHTML = `
@@ -1037,7 +1037,7 @@ function addSelectedProducts() {
         
         const product = productsArray[index];
         
-        fetch('<?= base_url('index.php/dashboard/product/add') ?>', {
+        fetch('<?= base_url('dashboard/product/add') ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1144,7 +1144,7 @@ function addSingleProduct(product, triggerBtn = null) {
         section_id: sectionId,
     };
     
-    fetch('<?= base_url('index.php/dashboard/product/add') ?>', {
+    fetch('<?= base_url('dashboard/product/add') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1171,7 +1171,7 @@ function addSingleProduct(product, triggerBtn = null) {
                 // Refresh product list without page reload
                 refreshProductList();
             } else {
-                showToast('Fout: ' + data.message, 'error');
+                showToast('Error: ' + data.message, 'error');
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = originalHtml;
@@ -1179,7 +1179,7 @@ function addSingleProduct(product, triggerBtn = null) {
             }
         } catch (e) {
             console.error('Invalid JSON response:', text);
-            showToast('Fout bij toevoegen product', 'error');
+            showToast('Error bij toevoegen product', 'error');
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -1188,7 +1188,7 @@ function addSingleProduct(product, triggerBtn = null) {
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('Fout bij toevoegen product', 'error');
+        showToast('Error bij toevoegen product', 'error');
         if (btn) {
             btn.disabled = false;
             btn.innerHTML = originalHtml;
@@ -1276,7 +1276,7 @@ function escapeHtml(text) {
 
 // Refresh product list without page reload
 function refreshProductList() {
-    fetch('<?= base_url('index.php/dashboard/list/products/' . $list['id']) ?>')
+    fetch('<?= base_url('dashboard/list/products/' . $list['id']) ?>')
         .then(response => response.json())
         .then(data => {
             if (data.success && data.products) {
@@ -1334,7 +1334,7 @@ function removeProduct(productId) {
         productCard.style.opacity = '0.5';
     }
 
-    fetch('<?= base_url('index.php/dashboard/product/remove') ?>', {
+    fetch('<?= base_url('dashboard/product/remove') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1406,7 +1406,7 @@ function saveProductOrder() {
         positions[productId] = index + 1; // Position starts from 1
     });
     
-    fetch('<?= base_url('index.php/dashboard/product/positions') ?>', {
+    fetch('<?= base_url('dashboard/product/positions') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1512,7 +1512,7 @@ function showAddSectionModal() {
 
 // Add new section
 function addSection(title) {
-    fetch('<?= base_url('index.php/dashboard/section/add') ?>', {
+    fetch('<?= base_url('dashboard/section/add') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1545,7 +1545,7 @@ function editSection(sectionId, currentTitle) {
         return;
     }
     
-    fetch('<?= base_url('index.php/dashboard/section/update') ?>', {
+    fetch('<?= base_url('dashboard/section/update') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1589,7 +1589,7 @@ function deleteSection(sectionId) {
         return;
     }
     
-    fetch('<?= base_url('index.php/dashboard/section/delete') ?>', {
+    fetch('<?= base_url('dashboard/section/delete') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1619,7 +1619,7 @@ function moveProductToSection(listProductId, sectionId) {
     // Convert empty string to null
     const targetSectionId = sectionId === '' ? null : sectionId;
     
-    fetch('<?= base_url('index.php/dashboard/product/move-to-section') ?>', {
+    fetch('<?= base_url('dashboard/product/move-to-section') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1717,7 +1717,7 @@ function updateGroupGiftAmount(listProductId, targetAmount) {
 
 // Send update to server
 function updateGroupGiftStatus(listProductId, isGroupGift, targetAmount) {
-    fetch('<?= base_url('index.php/contribution/toggle') ?>', {
+    fetch('<?= base_url('contribution/toggle') ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

@@ -30,7 +30,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="<?= base_url('index.php/admin/affiliate-source/toggle/' . $source['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                    <a href="<?= base_url('admin/affiliate-source/toggle/' . $source['id']) ?>" class="btn btn-sm btn-outline-primary">
                                         Status Omschakelen
                                     </a>
                                 </td>

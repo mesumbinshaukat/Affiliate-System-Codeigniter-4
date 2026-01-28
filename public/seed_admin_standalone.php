@@ -5,7 +5,7 @@
  * Visit: http://lijst.wmcdev.nl/seed_admin_standalone.php
  * 
  * Creates an admin user with:
- * - Email: admin@lijstje.nl
+ * - Email: admin@Maakjelijstje.nl
  * - Password: admin123
  * 
  * SECURITY: Delete this file after running!
@@ -209,7 +209,7 @@ function hashPassword($password) {
         
         $stmt = $mysqli->prepare("SELECT id, username, email, role, status, created_at FROM users WHERE email = ?");
         $stmt->bind_param('s', $admin_email);
-        $admin_email = 'admin@lijstje.nl';
+        $admin_email = 'admin@Maakjelijstje.nl';
         $stmt->execute();
         $result = $stmt->get_result();
         
@@ -236,7 +236,7 @@ function hashPassword($password) {
             
             try {
                 $username = 'admin';
-                $email = 'admin@lijstje.nl';
+                $email = 'admin@Maakjelijstje.nl';
                 $password = hashPassword('admin123');
                 $first_name = 'Admin';
                 $last_name = 'User';
@@ -272,7 +272,7 @@ function hashPassword($password) {
                     echo '<h4>Login Credentials:</h4>';
                     echo '<table>';
                     echo '<tr><th>Field</th><th>Value</th></tr>';
-                    echo '<tr><td>Email</td><td><code>admin@lijstje.nl</code></td></tr>';
+                    echo '<tr><td>Email</td><td><code>admin@Maakjelijstje.nl</code></td></tr>';
                     echo '<tr><td>Password</td><td><code>admin123</code></td></tr>';
                     echo '</table>';
                     echo '<p><strong>⚠️ IMPORTANT:</strong> Change the password immediately after first login!</p>';
@@ -335,7 +335,7 @@ function hashPassword($password) {
             <ol>
                 <li>Delete this file (seed_admin_standalone.php) via FTP or file manager</li>
                 <li>Visit your website: <a href="http://lijst.wmcdev.nl">http://lijst.wmcdev.nl</a></li>
-                <li>Login with admin credentials: <code>admin@lijstje.nl</code> / <code>admin123</code></li>
+                <li>Login with admin credentials: <code>admin@Maakjelijstje.nl</code> / <code>admin123</code></li>
                 <li>Change the admin password immediately</li>
                 <li>Access admin panel at: <code>/admin</code></li>
             </ol>

@@ -35,7 +35,7 @@
                         </div>
                     <?php endif; ?>
 
-                    <form method="post" action="<?= base_url('index.php/user/updateProfile') ?>">
+                    <form method="post" action="<?= base_url('user/updateProfile') ?>">
                         <!-- Name Fields -->
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -124,7 +124,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Profiel Opslaan
                             </button>
-                            <a href="<?= base_url('index.php/dashboard') ?>" class="btn btn-secondary">
+                            <a href="<?= base_url('dashboard') ?>" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Terug naar Dashboard
                             </a>
                         </div>

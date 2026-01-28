@@ -31,7 +31,7 @@ return [
     'register_button' => 'Account aanmaken',
     'register_have_account' => 'Hebt u al een account? ',
     'register_login_link' => 'Log hier in',
-    'register_success' => 'Welkom bij Lijstje.nl, {name}! Nu kunt u uw eerste lijst maken.',
+    'register_success' => 'Welkom bij Maakjelijstje.nl, {name}! Nu kunt u uw eerste lijst maken.',
     'register_error_email_taken' => 'Dit e-mailadres is al geregistreerd',
     'register_error_username_taken' => 'Deze gebruikersnaam is al in gebruik',
     'register_error_invalid_email' => 'Ongeldig e-mailadres',

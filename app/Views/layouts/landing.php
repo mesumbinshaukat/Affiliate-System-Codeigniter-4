@@ -23,6 +23,65 @@
             --landing-accent: #FFD56A;
         }
 
+        @media (min-width: 992px) {
+            .landing-nav-inner {
+                flex-wrap: nowrap;
+            }
+
+            .landing-nav-shell {
+                width: auto;
+                flex: 0 0 auto;
+            }
+
+            .landing-nav-toggle {
+                display: none !important;
+            }
+
+            .landing-nav-collapse {
+                display: flex !important;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 1.5rem;
+                position: static;
+                width: auto;
+                height: auto;
+                background: transparent;
+                border: none;
+                padding: 0;
+                box-shadow: none;
+                transform: none;
+            }
+
+            .nav-right {
+                flex-direction: row;
+                align-items: center;
+                gap: 1.25rem;
+                width: auto;
+            }
+
+            .nav-middle {
+                flex-direction: row;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .nav-middle .nav-link-cta {
+                width: auto;
+                background: transparent;
+                padding: 0;
+            }
+
+            .nav-search {
+                max-width: 320px;
+            }
+
+            .nav-actions {
+                flex-direction: row;
+                width: auto;
+                gap: 0.75rem;
+            }
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -33,6 +92,10 @@
             margin: 0;
             background: var(--landing-bg);
             color: var(--landing-deep);
+        }
+
+        body.nav-open {
+            overflow: hidden;
         }
 
         a {
@@ -64,12 +127,51 @@
             align-items: center;
             gap: 1.25rem;
             justify-content: space-between;
+            flex-wrap: nowrap;
+            width: 100%;
         }
 
-        .landing-nav .brand {
+        .landing-nav-shell {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 0.75rem;
+            flex: 1 1 100%;
+        }
+
+        .landing-nav-panel {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .landing-nav-utilities {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        .landing-nav-shortcuts {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            flex: 1;
+        }
+
+        .landing-nav-shell .brand {
             font-size: 2.5rem;
             font-weight: 700;
             color: white;
+            flex: 0 0 auto;
+        }
+
+        .landing-nav-shell .landing-nav-toggle {
+            margin-left: auto;
         }
 
         .nav-right {
@@ -294,70 +396,188 @@
             padding: 0.35rem 0.9rem;
         }
 
+        .landing-nav-toggle .toggle-bars {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 4px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .landing-nav-toggle .toggle-bars span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: #fff;
+            border-radius: 999px;
+        }
+
+        .landing-close-btn {
+            border: 1px solid rgba(255,255,255,0.4);
+            background: transparent;
+            color: #fff;
+            border-radius: 999px;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .landing-close-btn span {
+            font-size: 1.35rem;
+            line-height: 1;
+            margin-top: -2px;
+        }
+
         .landing-nav-collapse {
             display: flex;
             align-items: center;
             gap: 1.5rem;
         }
 
-        @media (max-width: 992px) {
+        .landing-nav-backdrop {
+            display: none;
+        }
+
+        @media (max-width: 991.98px) {
             .landing-nav-inner {
                 flex-wrap: wrap;
+            }
+
+            .landing-nav-shell {
+                width: 100%;
             }
 
             .landing-nav-toggle {
                 display: inline-flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: 0.4rem;
             }
 
             .landing-nav-collapse {
-                width: 100%;
-                flex-direction: column;
-                align-items: stretch;
-                display: none;
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 80vw;
+                max-width: 360px;
+                height: 100vh;
+                background: linear-gradient(145deg, #0B1533, #101D4A);
+                border-left: 1px solid rgba(255,255,255,0.08);
+                padding: 4.25rem 1.5rem 2rem;
+                overflow-y: auto;
+                box-shadow: -18px 0 50px rgba(5, 9, 26, 0.6);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                z-index: 1051;
             }
 
+            .landing-nav-collapse.collapsing,
             .landing-nav-collapse.show {
-                display: flex;
+                display: block !important;
+                transform: translateX(0);
+            }
+
+            .landing-nav-panel {
+                padding-bottom: 3rem;
+            }
+
+            .landing-nav-utilities {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1.25rem;
+                margin-top: 0;
+                width: 100%;
+            }
+
+            .landing-nav-shortcuts {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.85rem;
+                flex-wrap: wrap;
+            }
+
+            .landing-nav-shortcuts .nav-link-cta {
+                width: 100%;
+                justify-content: flex-start;
+                padding: 1rem 1.2rem;
+                border-radius: 18px;
+                border: 1px solid rgba(255,255,255,0.2);
+                background: rgba(255,255,255,0.1);
+                font-size: 1rem;
             }
 
             .nav-right {
                 flex-direction: column;
-                width: 100%;
                 align-items: stretch;
-                gap: 1rem;
+                gap: 1.5rem;
             }
 
             .nav-middle {
                 width: 100%;
                 flex-direction: column;
+                align-items: stretch;
                 gap: 1rem;
             }
 
-            .nav-middle .nav-link-cta {
-                text-align: center;
+            .nav-actions,
+            .landing-nav-actions {
                 width: 100%;
-                display: block;
-                padding: 0.75rem;
-                border-radius: 999px;
-                background: rgba(255,255,255,0.08);
+                justify-content: stretch;
+                gap: 0.75rem !important;
+                flex-direction: column;
+                flex-wrap: nowrap;
+            }
+
+            .nav-actions .btn,
+            .landing-nav-actions .btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .nav-actions .btn-nav-primary {
+                border-radius: 18px;
+                padding: 0.9rem;
+                font-size: 1rem;
             }
 
             .nav-search {
                 width: 100%;
-                max-width: none;
+                margin: 0;
+                border-radius: 24px;
+                padding: 0.75rem;
+                flex-direction: column;
+                gap: 0.65rem;
+                align-items: stretch;
             }
 
-            .nav-actions {
+            .nav-search svg {
+                top: 1.4rem;
+                left: 1.2rem;
+            }
+
+            .nav-search input {
+                font-size: 1rem;
                 width: 100%;
-                justify-content: stretch;
-                gap: 0.75rem;
+                padding-left: 2.8rem;
             }
 
-            .nav-actions .btn-nav-primary {
-                flex: 1;
-                text-align: center;
+            .nav-search button {
+                border-radius: 18px;
+                padding: 0.7rem 1.2rem;
+                width: 100%;
+            }
+
+            .landing-nav-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(5, 10, 30, 0.65);
+                z-index: 1050;
+            }
+
+            .landing-nav-backdrop:not(.active) {
+                display: none;
             }
         }
 
@@ -381,38 +601,50 @@
   
     <nav class="landing-nav">
         <div class="container landing-nav-inner">
-            <div class="d-flex align-items-center gap-2">
-                <a href="<?= base_url('index.php') ?>" class="brand">Remcom</a>
+            <div class="landing-nav-shell">
+                <a href="<?= base_url('') ?>" class="brand">Remcom</a>
                 <button class="landing-nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#landingNavCollapse" aria-controls="landingNavCollapse" aria-expanded="false" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
+                    <span class="toggle-bars" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
                 </button>
             </div>
             <div class="landing-nav-collapse collapse" id="landingNavCollapse">
-                <div class="nav-right">
-                    <div class="nav-middle">
-                        <a href="<?= base_url('index.php/register') ?>" class="nav-link-cta">Maak Een Verlanglijstje Aan</a>
-                        <form class="nav-search" action="<?= base_url('index.php/search') ?>" method="get">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6 6 0 1 0 14 15.5l.27.28v.79L20 21.5 21.5 20l-6-6zm-5.5 0a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="currentColor"/></svg>
-                            <input type="text" name="q" placeholder="Zoek lijsten..." autocomplete="off" value="<?= esc($query ?? '') ?>">
-                            <button type="submit">
-                                <span>Zoeken</span>
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor" />
-                                </svg>
-                            </button>
-                        </form>
+                <div class="landing-nav-panel">
+                    <div class="d-lg-none d-flex justify-content-end mb-3">
+                        <button type="button" class="landing-close-btn" data-bs-toggle="collapse" data-bs-target="#landingNavCollapse" aria-label="Sluiten">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <div class="nav-actions">
-                        <?php if ($isLoggedIn ?? false): ?>
-                            <a class="btn-nav-primary" href="<?= base_url('index.php/dashboard') ?>">Dashboard</a>
-                        <?php else: ?>
-                            <a class="btn-nav-primary" href="<?= base_url('index.php/login') ?>">Login</a>
-                        <?php endif; ?>
+                    <div class="nav-right landing-nav-utilities">
+                        <div class="nav-middle landing-nav-shortcuts">
+                            <a href="<?= base_url('register') ?>" class="nav-link-cta">Maak Een Verlanglijstje Aan</a>
+                            <form class="nav-search" action="<?= base_url('search') ?>" method="get">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6 6 0 1 0 14 15.5l.27.28v.79L20 21.5 21.5 20l-6-6zm-5.5 0a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="currentColor"/></svg>
+                                <input type="text" name="q" placeholder="Zoek lijsten..." autocomplete="off" value="<?= esc($query ?? '') ?>">
+                                <button type="submit">
+                                    <span>Zoeken</span>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="nav-actions landing-nav-actions">
+                            <?php if ($isLoggedIn ?? false): ?>
+                                <a class="btn-nav-primary" href="<?= base_url('dashboard') ?>">Dashboard</a>
+                            <?php else: ?>
+                                <a class="btn-nav-primary" href="<?= base_url('login') ?>">Login</a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
+    <div class="landing-nav-backdrop" id="landingNavBackdrop"></div>
 
     <main>
         <?= $this->renderSection('content') ?>
@@ -463,7 +695,31 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navCollapse = document.getElementById('landingNavCollapse');
+            const navBackdrop = document.getElementById('landingNavBackdrop');
+
+            if (navCollapse && navBackdrop) {
+                navCollapse.addEventListener('shown.bs.collapse', function () {
+                    navBackdrop.classList.add('active');
+                    document.body.classList.add('nav-open');
+                });
+
+                navCollapse.addEventListener('hidden.bs.collapse', function () {
+                    navBackdrop.classList.remove('active');
+                    document.body.classList.remove('nav-open');
+                });
+
+                navBackdrop.addEventListener('click', function () {
+                    const instance = bootstrap.Collapse.getInstance(navCollapse);
+                    if (instance) {
+                        instance.hide();
+                    }
+                });
+            }
+        });
+    </script>
     <?= $this->renderSection('scripts') ?>
 </body>
 </html>

@@ -5,7 +5,7 @@
  * Visit: http://lijst.wmcdev.nl/seed_admin.php
  * 
  * Creates an admin user with:
- * - Email: admin@lijstje.nl
+ * - Email: admin@Maakjelijstje.nl
  * - Password: admin123
  * 
  * SECURITY: Delete this file after running!
@@ -193,7 +193,7 @@ try {
         echo '<h3>Step 3: Checking for Existing Admin</h3>';
         
         $userModel = new \App\Models\UserModel();
-        $existingAdmin = $userModel->where('email', 'admin@lijstje.nl')->first();
+        $existingAdmin = $userModel->where('email', 'admin@Maakjelijstje.nl')->first();
         
         if ($existingAdmin) {
             echo '<div class="warning">⚠️ Admin user already exists!</div>';
@@ -218,7 +218,7 @@ try {
             try {
                 $adminData = [
                     'username' => 'admin',
-                    'email' => 'admin@lijstje.nl',
+                    'email' => 'admin@Maakjelijstje.nl',
                     'password' => 'admin123', // Will be hashed by the model
                     'first_name' => 'Admin',
                     'last_name' => 'User',
@@ -245,7 +245,7 @@ try {
                     echo '<h4>Login Credentials:</h4>';
                     echo '<table>';
                     echo '<tr><th>Field</th><th>Value</th></tr>';
-                    echo '<tr><td>Email</td><td><code>admin@lijstje.nl</code></td></tr>';
+                    echo '<tr><td>Email</td><td><code>admin@Maakjelijstje.nl</code></td></tr>';
                     echo '<tr><td>Password</td><td><code>admin123</code></td></tr>';
                     echo '</table>';
                     echo '<p><strong>⚠️ IMPORTANT:</strong> Change the password immediately after first login!</p>';
@@ -303,7 +303,7 @@ try {
             <ol>
                 <li>Delete this file (seed_admin.php) via FTP or file manager</li>
                 <li>Visit your website: <a href="http://lijst.wmcdev.nl">http://lijst.wmcdev.nl</a></li>
-                <li>Login with admin credentials: <code>admin@lijstje.nl</code> / <code>admin123</code></li>
+                <li>Login with admin credentials: <code>admin@Maakjelijstje.nl</code> / <code>admin123</code></li>
                 <li>Change the admin password immediately</li>
                 <li>Access admin panel at: <code>/admin</code></li>
             </ol>

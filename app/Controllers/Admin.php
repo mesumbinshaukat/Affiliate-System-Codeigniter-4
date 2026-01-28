@@ -60,7 +60,7 @@ class Admin extends BaseController
         $user = $userModel->find($userId);
 
         if (!$user) {
-            return redirect()->to('index.php/admin/users')->with('error', 'Gebruiker niet gevonden');
+            return redirect()->to('admin/users')->with('error', 'Gebruiker niet gevonden');
         }
 
         if (strtolower($this->request->getMethod()) === 'post') {
@@ -150,12 +150,12 @@ class Admin extends BaseController
 
         // Prevent deleting own account
         if ($userId == $this->session->get('user_id')) {
-            return redirect()->to('index.php/admin/users')->with('error', 'Je kunt je eigen account niet verwijderen');
+            return redirect()->to('admin/users')->with('error', 'Je kunt je eigen account niet verwijderen');
         }
 
         $userModel = new UserModel();
         if ($userModel->delete($userId)) {
-            return redirect()->to('index.php/admin/users')->with('success', 'Gebruiker succesvol verwijderd');
+            return redirect()->to('admin/users')->with('success', 'Gebruiker succesvol verwijderd');
         }
 
         return redirect()->back()->with('error', 'Gebruiker verwijderen mislukt');

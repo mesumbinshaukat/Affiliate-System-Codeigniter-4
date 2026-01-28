@@ -123,17 +123,17 @@
                     <?php endif; ?>
 
                     <div class="mb-4">
-                        <a href="<?= base_url('index.php/auth/social/facebook') ?>" class="social-button facebook w-100 mb-3">
+                        <a href="<?= base_url('auth/social/facebook') ?>" class="social-button facebook w-100 mb-3">
                             <i class="fab fa-facebook-f me-2"></i> Registreren met Facebook
                         </a>
-                        <a href="<?= base_url('index.php/auth/social/google') ?>" class="social-button google w-100">
+                        <a href="<?= base_url('auth/social/google') ?>" class="social-button google w-100">
                             <i class="fab fa-google me-2"></i> Registreren met Google
                         </a>
                     </div>
 
                     <div class="text-center my-3 auth-divider">of registreer met e-mail</div>
 
-                    <form method="post" action="<?= base_url('index.php/register') ?>" id="registerForm" class="auth-form">
+                    <form method="post" action="<?= base_url('register') ?>" id="registerForm" class="auth-form">
                         <div class="form-section-title">Persoonlijke gegevens</div>
                         <div class="row">
                             <div class="col-md-6 mb-3">

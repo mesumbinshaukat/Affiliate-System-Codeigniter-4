@@ -14,12 +14,12 @@
     <div class="row mb-4">
         <div class="col">
             <div class="btn-group" role="group">
-                <a href="<?= base_url('index.php/products') ?>" 
+                <a href="<?= base_url('products') ?>" 
                    class="btn <?= !$selectedCategory ? 'btn-primary' : 'btn-outline-primary' ?>">
                     All Products
                 </a>
                 <?php foreach ($categories as $category): ?>
-                    <a href="<?= base_url('index.php/products?category=' . $category['id']) ?>" 
+                    <a href="<?= base_url('products?category=' . $category['id']) ?>" 
                        class="btn <?= $selectedCategory == $category['id'] ? 'btn-primary' : 'btn-outline-primary' ?>">
                         <?php if ($category['icon']): ?>
                             <i class="<?= esc($category['icon']) ?>"></i>
@@ -49,16 +49,16 @@
                             <p class="card-text text-muted"><?= esc(character_limiter($product['description'], 100)) ?></p>
                             
                             <?php if ($product['price']): ?>
-                                <p class="h4 text-primary">€<?= number_format($product['price'], 2) ?></p>
+                                <p class="h4 text-primary">€<?= number_format($product['price'], 2, ',', '') ?></p>
                             <?php endif; ?>
                             
                             <div class="d-flex gap-2 mb-2">
-                                <a href="<?= base_url('index.php/out/' . $product['id']) ?>" 
+                                <a href="<?= base_url('out/' . $product['id']) ?>" 
                                    class="btn btn-primary flex-grow-1" target="_blank">
                                     View Product <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 <button class="btn btn-outline-secondary" 
-                                        onclick="copyAffiliateLink('<?= base_url('index.php/out/' . $product['id']) ?>')"
+                                        onclick="copyAffiliateLink('<?= base_url('out/' . $product['id']) ?>')"
                                         title="Copy Affiliate Link">
                                     <i class="fas fa-copy"></i>
                                 </button>

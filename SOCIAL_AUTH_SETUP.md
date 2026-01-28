@@ -1,7 +1,7 @@
 # Social Authentication Integration - Facebook & Google OAuth
 
 ## Overview
-This document describes the complete Facebook and Google OAuth integration for the Lijstje.nl affiliate platform.
+This document describes the complete Facebook and Google OAuth integration for the Maakjelijstje.nl affiliate platform.
 
 ## Features Implemented
 
