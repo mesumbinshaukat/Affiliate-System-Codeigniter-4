@@ -31,6 +31,9 @@ class Contribution extends BaseController
         $contributorName = trim($this->request->getPost('contributor_name'));
         $contributorEmail = trim($this->request->getPost('contributor_email'));
         $amount = $this->request->getPost('amount');
+        // Normalize decimal separator (handle both comma and dot)
+        $amount = str_replace(',', '.', $amount);
+        $amount = (float) $amount;
         $message = trim($this->request->getPost('message'));
         $isAnonymous = (bool) $this->request->getPost('is_anonymous');
 
@@ -83,12 +86,12 @@ class Contribution extends BaseController
             ]);
         }
 
-        // Don't allow contribution that exceeds target
-        if (($currentAmount + $amount) > $targetAmount) {
-            $remaining = $targetAmount - $currentAmount;
+        // Don't allow contribution that significantly exceeds target
+        $remaining = max($targetAmount - $currentAmount, 0);
+        if ($amount > ($remaining + 0.001)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => sprintf('Maximaal €%.2f kan nog worden bijgedragen', $remaining),
+                'message' => sprintf('Maximaal €%s kan nog worden bijgedragen', number_format($remaining, 2, ',', '')),
             ]);
         }
 

@@ -1003,7 +1003,7 @@ function clearSelection() {
 // Add selected products in batch
 function addSelectedProducts() {
     if (selectedProducts.size === 0) {
-        showToast('Please select at least one product', 'warning');
+        showToast('Selecteer minimaal één product', 'warning');
         return;
     }
     
@@ -1023,12 +1023,12 @@ function addSelectedProducts() {
             addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Selected';
             
             if (failedCount === 0) {
-                showToast(`Successfully added ${addedCount} product(s)!`, 'success');
+                showToast(`${addedCount} product(en) succesvol toegevoegd!`, 'success');
                 // Clear selection and refresh product list
                 clearSelection();
                 refreshProductList();
             } else {
-                showToast(`Added ${addedCount} product(s). ${failedCount} failed.`, 'warning');
+                showToast(`${addedCount} product(en) toegevoegd. ${failedCount} mislukt.`, 'warning');
                 clearSelection();
                 refreshProductList();
             }
@@ -1171,7 +1171,7 @@ function addSingleProduct(product, triggerBtn = null) {
                 // Refresh product list without page reload
                 refreshProductList();
             } else {
-                showToast('Error: ' + data.message, 'error');
+                showToast('Fout: ' + data.message, 'error');
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = originalHtml;
@@ -1347,11 +1347,11 @@ function removeProduct(productId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showToast('Product removed successfully', 'success');
+            showToast('Product succesvol verwijderd', 'success');
             // Refresh product list without page reload
             refreshProductList();
         } else {
-            showToast('Error: ' + data.message, 'error');
+            showToast('Fout: ' + data.message, 'error');
             if (productCard) {
                 productCard.style.opacity = '1';
             }
@@ -1359,7 +1359,7 @@ function removeProduct(productId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('Error removing product', 'error');
+        showToast('Fout bij verwijderen product', 'error');
         if (productCard) {
             productCard.style.opacity = '1';
         }
@@ -1419,14 +1419,14 @@ function saveProductOrder() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showToast('Product order updated', 'success');
+            showToast('Productvolgorde bijgewerkt', 'success');
         } else {
-            showToast('Error updating order: ' + data.message, 'error');
+            showToast('Fout bij bijwerken volgorde: ' + data.message, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('Error updating product order', 'error');
+        showToast('Fout bij bijwerken productvolgorde', 'error');
     });
 }
 

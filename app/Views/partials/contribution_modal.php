@@ -73,14 +73,19 @@ document.addEventListener('DOMContentLoaded', function() {
     contributionModal = new bootstrap.Modal(document.getElementById('contributionModal'));
 });
 
+function formatCurrency(amount) {
+    return amount.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function showContributionModal(listProductId, productTitle, targetAmount, remaining) {
     document.getElementById('contribution_list_product_id').value = listProductId;
     document.getElementById('contributionProductInfo').innerHTML = `
         <strong>${productTitle}</strong><br>
-        <small>Doel: €${targetAmount.toFixed(2)} | Nog te verzamelen: €${remaining.toFixed(2)}</small>
+        <small>Doel: €${formatCurrency(targetAmount)} | Nog te verzamelen: €${formatCurrency(remaining)}</small>
     `;
-    document.getElementById('remainingAmount').textContent = `Maximaal €${remaining.toFixed(2)} kan nog worden bijgedragen`;
-    document.getElementById('contribution_amount').max = remaining.toFixed(2);
+    document.getElementById('remainingAmount').textContent = `Maximaal €${formatCurrency(remaining)} kan nog worden bijgedragen`;
+    // Remove max restriction and let backend handle validation
+    document.getElementById('contribution_amount').removeAttribute('max');
     
     // Reset form
     document.getElementById('contributionForm').reset();
@@ -95,9 +100,16 @@ function submitContribution() {
     const form = document.getElementById('contributionForm');
     const formData = new FormData(form);
     
+    // Normalize amount (replace comma with dot for proper parsing)
+    let amountValue = formData.get('amount');
+    if (amountValue) {
+        amountValue = amountValue.replace(',', '.');
+        formData.set('amount', amountValue);
+    }
+    
     // Validate
     const name = formData.get('contributor_name');
-    const amount = parseFloat(formData.get('amount'));
+    const amount = parseFloat(amountValue);
     
     if (!name || !amount || amount <= 0) {
         showContributionError('Vul alle verplichte velden in');

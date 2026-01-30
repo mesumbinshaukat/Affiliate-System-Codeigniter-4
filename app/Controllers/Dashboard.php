@@ -453,7 +453,7 @@ class Dashboard extends BaseController
         if (!$this->isLoggedIn()) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Please login to continue',
+                'message' => 'Log in om door te gaan',
             ]);
         }
 
@@ -482,7 +482,7 @@ class Dashboard extends BaseController
             if (!$list || !$listModel->canUserEdit($listId, $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'List not found or access denied',
+                    'message' => 'Lijst niet gevonden of toegang geweigerd',
                 ]);
             }
 
@@ -495,7 +495,7 @@ class Dashboard extends BaseController
                 if (!$product) {
                     return $this->response->setJSON([
                         'success' => false,
-                        'message' => 'Product not found',
+                        'message' => 'Product niet gevonden',
                     ]);
                 }
             } else {
@@ -556,7 +556,7 @@ class Dashboard extends BaseController
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'Invalid request method',
+            'message' => 'Ongeldige verzoeksmethode',
         ]);
     }
 
@@ -842,7 +842,7 @@ class Dashboard extends BaseController
         if (!$this->isLoggedIn()) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Please login to continue',
+                'message' => 'Log in om door te gaan',
             ]);
         }
 
@@ -854,7 +854,7 @@ class Dashboard extends BaseController
         if (!$list || !$listModel->canUserEdit($listId, $userId)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'List not found or access denied',
+                'message' => 'Lijst niet gevonden of toegang geweigerd',
             ]);
         }
 
@@ -873,7 +873,7 @@ class Dashboard extends BaseController
         if (!$this->isLoggedIn()) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Please login to continue',
+                'message' => 'Log in om door te gaan',
             ]);
         }
 
@@ -889,7 +889,7 @@ class Dashboard extends BaseController
             if (!$list || !$listModel->canUserEdit($listId, $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'List not found',
+                    'message' => 'Lijst niet gevonden',
                 ]);
             }
 
@@ -898,13 +898,13 @@ class Dashboard extends BaseController
 
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'Product removed successfully',
+                'message' => 'Product succesvol verwijderd',
             ]);
         }
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'Invalid request',
+            'message' => 'Ongeldig verzoek',
         ]);
     }
 
@@ -913,13 +913,26 @@ class Dashboard extends BaseController
         if (!$this->isLoggedIn()) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Please login to continue',
+                'message' => 'Log in om door te gaan',
             ]);
         }
 
         if (strtolower($this->request->getMethod()) === 'post') {
             $listId = $this->request->getPost('list_id');
             $positions = $this->request->getPost('positions');
+            
+            // Decode JSON string to array if needed
+            if (is_string($positions)) {
+                $positions = json_decode($positions, true);
+            }
+            
+            // Validate positions data
+            if (!is_array($positions)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Ongeldige positiegegevens',
+                ]);
+            }
 
             // Verify list access (owner or co-owner)
             $listModel = new ListModel();
@@ -929,7 +942,7 @@ class Dashboard extends BaseController
             if (!$list || !$listModel->canUserEdit($listId, $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'List not found',
+                    'message' => 'Lijst niet gevonden',
                 ]);
             }
 
@@ -938,13 +951,13 @@ class Dashboard extends BaseController
 
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'Positions updated successfully',
+                'message' => 'Posities succesvol bijgewerkt',
             ]);
         }
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'Invalid request',
+            'message' => 'Ongeldig verzoek',
         ]);
     }
 
@@ -1038,7 +1051,7 @@ class Dashboard extends BaseController
             if (!$list || !$listModel->canUserEdit($listId, $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'List not found or access denied',
+                    'message' => 'Lijst niet gevonden of toegang geweigerd',
                 ]);
             }
 
@@ -1071,7 +1084,7 @@ class Dashboard extends BaseController
         if (!$this->isLoggedIn()) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Please login to continue',
+                'message' => 'Log in om door te gaan',
             ]);
         }
 
@@ -1092,7 +1105,7 @@ class Dashboard extends BaseController
             if (!$section) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Section not found',
+                    'message' => 'Sectie niet gevonden',
                 ]);
             }
 
@@ -1104,7 +1117,7 @@ class Dashboard extends BaseController
             if (!$list || !$listModel->canUserEdit($section['list_id'], $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Access denied',
+                    'message' => 'Toegang geweigerd',
                 ]);
             }
 
@@ -1132,7 +1145,7 @@ class Dashboard extends BaseController
         if (!$this->isLoggedIn()) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Please login to continue',
+                'message' => 'Log in om door te gaan',
             ]);
         }
 
@@ -1142,7 +1155,7 @@ class Dashboard extends BaseController
             if (empty($sectionId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Section ID is required',
+                    'message' => 'Sectie-ID is vereist',
                 ]);
             }
 
@@ -1152,7 +1165,7 @@ class Dashboard extends BaseController
             if (!$section) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Section not found',
+                    'message' => 'Sectie niet gevonden',
                 ]);
             }
 
@@ -1164,7 +1177,7 @@ class Dashboard extends BaseController
             if (!$list || !$listModel->canUserEdit($section['list_id'], $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Access denied',
+                    'message' => 'Toegang geweigerd',
                 ]);
             }
 
@@ -1172,19 +1185,19 @@ class Dashboard extends BaseController
             if ($listSectionModel->deleteSection($sectionId)) {
                 return $this->response->setJSON([
                     'success' => true,
-                    'message' => 'Section deleted successfully',
+                    'message' => 'Sectie succesvol verwijderd',
                 ]);
             }
 
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Failed to delete section',
+                'message' => 'Sectie verwijderen mislukt',
             ]);
         }
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'Invalid request method',
+            'message' => 'Ongeldige verzoeksmethode',
         ]);
     }
 
@@ -1193,7 +1206,7 @@ class Dashboard extends BaseController
         if (!$this->isLoggedIn()) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Please login to continue',
+                'message' => 'Log in om door te gaan',
             ]);
         }
 
@@ -1204,7 +1217,7 @@ class Dashboard extends BaseController
             if (empty($listProductId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'List product ID is required',
+                    'message' => 'Lijstproduct-ID is vereist',
                 ]);
             }
 
@@ -1214,7 +1227,7 @@ class Dashboard extends BaseController
             if (!$listProduct) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Product not found in list',
+                    'message' => 'Product niet gevonden in lijst',
                 ]);
             }
 
@@ -1226,26 +1239,26 @@ class Dashboard extends BaseController
             if (!$list || !$listModel->canUserEdit($listProduct['list_id'], $userId)) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Access denied',
+                    'message' => 'Toegang geweigerd',
                 ]);
             }
 
             if ($listProductModel->moveProductToSection($listProductId, $sectionId)) {
                 return $this->response->setJSON([
                     'success' => true,
-                    'message' => 'Product moved successfully',
+                    'message' => 'Product succesvol verplaatst',
                 ]);
             }
 
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Failed to move product',
+                'message' => 'Product verplaatsen mislukt',
             ]);
         }
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'Invalid request method',
+            'message' => 'Ongeldige verzoeksmethode',
         ]);
     }
 }
