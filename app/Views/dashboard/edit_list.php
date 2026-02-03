@@ -94,6 +94,107 @@
         border-radius: var(--radius-lg);
         box-shadow: 0 10px 24px rgba(9, 12, 34, 0.08);
     }
+
+    /* Mobile-specific improvements */
+    @media (max-width: 767.98px) {
+        .personalized-item,
+        .search-result-item {
+            flex-direction: column;
+            padding: 14px;
+            gap: 12px;
+        }
+
+        .personalized-item__image,
+        .search-result-item__image {
+            width: 100%;
+            height: 180px;
+            max-width: 100%;
+        }
+
+        .personalized-item__body,
+        .search-result-item__body {
+            width: 100%;
+        }
+
+        .personalized-item__title,
+        .search-result-item__title {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .personalized-item__description,
+        .search-result-item__description {
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .personalized-item__actions,
+        .search-result-item__actions {
+            width: 100%;
+        }
+
+        .personalized-item__actions .btn,
+        .search-result-item__actions .btn {
+            width: 100%;
+            padding: 0.65rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        .search-result-item__checkbox {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 10;
+        }
+
+        .search-result-item__checkbox .form-check {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 0.85rem;
+            font-size: 0.875rem;
+        }
+
+        .personalized-pill {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .personalized-item__image,
+        .search-result-item__image {
+            height: 160px;
+        }
+
+        .personalized-item__title,
+        .search-result-item__title {
+            font-size: 0.9rem;
+        }
+
+        .personalized-item__description,
+        .search-result-item__description {
+            font-size: 0.8rem;
+        }
+    }
 </style>
 
 <div class="container my-5">

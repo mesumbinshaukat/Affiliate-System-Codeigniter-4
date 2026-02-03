@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="<?= base_url('public/vendor/fontawesome/all.min.css') ?>" />
     <style>
         :root {
             --landing-deep: #030A3D;
@@ -199,11 +199,10 @@
         }
 
         .nav-search {
-            position: relative;
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.2);
             border-radius: 999px;
-            padding: 0.35rem 0.35rem 0.35rem 2.5rem;
+            padding: 0.35rem;
             min-width: 220px;
             max-width: 340px;
             width: 100%;
@@ -213,14 +212,20 @@
             overflow: hidden;
         }
 
-        .nav-search svg {
-            position: absolute;
-            top: 50%;
-            left: 0.9rem;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
-            opacity: 0.6;
+        .nav-search-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .nav-search-icon i {
+            font-size: 15px;
         }
 
         .nav-search input {
@@ -230,6 +235,11 @@
             color: #fff;
             font-size: 0.95rem;
             outline: none;
+            padding-left: 0;
+        }
+
+        .nav-search input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .nav-search button {
@@ -243,6 +253,7 @@
             align-items: center;
             gap: 0.35rem;
             transition: background 0.2s ease;
+            flex-shrink: 0;
         }
 
         .nav-search button:hover {
@@ -469,13 +480,13 @@
                 overflow-y: auto;
                 box-shadow: -18px 0 50px rgba(5, 9, 26, 0.6);
                 transform: translateX(100%);
-                transition: transform 0.3s ease;
+                transition: transform 0.25s ease;
                 z-index: 1051;
+                display: none;
             }
 
-            .landing-nav-collapse.collapsing,
             .landing-nav-collapse.show {
-                display: block !important;
+                display: block;
                 transform: translateX(0);
             }
 
@@ -552,15 +563,10 @@
                 align-items: stretch;
             }
 
-            .nav-search svg {
-                top: 1.4rem;
-                left: 1.2rem;
-            }
-
             .nav-search input {
                 font-size: 1rem;
                 width: 100%;
-                padding-left: 2.8rem;
+                padding-left: 0;
             }
 
             .nav-search button {
@@ -603,7 +609,7 @@
         <div class="container landing-nav-inner">
             <div class="landing-nav-shell">
                 <a href="<?= base_url('') ?>" class="brand">Remcom</a>
-                <button class="landing-nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#landingNavCollapse" aria-controls="landingNavCollapse" aria-expanded="false" aria-label="Menu">
+                <button class="landing-nav-toggle" type="button" aria-label="Menu">
                     <span class="toggle-bars" aria-hidden="true">
                         <span></span>
                         <span></span>
@@ -611,10 +617,10 @@
                     </span>
                 </button>
             </div>
-            <div class="landing-nav-collapse collapse" id="landingNavCollapse">
+            <div class="landing-nav-collapse" id="landingNavCollapse">
                 <div class="landing-nav-panel">
                     <div class="d-lg-none d-flex justify-content-end mb-3">
-                        <button type="button" class="landing-close-btn" data-bs-toggle="collapse" data-bs-target="#landingNavCollapse" aria-label="Sluiten">
+                        <button type="button" class="landing-close-btn" aria-label="Sluiten">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -622,7 +628,9 @@
                         <div class="nav-middle landing-nav-shortcuts">
                             <a href="<?= base_url('register') ?>" class="nav-link-cta">Maak Een Verlanglijstje Aan</a>
                             <form class="nav-search" action="<?= base_url('search') ?>" method="get">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6 6 0 1 0 14 15.5l.27.28v.79L20 21.5 21.5 20l-6-6zm-5.5 0a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="currentColor"/></svg>
+                                <span class="nav-search-icon">
+                                    <i class="fas fa-search"></i>
+                                </span>
                                 <input type="text" name="q" placeholder="Zoek lijsten..." autocomplete="off" value="<?= esc($query ?? '') ?>">
                                 <button type="submit">
                                     <span>Zoeken</span>
@@ -699,24 +707,41 @@
         document.addEventListener('DOMContentLoaded', function () {
             const navCollapse = document.getElementById('landingNavCollapse');
             const navBackdrop = document.getElementById('landingNavBackdrop');
+            const navToggle = document.querySelector('.landing-nav-toggle');
+            const navClose = document.querySelector('.landing-close-btn');
 
-            if (navCollapse && navBackdrop) {
-                navCollapse.addEventListener('shown.bs.collapse', function () {
-                    navBackdrop.classList.add('active');
-                    document.body.classList.add('nav-open');
-                });
+            function openNav() {
+                navCollapse.classList.add('show');
+                navBackdrop.classList.add('active');
+                document.body.classList.add('nav-open');
+            }
 
-                navCollapse.addEventListener('hidden.bs.collapse', function () {
-                    navBackdrop.classList.remove('active');
-                    document.body.classList.remove('nav-open');
-                });
+            function closeNav() {
+                navCollapse.classList.remove('show');
+                navBackdrop.classList.remove('active');
+                document.body.classList.remove('nav-open');
+            }
 
-                navBackdrop.addEventListener('click', function () {
-                    const instance = bootstrap.Collapse.getInstance(navCollapse);
-                    if (instance) {
-                        instance.hide();
+            if (navToggle) {
+                navToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (navCollapse.classList.contains('show')) {
+                        closeNav();
+                    } else {
+                        openNav();
                     }
                 });
+            }
+
+            if (navClose) {
+                navClose.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    closeNav();
+                });
+            }
+
+            if (navBackdrop) {
+                navBackdrop.addEventListener('click', closeNav);
             }
         });
     </script>

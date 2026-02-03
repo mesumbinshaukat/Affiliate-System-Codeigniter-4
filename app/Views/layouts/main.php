@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="<?= base_url('public/vendor/fontawesome/all.min.css') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -696,14 +696,13 @@
                 overflow-y: auto;
                 box-shadow: -18px 0 50px rgba(5, 9, 26, 0.6);
                 transform: translateX(100%);
-                transition: transform 0.3s ease;
+                transition: transform 0.25s ease;
                 z-index: 1051;
-                width: 80vw;
+                display: none;
             }
 
-            .nav-collapse.collapsing,
             .nav-collapse.show {
-                display: block !important;
+                display: block;
                 transform: translateX(0);
             }
 
@@ -1019,13 +1018,13 @@
                     <span class="brand-mark">R</span>
                     Remcom
                 </a>
-                <button class="nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavCollapse" aria-controls="mainNavCollapse" aria-expanded="false" aria-label="Navigatie wisselen">
+                <button class="nav-toggle" type="button" aria-label="Navigatie wisselen">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
-            <div class="nav-collapse collapse" id="mainNavCollapse">
+            <div class="nav-collapse" id="mainNavCollapse">
                 <div class="d-lg-none d-flex justify-content-end mb-4">
-                    <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavCollapse" aria-label="Sluiten">
+                    <button class="btn btn-outline-light btn-sm" type="button" aria-label="Sluiten">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -1152,24 +1151,41 @@
         document.addEventListener('DOMContentLoaded', function () {
             const navCollapse = document.getElementById('mainNavCollapse');
             const navBackdrop = document.getElementById('mainNavBackdrop');
+            const navToggle = document.querySelector('.nav-toggle');
+            const navClose = document.querySelector('#mainNavCollapse .btn-outline-light');
 
-            if (navCollapse && navBackdrop) {
-                navCollapse.addEventListener('shown.bs.collapse', function () {
-                    navBackdrop.classList.add('active');
-                    document.body.classList.add('nav-open');
-                });
+            function openNav() {
+                navCollapse.classList.add('show');
+                navBackdrop.classList.add('active');
+                document.body.classList.add('nav-open');
+            }
 
-                navCollapse.addEventListener('hidden.bs.collapse', function () {
-                    navBackdrop.classList.remove('active');
-                    document.body.classList.remove('nav-open');
-                });
+            function closeNav() {
+                navCollapse.classList.remove('show');
+                navBackdrop.classList.remove('active');
+                document.body.classList.remove('nav-open');
+            }
 
-                navBackdrop.addEventListener('click', function () {
-                    const instance = bootstrap.Collapse.getInstance(navCollapse);
-                    if (instance) {
-                        instance.hide();
+            if (navToggle) {
+                navToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (navCollapse.classList.contains('show')) {
+                        closeNav();
+                    } else {
+                        openNav();
                     }
                 });
+            }
+
+            if (navClose) {
+                navClose.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    closeNav();
+                });
+            }
+
+            if (navBackdrop) {
+                navBackdrop.addEventListener('click', closeNav);
             }
         });
 

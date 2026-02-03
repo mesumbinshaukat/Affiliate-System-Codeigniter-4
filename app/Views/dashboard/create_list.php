@@ -13,7 +13,7 @@
                     <form method="post" action="<?= base_url('dashboard/list/create') ?>">
                         <div class="mb-3">
                             <label for="title" class="form-label">Lijsttitel *</label>
-                            <input type="text" class="form-control" id="title" name="title" value="<?= old('title') ?>" required>
+                            <input type="text" class="form-control" id="title" name="title" value="<?= old('title') ?>" placeholder="Bijv. Mijn Verlanglijstje 2025" required>
                         </div>
 
                         <div class="mb-3">

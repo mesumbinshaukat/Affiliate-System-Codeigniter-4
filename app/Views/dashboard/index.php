@@ -17,15 +17,6 @@
                         <small>Start direct en deel hem meteen</small>
                     </div>
                 </a>
-                <a href="<?= base_url('dashboard/analytics') ?>" class="hero-btn hero-btn-ghost">
-                    <span class="hero-btn-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </span>
-                    <div>
-                        <strong>Bekijk Analytics</strong>
-                        <small>Ontdek trends en prestaties</small>
-                    </div>
-                </a>
             </div>
         </div>
     </div>
@@ -73,10 +64,10 @@
             </a>
         </div>
         <div class="col-md-3 col-6">
-            <a href="<?= base_url('dashboard/analytics') ?>" class="card text-center text-decoration-none h-100">
+            <a href="<?= base_url('dashboard/list/create') ?>" class="card text-center text-decoration-none h-100" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <i class="fas fa-chart-line fa-3x mb-3" style="color: var(--primary-color);"></i>
-                    <h5>Analytica</h5>
+                    <i class="fas fa-gift fa-3x mb-3"></i>
+                    <h5>Maak Een Verlanglijstje Aan</h5>
                 </div>
             </a>
         </div>

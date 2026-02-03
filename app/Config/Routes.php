@@ -106,9 +106,6 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     $routes->post('section/delete', 'Dashboard::deleteSection');
     $routes->post('product/move-to-section', 'Dashboard::moveProductToSection');
     
-    // Analytics
-    $routes->get('analytics', 'Dashboard::analytics');
-    
     // Purchased Products
     $routes->get('purchased', 'Dashboard::purchasedProducts');
     

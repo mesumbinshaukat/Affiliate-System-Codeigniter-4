@@ -91,6 +91,31 @@ $blogImages = [
         color: #fff;
     }
 
+    .hero-cta .btn-success,
+    .steps-cta,
+    .why-cta {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border: 1px solid #28a745;
+        box-shadow: 0 18px 40px rgba(40, 167, 69, 0.35);
+        color: #fff;
+        border-radius: 999px;
+        padding: 0.95rem 1.9rem;
+        font-weight: 600;
+        min-width: 230px;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .hero-cta .btn-success:hover,
+    .steps-cta:hover,
+    .why-cta:hover {
+        background: linear-gradient(135deg, #218838, #1aa179);
+        box-shadow: 0 20px 45px rgba(40, 167, 69, 0.45);
+        transform: translateY(-2px);
+    }
+
     .hero-cta .btn-outline {
         border: 2px solid #3479CD;
         /* background: rgba(255,255,255,0.65); */
@@ -677,7 +702,7 @@ $blogImages = [
                 </div>
             </div>
         </div>
-        <a href="<?= base_url('register') ?>" class="steps-cta mt-4">Maak Een Verlanglijstje Aan</a>
+        <a href="<?= base_url('register') ?>" class="btn btn-success steps-cta mt-4">Maak Een Verlanglijstje Aan</a>
     </div>
 </section>
 
@@ -688,7 +713,7 @@ $blogImages = [
                 <h2 class="section-heading">Waarom Mensen Graag Remcom Gebruiken</h2>
                 <p class="why-copy">Remcom gebruikt een volledig willekeurig systeem om mensen binnen je groep te matchen, waardoor elke trekking eerlijk en onpartijdig is. Zodra iedereen zich heeft aangemeld, worden de lotingen automatisch uitgevoerd, waardoor er geen handmatige selectie plaatsvindt en er geen kans is op voorkeursbeleid.</p>
                 <p class="why-copy mt-3">Aan elke deelnemer wordt willekeurig één persoon toegewezen, waardoor het proces eenvoudig en transparant blijft. Privacy staat centraal. Elke match wordt alleen getoond aan de persoon die deze moet zien.</p>
-                <a href="<?= base_url('register') ?>" class="why-cta mt-3">Maak Een Verlanglijstje Aan</a>
+                <a href="<?= base_url('register') ?>" class="btn btn-success why-cta mt-3">Maak Een Verlanglijstje Aan</a>
             </div>
             <div class="col-lg-6">
                 <div class="why-stack">
