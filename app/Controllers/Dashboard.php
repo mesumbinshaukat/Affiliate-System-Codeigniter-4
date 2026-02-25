@@ -461,13 +461,14 @@ class Dashboard extends BaseController
             $listId = $this->request->getPost('list_id');
             $productId = $this->request->getPost('product_id');
             $productData = $this->request->getPost('product');
+            $manualUpload = $this->request->getPost('manual_upload');
             $sectionId = $this->request->getPost('section_id');
             if ($sectionId === '' || $sectionId === false) {
                 $sectionId = null;
             }
 
             // Validate required fields
-            if (empty($listId) || (empty($productId) && empty($productData))) {
+            if (empty($listId) || (empty($productId) && empty($productData) && empty($manualUpload))) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Missing required fields',
@@ -487,9 +488,76 @@ class Dashboard extends BaseController
             }
 
             $productModel = new ProductModel();
-            
+            $product = null;
+
+            if (!empty($manualUpload)) {
+                $manualName = trim($this->request->getPost('manual_name') ?? '');
+                $manualPriceRaw = $this->request->getPost('manual_price');
+                $manualImage = $this->request->getFile('manual_image');
+
+                if (empty($manualName)) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Productnaam is verplicht',
+                    ]);
+                }
+
+                if (!$manualImage || !$manualImage->isValid()) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Geldige productafbeelding is verplicht',
+                    ]);
+                }
+
+                $allowedExtensions = ['png', 'jpg', 'jpeg', 'svg', 'webp'];
+                $extension = strtolower($manualImage->getClientExtension());
+                if (!in_array($extension, $allowedExtensions, true)) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Ongeldig bestandsformaat. Toegestaan: WEBP, SVG, PNG, JPEG, JPG',
+                    ]);
+                }
+
+                $uploadDir = FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'manual-products';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+                $newName = 'manual_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $extension;
+                try {
+                    $manualImage->move($uploadDir, $newName, true);
+                } catch (\Throwable $e) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Uploaden van afbeelding mislukt',
+                    ])->setStatusCode(500);
+                }
+
+                $imageUrl = base_url('uploads/manual-products/' . $newName);
+                $priceValue = 0;
+                if ($manualPriceRaw !== null && $manualPriceRaw !== '') {
+                    $priceValue = (float) str_replace(',', '.', $manualPriceRaw);
+                    if ($priceValue < 0) {
+                        $priceValue = 0;
+                    }
+                }
+
+                $externalId = 'manual_' . $this->session->get('user_id') . '_' . time() . '_' . bin2hex(random_bytes(3));
+                $fallbackLink = base_url('manual-product/' . $externalId);
+                $productData = [
+                    'external_id' => $externalId,
+                    'title' => $manualName,
+                    'description' => '',
+                    'image_url' => $imageUrl,
+                    'price' => $priceValue,
+                    'affiliate_url' => $fallbackLink,
+                    'source' => 'manual',
+                    'ean' => '',
+                ];
+            }
+
             // If product_id is provided directly, use it (for suggested products)
-            if (!empty($productId)) {
+            if (!empty($productId) && empty($manualUpload)) {
                 // Verify product exists
                 $product = $productModel->find($productId);
                 if (!$product) {
@@ -499,25 +567,36 @@ class Dashboard extends BaseController
                     ]);
                 }
             } else {
-                // Handle new product from search
-                $product = null;
-
-                if (!empty($productData['external_id'])) {
-                    $product = $productModel->findByExternalId($productData['external_id'], $productData['source']);
+                if (empty($manualUpload)) {
+                    if (!empty($productData['external_id'])) {
+                        $product = $productModel->findByExternalId($productData['external_id'], $productData['source']);
+                    }
                 }
 
                 // Create product if not exists
                 if (!$product) {
-                    // Validate product data
-                    if (empty($productData['title']) || empty($productData['affiliate_url'])) {
+                    $requiresAffiliate = empty($manualUpload);
+                    if (empty($productData['title']) || ($requiresAffiliate && empty($productData['affiliate_url']))) {
                         return $this->response->setJSON([
                             'success' => false,
                             'message' => 'Product title and affiliate URL are required',
                         ]);
                     }
-                    
-                    $productModel->insert($productData);
+
+                    if (!$productModel->insert($productData, true)) {
+                        log_message('error', 'Failed to create product: ' . implode('; ', $productModel->errors() ?? []));
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => 'Product kon niet worden opgeslagen. Controleer de invoer en probeer opnieuw.',
+                        ])->setStatusCode(500);
+                    }
                     $productId = $productModel->getInsertID();
+                    if (!$productId) {
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => 'Product kon niet worden opgeslagen. Probeer het later opnieuw.',
+                        ])->setStatusCode(500);
+                    }
                 } else {
                     $productId = $product['id'];
                 }

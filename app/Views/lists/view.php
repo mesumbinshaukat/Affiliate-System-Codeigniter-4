@@ -691,13 +691,16 @@
                             <?php foreach ($section['products'] as $product): ?>
                                 <?php 
                                     $isClaimed = !empty($product['claimed_at']);
-                                    $productUrl = base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']);
+                                    $isManualProduct = strtolower($product['source'] ?? '') === 'manual';
+                                    $productUrl = !$isManualProduct
+                                        ? base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id'])
+                                        : null;
+                                    $cardAttributes = $isManualProduct
+                                        ? ''
+                                        : ' data-affiliate-url="' . esc($productUrl) . '" role="link" tabindex="0"';
                                 ?>
                                 <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>"
-                                     data-list-product-id="<?= $product['list_product_id'] ?>"
-                                     data-affiliate-url="<?= esc($productUrl) ?>"
-                                     role="link"
-                                     tabindex="0">
+                                     data-list-product-id="<?= $product['list_product_id'] ?>"<?= $cardAttributes ?>>
                         <?php if ($isClaimed): ?>
                             <span class="claimed-badge">
                                 <i class="fas fa-check-circle"></i> Gekocht
@@ -743,13 +746,23 @@
                             <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
                             
                             <div class="list-product-card__actions d-grid gap-2">
-                                <a href="<?= $productUrl ?>" 
-                                   class="btn-product-action btn-product-action--primary w-100" 
-                                   target="_blank"
-                                   title="Bekijk product in winkel">
-                                    <i class="fas fa-external-link-alt"></i>
-                                    <span>Product Bekijken</span>
-                                </a>
+                                <?php if ($isManualProduct): ?>
+                                    <button type="button"
+                                            class="btn-product-action btn-product-action--primary w-100 disabled"
+                                            disabled
+                                            title="Dit is een handmatig toegevoegd product">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Product Bekijken</span>
+                                    </button>
+                                <?php else: ?>
+                                    <a href="<?= $productUrl ?>" 
+                                       class="btn-product-action btn-product-action--primary w-100" 
+                                       target="_blank"
+                                       title="Bekijk product in winkel">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Product Bekijken</span>
+                                    </a>
+                                <?php endif; ?>
                                 <?php if (!empty($list['is_crossable'])): ?>
                                     <?php if ($isClaimed): ?>
                                         <button class="btn-product-action btn-product-action--undo w-100"
@@ -767,12 +780,14 @@
                                         </button>
                                     <?php endif; ?>
                                 <?php endif; ?>
-                                <button class="btn-product-action btn-product-action--link w-100"
-                                        onclick="copyAffiliateLink('<?= $productUrl ?>')"
-                                        title="Kopieer affiliate link om te delen">
-                                    <i class="fas fa-share-alt"></i>
-                                    <span>Link Delen</span>
-                                </button>
+                                <?php if (!$isManualProduct): ?>
+                                    <button class="btn-product-action btn-product-action--link w-100"
+                                            onclick="copyAffiliateLink('<?= $productUrl ?>')"
+                                            title="Kopieer affiliate link om te delen">
+                                        <i class="fas fa-share-alt"></i>
+                                        <span>Link Delen</span>
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -787,13 +802,16 @@
                             <?php foreach ($noSectionProducts as $product): ?>
                                 <?php 
                                     $isClaimed = !empty($product['claimed_at']);
-                                    $productUrl = base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']);
+                                    $isManualProduct = strtolower($product['source'] ?? '') === 'manual';
+                                    $productUrl = !$isManualProduct
+                                        ? base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id'])
+                                        : null;
+                                    $cardAttributes = $isManualProduct
+                                        ? ''
+                                        : ' data-affiliate-url="' . esc($productUrl) . '" role="link" tabindex="0"';
                                 ?>
                                 <div class="list-product-card <?= $isClaimed ? 'list-product-card--claimed' : '' ?>"
-                                     data-list-product-id="<?= $product['list_product_id'] ?>"
-                                     data-affiliate-url="<?= esc($productUrl) ?>"
-                                     role="link"
-                                     tabindex="0">
+                                     data-list-product-id="<?= $product['list_product_id'] ?>"<?= $cardAttributes ?>>
                         <?php if ($isClaimed): ?>
                             <span class="claimed-badge">
                                 <i class="fas fa-check-circle"></i> Gekocht
@@ -839,13 +857,23 @@
                             <?= view('partials/group_gift_contribution', ['product' => $product]) ?>
                             
                             <div class="list-product-card__actions d-grid gap-2">
-                                <a href="<?= base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>" 
-                                   class="btn-product-action btn-product-action--primary w-100" 
-                                   target="_blank"
-                                   title="Bekijk product in winkel">
-                                    <i class="fas fa-external-link-alt"></i>
-                                    <span>Product Bekijken</span>
-                                </a>
+                                <?php if ($isManualProduct): ?>
+                                    <button type="button"
+                                            class="btn-product-action btn-product-action--primary w-100 disabled"
+                                            disabled
+                                            title="Dit is een handmatig toegevoegd product">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Product Bekijken</span>
+                                    </button>
+                                <?php else: ?>
+                                    <a href="<?= $productUrl ?>" 
+                                       class="btn-product-action btn-product-action--primary w-100" 
+                                       target="_blank"
+                                       title="Bekijk product in winkel">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Product Bekijken</span>
+                                    </a>
+                                <?php endif; ?>
                                 <?php if (!empty($list['is_crossable'])): ?>
                                     <?php if ($isClaimed): ?>
                                         <button class="btn-product-action btn-product-action--undo w-100"
@@ -863,12 +891,14 @@
                                         </button>
                                     <?php endif; ?>
                                 <?php endif; ?>
-                                <button class="btn-product-action btn-product-action--link w-100"
-                                        onclick="copyAffiliateLink('<?= base_url('out/' . $product['product_id'] . '?list=' . $list['id'] . '&lp=' . $product['list_product_id']) ?>')"
-                                        title="Kopieer affiliate link om te delen">
-                                    <i class="fas fa-share-alt"></i>
-                                    <span>Link Delen</span>
-                                </button>
+                                <?php if (!$isManualProduct): ?>
+                                    <button class="btn-product-action btn-product-action--link w-100"
+                                            onclick="copyAffiliateLink('<?= $productUrl ?>')"
+                                            title="Kopieer affiliate link om te delen">
+                                        <i class="fas fa-share-alt"></i>
+                                        <span>Link Delen</span>
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

@@ -7,7 +7,7 @@
         <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= base_url('products/categories') ?>">Categories</a></li>
+                    <li class="breadcrumb-item"><a href="<?= base_url('products/categories') ?>">Categorieën</a></li>
                     <li class="breadcrumb-item active" aria-current="page"><?= esc($category['name']) ?></li>
                 </ol>
             </nav>
@@ -47,11 +47,11 @@
                             <div class="d-flex gap-2 mb-2">
                                 <a href="<?= base_url('out/' . $product['id']) ?>" 
                                    class="btn btn-primary flex-grow-1" target="_blank">
-                                    View Product <i class="fas fa-external-link-alt"></i>
+                                    Product bekijken <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 <button class="btn btn-outline-secondary" 
                                         onclick="copyAffiliateLink('<?= base_url('out/' . $product['id']) ?>')"
-                                        title="Copy Affiliate Link">
+                                        title="Affiliate-link kopiëren">
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </div>
@@ -59,7 +59,7 @@
                             <small class="text-muted d-block">
                                 <i class="fas fa-store"></i> <?= esc($product['source']) ?>
                                 <?php if (isset($product['list_count']) && $product['list_count'] > 0): ?>
-                                    | <i class="fas fa-list"></i> In <?= $product['list_count'] ?> list(s)
+                                    | <i class="fas fa-list"></i> In <?= $product['list_count'] ?> lijst(en)
                                 <?php endif; ?>
                             </small>
                         </div>
@@ -69,7 +69,7 @@
         <?php else: ?>
             <div class="col-12">
                 <div class="alert alert-info">
-                    No products found in this category yet.
+                    Nog geen producten gevonden in deze categorie.
                 </div>
             </div>
         <?php endif; ?>
@@ -95,14 +95,14 @@ function copyAffiliateLink(url) {
         const toast = document.createElement('div');
         toast.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3';
         toast.style.zIndex = '9999';
-        toast.innerHTML = '<i class="fas fa-check"></i> Product link copied! Share it to help others discover this product.';
+        toast.innerHTML = '<i class="fas fa-check"></i> Productlink gekopieerd! Deel deze link zodat anderen dit product ook ontdekken.';
         document.body.appendChild(toast);
         
         setTimeout(() => {
             toast.remove();
         }, 3000);
     }, function(err) {
-        alert('Failed to copy link. Please try again.');
+        alert('Kopiëren mislukt. Probeer het opnieuw.');
         console.error('Could not copy text: ', err);
     });
 }

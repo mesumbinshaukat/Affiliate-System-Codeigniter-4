@@ -433,11 +433,14 @@
                             <?php endif; ?>
                             
                             <!-- Manual Scrape Toggle -->
-                            <div class="form-check form-switch mb-2">
-                                <input class="form-check-input" type="checkbox" id="scrapeToggle" onchange="toggleScrapeMode(this.checked)">
-                                <label class="form-check-label" for="scrapeToggle">
-                                    Product handmatig toevoegen via URL
-                                </label>
+                            <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="scrapeToggle" onchange="toggleScrapeMode(this.checked)">
+                                    <label class="form-check-label" for="scrapeToggle">
+                                        Product handmatig toevoegen via URL
+                                    </label>
+                                </div>
+                                <span class="text-muted small">Gebruik deze optie om een product van een externe website te scrapen.</span>
                             </div>
                             
                             <div class="input-group mb-3 d-none" id="scrapeUrlGroup">
@@ -448,7 +451,49 @@
                             </div>
                             
                             <div id="scrapeResult" class="mb-3"></div>
-                            
+
+                            <div id="manualUploadCard" class="card card-light border-0 shadow-sm mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="manual-upload-icon rounded-circle bg-soft-primary text-primary me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Eigen product toevoegen</h6>
+                                            <small class="text-muted">Voeg een volledig handmatig product toe met naam, prijs en afbeelding.</small>
+                                        </div>
+                                    </div>
+                                    <form id="manualProductForm" enctype="multipart/form-data">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold" for="manualProductName">Productnaam *</label>
+                                            <input type="text" class="form-control" id="manualProductName" name="manual_name" placeholder="Bijv. Handgemaakte kaars" maxlength="255" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold" for="manualProductPrice">Prijs (EUR)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">€</span>
+                                                <input type="number" step="0.01" min="0" class="form-control" id="manualProductPrice" name="manual_price" placeholder="0,00">
+                                            </div>
+                                            <small class="text-muted">Gebruik een punt of komma voor centen.</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold" for="manualProductImage">Productafbeelding *</label>
+                                            <input type="file" class="form-control" id="manualProductImage" name="manual_image" accept=".webp,.svg,.png,.jpeg,.jpg" required>
+                                            <small class="text-muted">Toegestane bestanden: WEBP, SVG, PNG, JPEG, JPG.</small>
+                                        </div>
+                                        <div class="alert alert-light border mb-3">
+                                            <small class="text-muted">
+                                                Producten worden standaard toegevoegd aan de geselecteerde sectie hierboven.
+                                            </small>
+                                        </div>
+                                        <button type="button" class="btn btn-success w-100" id="manualUploadBtn" onclick="submitManualProduct()">
+                                            <i class="fas fa-plus-circle"></i> Handmatig product toevoegen
+                                        </button>
+                                    </form>
+                                    <div id="manualUploadResult" class="mt-3"></div>
+                                </div>
+                            </div>
+
                             <!-- Filters Section (Hidden by default, shown after search) -->
                             <div class="card card-light mb-3 d-none" id="filtersContainer">
                                 <div class="card-body">
@@ -859,6 +904,99 @@ function updateCategoryFilter(categories) {
     if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
         select.value = currentValue;
     }
+}
+
+function submitManualProduct() {
+    const form = document.getElementById('manualProductForm');
+    const nameInput = document.getElementById('manualProductName');
+    const imageInput = document.getElementById('manualProductImage');
+    const priceInput = document.getElementById('manualProductPrice');
+    const sectionSelect = document.getElementById('defaultSectionSelect');
+    const button = document.getElementById('manualUploadBtn');
+    const resultContainer = document.getElementById('manualUploadResult');
+
+    if (!form || !nameInput || !imageInput) {
+        showToast('Handmatig uploadformulier niet gevonden.', 'error');
+        return;
+    }
+
+    const productName = nameInput.value.trim();
+    const imageFile = imageInput.files[0];
+
+    if (!productName) {
+        showToast('Productnaam is verplicht.', 'warning');
+        nameInput.focus();
+        return;
+    }
+
+    if (!imageFile) {
+        showToast('Selecteer een productafbeelding.', 'warning');
+        imageInput.focus();
+        return;
+    }
+
+    const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+    if (imageFile.type && !allowedMimeTypes.includes(imageFile.type.toLowerCase())) {
+        showToast('Ongeldig bestandsformaat. Gebruik PNG, JPG, SVG of WEBP.', 'warning');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('list_id', listId);
+    formData.append('manual_upload', '1');
+    formData.append('manual_name', productName);
+    formData.append('manual_image', imageFile);
+
+    if (priceInput && priceInput.value) {
+        formData.append('manual_price', priceInput.value);
+    }
+
+    if (sectionSelect) {
+        formData.append('section_id', sectionSelect.value || '');
+    }
+
+    button.disabled = true;
+    const originalHtml = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Opslaan...';
+    resultContainer.innerHTML = '';
+
+    fetch('<?= base_url('dashboard/product/add') ?>', {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Product handmatig toegevoegd!', 'success');
+                form.reset();
+                resultContainer.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> Product toegevoegd aan je lijst.
+                    </div>
+                `;
+                refreshProductList();
+            } else {
+                showToast(data.message || 'Toevoegen mislukt.', 'error');
+                resultContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-triangle-exclamation"></i> ${escapeHtml(data.message || 'Toevoegen mislukt.')}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Manual upload error:', error);
+            showToast('Onverwachte fout bij uploaden.', 'error');
+            resultContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-triangle-exclamation"></i> Onverwachte fout bij uploaden.
+                </div>
+            `;
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        });
 }
 
 // Render search results with checkboxes
@@ -1280,7 +1418,7 @@ function addSingleProduct(product, triggerBtn = null) {
             }
         } catch (e) {
             console.error('Invalid JSON response:', text);
-            showToast('Error bij toevoegen product', 'error');
+            showToast('Fout bij toevoegen van product', 'error');
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -1289,7 +1427,7 @@ function addSingleProduct(product, triggerBtn = null) {
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('Error bij toevoegen product', 'error');
+        showToast('Fout bij toevoegen van product', 'error');
         if (btn) {
             btn.disabled = false;
             btn.innerHTML = originalHtml;
@@ -1427,7 +1565,7 @@ function updateProductListUI(products) {
 }
 
 function removeProduct(productId) {
-    if (!confirm('Are you sure you want to remove this product?')) return;
+    if (!confirm('Weet je zeker dat je dit product wilt verwijderen?')) return;
 
     // Show loading state on the product card
     const productCard = document.querySelector(`[data-product-id="${productId}"]`);

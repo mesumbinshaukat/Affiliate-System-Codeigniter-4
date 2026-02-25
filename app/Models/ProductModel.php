@@ -28,7 +28,7 @@ class ProductModel extends Model
     // Validation
     protected $validationRules = [
         'title' => 'required|min_length[3]|max_length[255]',
-        'affiliate_url' => 'required|valid_url',
+        'affiliate_url' => 'permit_empty|valid_url',
     ];
 
     protected $validationMessages = [];

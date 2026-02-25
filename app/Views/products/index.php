@@ -5,8 +5,8 @@
 <div class="container my-5">
     <div class="row mb-4">
         <div class="col">
-            <h1>Browse Products</h1>
-            <p class="text-muted">Discover products from our curated lists</p>
+            <h1>Producten bekijken</h1>
+            <p class="text-muted">Ontdek producten uit onze samengestelde lijsten</p>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
             <div class="btn-group" role="group">
                 <a href="<?= base_url('products') ?>" 
                    class="btn <?= !$selectedCategory ? 'btn-primary' : 'btn-outline-primary' ?>">
-                    All Products
+                    Alle producten
                 </a>
                 <?php foreach ($categories as $category): ?>
                     <a href="<?= base_url('products?category=' . $category['id']) ?>" 
@@ -55,11 +55,11 @@
                             <div class="d-flex gap-2 mb-2">
                                 <a href="<?= base_url('out/' . $product['id']) ?>" 
                                    class="btn btn-primary flex-grow-1" target="_blank">
-                                    View Product <i class="fas fa-external-link-alt"></i>
+                                    Product bekijken <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 <button class="btn btn-outline-secondary" 
                                         onclick="copyAffiliateLink('<?= base_url('out/' . $product['id']) ?>')"
-                                        title="Copy Affiliate Link">
+                                        title="Affiliate-link kopiëren">
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </div>
@@ -67,7 +67,7 @@
                             <small class="text-muted d-block">
                                 <i class="fas fa-store"></i> <?= esc($product['source']) ?>
                                 <?php if (isset($product['list_count']) && $product['list_count'] > 0): ?>
-                                    | <i class="fas fa-list"></i> In <?= $product['list_count'] ?> list(s)
+                                    | <i class="fas fa-list"></i> In <?= $product['list_count'] ?> lijst(en)
                                 <?php endif; ?>
                             </small>
                         </div>
@@ -77,7 +77,7 @@
         <?php else: ?>
             <div class="col-12">
                 <div class="alert alert-info">
-                    No products found. Try selecting a different category.
+                    Geen producten gevonden. Probeer een andere categorie te kiezen.
                 </div>
             </div>
         <?php endif; ?>
@@ -103,14 +103,14 @@ function copyAffiliateLink(url) {
         const toast = document.createElement('div');
         toast.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3';
         toast.style.zIndex = '9999';
-        toast.innerHTML = '<i class="fas fa-check"></i> Product link copied! Share it to help others discover this product.';
+        toast.innerHTML = '<i class="fas fa-check"></i> Productlink gekopieerd! Deel deze link zodat anderen dit product ook kunnen vinden.';
         document.body.appendChild(toast);
         
         setTimeout(() => {
             toast.remove();
         }, 3000);
     }, function(err) {
-        alert('Failed to copy link. Please try again.');
+        alert('Kopiëren mislukt. Probeer het opnieuw.');
         console.error('Could not copy text: ', err);
     });
 }
