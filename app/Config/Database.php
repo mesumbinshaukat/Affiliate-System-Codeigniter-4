@@ -30,6 +30,8 @@ class Database extends Config
         'numberNative' => false,
     ];
 
+    public array $tests = [];
+
     public function __construct()
     {
         parent::__construct();
@@ -52,6 +54,16 @@ class Database extends Config
         }
         if (getenv('database.default.port') !== false) {
             $this->default['port'] = (int) getenv('database.default.port');
+        }
+
+        $this->tests = $this->default;
+        $this->tests['database'] = getenv('database.tests.database') !== false
+            ? getenv('database.tests.database')
+            : ($this->default['database'] . '_test');
+        $this->tests['DBDebug'] = false;
+
+        if (defined('ENVIRONMENT') && ENVIRONMENT === 'testing') {
+            $this->defaultGroup = 'tests';
         }
     }
 }

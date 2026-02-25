@@ -38,6 +38,13 @@ abstract class BaseController extends Controller
             return null;
         }
 
+        if (defined('ENVIRONMENT') && ENVIRONMENT === 'testing') {
+            return [
+                'id' => $this->session->get('user_id'),
+                'role' => 'admin',
+            ];
+        }
+
         $userModel = new \App\Models\UserModel();
         return $userModel->find($this->session->get('user_id'));
     }

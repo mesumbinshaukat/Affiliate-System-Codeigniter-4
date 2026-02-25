@@ -593,64 +593,69 @@ class Dashboard extends BaseController
 
         $apiBase = rtrim(getenv('SCRAPER_API_BASE') ?: '', '/');
         $apiKey = getenv('SCRAPER_API_KEY') ?: '';
-
-        if (empty($apiBase) || empty($apiKey)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Scraper configuratie ontbreekt. Neem contact op met de beheerder.',
-            ])->setStatusCode(500);
-        }
-
-        $client = Services::curlrequest([
-            'timeout' => 15,
-            'connect_timeout' => 8,
-            'http_errors' => false,
-        ]);
-
-        $endpoint = $apiBase . '/scrape?url=' . urlencode($url);
-        $maxAttempts = 2;
+        $externalEnabled = !empty($apiBase) && !empty($apiKey);
         $lastErrorMessage = 'Scrapen mislukt. Controleer de URL en probeer opnieuw.';
         $lastStatusCode = 500;
 
-        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-            try {
-                $response = $client->get($endpoint, [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $apiKey,
-                        'Accept' => 'application/json',
-                    ],
-                ]);
+        if ($externalEnabled) {
+            $client = Services::curlrequest([
+                'timeout' => 15,
+                'connect_timeout' => 8,
+                'http_errors' => false,
+            ]);
 
-                $status = $response->getStatusCode();
-                $body = json_decode($response->getBody(), true);
+            $endpoint = $apiBase . '/scrape?url=' . urlencode($url);
+            $maxAttempts = 2;
 
-                if ($status === 200 && !empty($body) && !empty($body['data'])) {
-                    $scrapedData = $body['data'];
-                    $product = $this->normalizeScrapedProduct($url, $scrapedData);
+            for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+                try {
+                    $response = $client->get($endpoint, [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $apiKey,
+                            'Accept' => 'application/json',
+                        ],
+                    ]);
 
-                    if (empty($product['title'])) {
-                        $lastErrorMessage = 'Kon geen productgegevens extraheren. Controleer of de pagina openbaar toegankelijk is.';
-                        $lastStatusCode = 422;
+                    $status = $response->getStatusCode();
+                    $body = json_decode($response->getBody(), true);
+
+                    if ($status === 200) {
+                        if (!empty($body) && !empty($body['data'])) {
+                            $scrapedData = $body['data'];
+                            $product = $this->normalizeScrapedProduct($url, $scrapedData);
+
+                            if (empty($product['title'])) {
+                                $lastErrorMessage = 'Kon geen productgegevens extraheren. Controleer of de pagina openbaar toegankelijk is.';
+                                $lastStatusCode = 422;
+                            } else {
+                                return $this->response->setJSON([
+                                    'success' => true,
+                                    'product' => $product,
+                                    'source' => 'scraper_hub',
+                                ]);
+                            }
+                        } else {
+                            $apiMessage = $body['message'] ?? ($body['error']['message'] ?? 'Scraper gaf geen productdata terug.');
+                            $lastErrorMessage = $apiMessage;
+                            $lastStatusCode = 503;
+                        }
                     } else {
-                        return $this->response->setJSON([
-                            'success' => true,
-                            'product' => $product,
-                            'source' => 'scraper_hub',
-                        ]);
+                        $lastErrorMessage = $body['error']['message'] ?? 'Scraper gaf een lege reactie terug.';
+                        $lastStatusCode = $status >= 400 ? $status : 500;
                     }
-                } else {
-                    $lastErrorMessage = $body['error']['message'] ?? 'Scraper gaf een lege reactie terug.';
-                    $lastStatusCode = $status >= 400 ? $status : 500;
+                } catch (\Throwable $e) {
+                    log_message('warning', 'Scrape attempt ' . $attempt . ' failed: ' . $e->getMessage());
+                    $lastErrorMessage = 'Onverwachte fout tijdens het scrapen.';
+                    $lastStatusCode = 500;
                 }
-            } catch (\Throwable $e) {
-                log_message('warning', 'Scrape attempt ' . $attempt . ' failed: ' . $e->getMessage());
-                $lastErrorMessage = 'Onverwachte fout tijdens het scrapen.';
-                $lastStatusCode = 500;
-            }
 
-            if ($attempt < $maxAttempts) {
-                usleep($attempt * 300000); // incremental backoff (0.3s, 0.6s, ...)
+                if ($attempt < $maxAttempts) {
+                    usleep($attempt * 300000); // incremental backoff (0.3s, 0.6s, ...)
+                }
             }
+        } else {
+            $lastErrorMessage = 'Externe scraperconfiguratie ontbreekt; gebruik fallback.';
+            log_message('warning', 'ScrapeProduct: external scraper disabled or misconfigured. Falling back for URL: ' . $url);
         }
 
         // Primary scraper failed: attempt local fallback
