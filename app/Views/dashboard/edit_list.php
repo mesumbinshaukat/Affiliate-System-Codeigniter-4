@@ -95,6 +95,87 @@
         box-shadow: 0 10px 24px rgba(9, 12, 34, 0.08);
     }
 
+    .price-slider-wrapper {
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 10px 14px;
+        background: linear-gradient(135deg, rgba(52, 121, 205, 0.04), rgba(83, 149, 230, 0.06));
+    }
+
+    .price-slider {
+        position: relative;
+        height: 26px;
+    }
+
+    .price-slider-track,
+    .price-slider-range {
+        position: absolute;
+        height: 6px;
+        border-radius: 999px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .price-slider-track {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.1);
+    }
+
+    .price-slider-range {
+        background: linear-gradient(120deg, #3479CD, #5D9BFF);
+    }
+
+    .price-slider input[type=range] {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        top: 0;
+        background: none;
+        pointer-events: none;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 26px;
+    }
+
+    .price-slider input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid var(--primary-color);
+        pointer-events: auto;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .price-slider input[type=range]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid var(--primary-color);
+        pointer-events: auto;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .price-slider-values {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.35rem;
+        font-weight: 600;
+    }
+
+    .price-chip {
+        background: #fff;
+        border-radius: 999px;
+        padding: 2px 12px;
+        font-size: 0.85rem;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        box-shadow: 0 6px 10px rgba(9, 12, 34, 0.08);
+    }
+
     /* Mobile-specific improvements */
     @media (max-width: 767.98px) {
         .personalized-item,
@@ -498,7 +579,7 @@
                             <div class="card card-light mb-3 d-none" id="filtersContainer">
                                 <div class="card-body">
                                     <h6 class="card-title mb-3"><i class="fas fa-filter"></i> Geavanceerde Filters</h6>
-                                    <div class="row g-2">
+                                    <div class="row g-3 align-items-end">
                                         <div class="col-md-4">
                                             <label class="form-label small fw-bold">Sorteren</label>
                                             <select class="form-select form-select-sm" id="sortSelect" onchange="applyFilters()">
@@ -509,15 +590,24 @@
                                                 <option value="RATING_DESC">Rating: Hoog naar Laag</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-2">
-                                            <label class="form-label small fw-bold">Min €</label>
-                                            <input type="number" class="form-control form-control-sm" id="minPrice" placeholder="0" min="0" onchange="applyFilters()">
+                                        <div class="col-md-5">
+                                            <label class="form-label small fw-bold">Prijsbereik (€)</label>
+                                            <div class="price-slider-wrapper">
+                                                <div class="price-slider">
+                                                    <div class="price-slider-track"></div>
+                                                    <div class="price-slider-range" id="priceSliderRange"></div>
+                                                    <input type="range" id="minPriceRange" min="0" max="9999" value="0" step="1" oninput="handlePriceRangeInput('min')">
+                                                    <input type="range" id="maxPriceRange" min="0" max="9999" value="9999" step="1" oninput="handlePriceRangeInput('max')">
+                                                </div>
+                                                <div class="price-slider-values">
+                                                    <span class="price-chip" id="minPriceDisplay">€0</span>
+                                                    <span class="price-chip" id="maxPriceDisplay">€9.999</span>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" id="minPrice" value="0">
+                                            <input type="hidden" id="maxPrice" value="9999">
                                         </div>
-                                        <div class="col-md-2">
-                                            <label class="form-label small fw-bold">Max €</label>
-                                            <input type="number" class="form-control form-control-sm" id="maxPrice" placeholder="9999" min="0" onchange="applyFilters()">
-                                        </div>
-                                        <div class="col-md-4 d-flex align-items-end">
+                                        <div class="col-md-3 d-flex align-items-end">
                                             <button class="btn btn-sm btn-outline-secondary w-100" onclick="resetFilters()">
                                                 <i class="fas fa-redo"></i> Reset Filters
                                             </button>
@@ -739,11 +829,24 @@ let priceRefinementId = null;
 let allFetchedProducts = []; // Store all fetched products for client-side filtering
 let manualScrapeMode = false;
 let scrapedProductData = null;
+const priceSliderConfig = {
+    defaultMin: 0,
+    defaultMax: 9999,
+    min: 0,
+    max: 9999,
+    minGap: 1,
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    setPriceSliderBounds(priceSliderConfig.defaultMin, priceSliderConfig.defaultMax);
+});
 
 // Apply filters to already-fetched products
-function applyFilters() {
+function applyFilters(showNoDataToast = true) {
     if (allFetchedProducts.length === 0) {
-        showToast('Voer eerst een zoekopdracht uit', 'warning');
+        if (showNoDataToast) {
+            showToast('Voer eerst een zoekopdracht uit', 'warning');
+        }
         return;
     }
     
@@ -755,18 +858,138 @@ function applyFilters() {
 // Reset all filters
 function resetFilters() {
     document.getElementById('sortSelect').value = 'RELEVANCE';
-    document.getElementById('minPrice').value = '';
-    document.getElementById('maxPrice').value = '';
+    setPriceSlider(priceSliderConfig.min, priceSliderConfig.max, false);
     currentPage = 1;
     renderFilteredProducts();
+}
+
+function setPriceSlider(minValue, maxValue, triggerFilters = true) {
+    const minSlider = document.getElementById('minPriceRange');
+    const maxSlider = document.getElementById('maxPriceRange');
+    if (!minSlider || !maxSlider) {
+        return;
+    }
+
+    const clampedMin = Math.max(priceSliderConfig.min, Math.min(minValue, priceSliderConfig.max));
+    const clampedMax = Math.min(priceSliderConfig.max, Math.max(maxValue, priceSliderConfig.min));
+    const adjustedMin = Math.min(clampedMin, clampedMax - priceSliderConfig.minGap);
+    const adjustedMax = Math.max(clampedMax, adjustedMin + priceSliderConfig.minGap);
+
+    minSlider.value = adjustedMin;
+    maxSlider.value = adjustedMax;
+    updatePriceSliderValues(adjustedMin, adjustedMax, triggerFilters);
+}
+
+function handlePriceRangeInput(changedThumb) {
+    const minSlider = document.getElementById('minPriceRange');
+    const maxSlider = document.getElementById('maxPriceRange');
+    let minValue = parseInt(minSlider.value, 10);
+    let maxValue = parseInt(maxSlider.value, 10);
+
+    if ((maxValue - minValue) < priceSliderConfig.minGap) {
+        if (changedThumb === 'min') {
+            minValue = maxValue - priceSliderConfig.minGap;
+            minSlider.value = minValue;
+        } else {
+            maxValue = minValue + priceSliderConfig.minGap;
+            maxSlider.value = maxValue;
+        }
+    }
+
+    updatePriceSliderValues(minValue, maxValue, true);
+}
+
+function updatePriceSliderValues(minValue, maxValue, triggerFilters = true) {
+    const hiddenMin = document.getElementById('minPrice');
+    const hiddenMax = document.getElementById('maxPrice');
+    const minDisplay = document.getElementById('minPriceDisplay');
+    const maxDisplay = document.getElementById('maxPriceDisplay');
+    const rangeFill = document.getElementById('priceSliderRange');
+    const minSlider = document.getElementById('minPriceRange');
+    const maxSlider = document.getElementById('maxPriceRange');
+
+    hiddenMin.value = minValue;
+    hiddenMax.value = maxValue;
+    if (minDisplay) {
+        minDisplay.textContent = formatEuro(minValue);
+    }
+    if (maxDisplay) {
+        maxDisplay.textContent = formatEuro(maxValue);
+    }
+
+    const sliderMin = parseInt(minSlider.min, 10);
+    const sliderMax = parseInt(maxSlider.max, 10);
+    const minPercent = ((minValue - sliderMin) / (sliderMax - sliderMin)) * 100;
+    const maxPercent = ((maxValue - sliderMin) / (sliderMax - sliderMin)) * 100;
+    if (rangeFill) {
+        rangeFill.style.left = `${minPercent}%`;
+        rangeFill.style.right = `${100 - maxPercent}%`;
+    }
+
+    if (triggerFilters) {
+        applyFilters(false);
+    }
+}
+
+function formatEuro(value) {
+    return `€${value.toLocaleString('nl-NL')}`;
+}
+
+function setPriceSliderBounds(minValue, maxValue) {
+    const minSlider = document.getElementById('minPriceRange');
+    const maxSlider = document.getElementById('maxPriceRange');
+    if (!minSlider || !maxSlider) {
+        return;
+    }
+
+    const sanitizedMin = Math.floor(Math.max(priceSliderConfig.defaultMin, minValue));
+    const sanitizedMax = Math.ceil(Math.max(sanitizedMin + priceSliderConfig.minGap, maxValue));
+
+    priceSliderConfig.min = sanitizedMin;
+    priceSliderConfig.max = sanitizedMax;
+
+    minSlider.min = sanitizedMin;
+    minSlider.max = sanitizedMax;
+    maxSlider.min = sanitizedMin;
+    maxSlider.max = sanitizedMax;
+
+    setPriceSlider(sanitizedMin, sanitizedMax, false);
+}
+
+function calculatePriceBounds(products) {
+    const prices = products
+        .map(product => parseFloat(product.price))
+        .filter(price => !isNaN(price) && price >= 0);
+
+    if (prices.length === 0) {
+        return {
+            min: priceSliderConfig.defaultMin,
+            max: priceSliderConfig.defaultMax,
+        };
+    }
+
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    if (minPrice === maxPrice) {
+        return {
+            min: Math.max(priceSliderConfig.defaultMin, Math.floor(minPrice) - 1),
+            max: Math.ceil(maxPrice) + 1,
+        };
+    }
+
+    return {
+        min: Math.floor(Math.min(minPrice, priceSliderConfig.defaultMin)),
+        max: Math.ceil(maxPrice),
+    };
 }
 
 // Filter products based on current filter values
 function getFilteredProducts() {
     let filtered = [...allFetchedProducts];
     
-    const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
-    const maxPrice = parseFloat(document.getElementById('maxPrice').value) || 99999;
+    const minPrice = parseFloat(document.getElementById('minPrice').value) || priceSliderConfig.min;
+    const maxPrice = parseFloat(document.getElementById('maxPrice').value) || priceSliderConfig.max;
     const sort = document.getElementById('sortSelect').value || 'RELEVANCE';
     
     // Apply price filter
@@ -853,14 +1076,15 @@ function searchProducts(page = 1) {
                 
                 // Reset filters to default
                 document.getElementById('sortSelect').value = 'RELEVANCE';
-                document.getElementById('minPrice').value = '';
-                document.getElementById('maxPrice').value = '';
+                const bounds = calculatePriceBounds(data.products);
+                setPriceSliderBounds(bounds.min, bounds.max);
                 currentPage = 1;
                 
                 // Render filtered products
                 renderFilteredProducts();
             } else {
                 allFetchedProducts = [];
+                setPriceSliderBounds(priceSliderConfig.defaultMin, priceSliderConfig.defaultMax);
                 document.getElementById('searchResults').innerHTML = `
                     <div class="alert alert-warning">
                         <i class="fas fa-info-circle"></i> Geen producten gevonden voor "<strong>${escapeHtml(query)}</strong>".
