@@ -1,6 +1,7 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<?php $showTour = session()->getFlashdata('show_tour'); ?>
 <style>
     .personalized-list,
     .search-results-list {
@@ -176,6 +177,88 @@
         box-shadow: 0 6px 10px rgba(9, 12, 34, 0.08);
     }
 
+    .guided-tour-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 10, 10, 0.4);
+        backdrop-filter: blur(2px);
+        z-index: 1045;
+        display: none;
+    }
+
+    .guided-tour-tooltip {
+        position: fixed;
+        background: rgba(255, 255, 255, 0.98);
+        color: #0b1533;
+        border-radius: 18px;
+        padding: 1.25rem;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+        width: min(320px, 80vw);
+        z-index: 1065;
+        display: none;
+        transition: transform 0.2s ease;
+    }
+
+    .guided-tour-tooltip::after {
+        content: '';
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background: rgba(255, 255, 255, 0.98);
+        transform: rotate(45deg);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .guided-tour-tooltip.top::after {
+        left: 50%;
+        bottom: -9px;
+        transform: translateX(-50%) rotate(45deg);
+    }
+
+    .guided-tour-tooltip.bottom::after {
+        left: 50%;
+        top: -9px;
+        transform: translateX(-50%) rotate(45deg);
+    }
+
+    .guided-tour-tooltip.left::after {
+        top: 50%;
+        right: -9px;
+        transform: translateY(-50%) rotate(45deg);
+    }
+
+    .guided-tour-tooltip.right::after {
+        top: 50%;
+        left: -9px;
+        transform: translateY(-50%) rotate(45deg);
+    }
+
+    .guided-tour-tooltip h5 {
+        margin-top: 0;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .guided-tour-tooltip p {
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .guided-tour-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.25rem;
+    }
+
+    .guided-tour-highlight {
+        position: relative;
+        z-index: 1052;
+        box-shadow: 0 0 0 4px rgba(52, 121, 205, 0.4);
+        border-radius: 0.35rem;
+        transition: box-shadow 0.2s ease;
+        pointer-events: none;
+    }
+
     /* Mobile-specific improvements */
     @media (max-width: 767.98px) {
         .personalized-item,
@@ -284,7 +367,7 @@
     <ul class="nav nav-tabs mb-4" id="listTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
-                <i class="fas fa-info-circle"></i> Details
+                <i class="fas fa-info-circle"></i> Instellingen
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -633,7 +716,10 @@
                             
                             <!-- Search Results -->
                             <div id="searchResults" class="mt-3"></div>
-                            
+                            <?php if ($showTour): ?>
+                                <div class="guided-tour-backdrop" id="guidedTourBackdrop"></div>
+                                <div class="guided-tour-tooltip" id="guidedTourTooltip"></div>
+                            <?php endif; ?>
                             <!-- Pagination -->
                             <div id="paginationContainer" class="mt-3 d-none">
                                 <nav>
@@ -836,9 +922,76 @@ const priceSliderConfig = {
     max: 9999,
     minGap: 1,
 };
+const showGuidedTour = <?= $showTour ? 'true' : 'false' ?>;
+const guidedTourSteps = [
+    {
+        selector: '#details-tab',
+        title: 'Instellingen',
+        text: 'Hier stel je de titel, beveiliging en herinneringen van je lijst in.',
+        placement: 'bottom',
+        tab: 'details',
+    },
+    {
+        selector: '#title',
+        title: 'Lijsttitel',
+        text: 'Geef je lijst een duidelijke naam zodat gasten meteen weten waar deze voor is.',
+        placement: 'right',
+        tab: 'details',
+    },
+    {
+        selector: '#protection_none',
+        title: 'Beveiliging',
+        text: 'Kies of de lijst publiek blijft of beschermd wordt met een wachtwoord of vraag.',
+        placement: 'right',
+        tab: 'details',
+    },
+    {
+        selector: '#products-tab',
+        title: 'Producten tab',
+        text: 'Hier zoek je naar producten, voeg je ze toe en beheer je je selectie.',
+        placement: 'bottom',
+        tab: 'products',
+    },
+    {
+        selector: '#productSearch',
+        title: 'Zoek producten',
+        text: 'Gebruik een trefwoord om Bol.com-producten te doorzoeken.',
+        placement: 'bottom',
+        tab: 'products',
+    },
+    {
+        selector: '#manualUploadCard',
+        title: 'Eigen product toevoegen',
+        text: 'Upload een afbeelding en vul naam, prijs en sectie in.',
+        placement: 'top',
+        tab: 'products',
+    },
+    {
+        selector: '#productList',
+        title: 'Jouw lijst',
+        text: 'Sleep producten, gebruik acties en houd je lijst up-to-date voor je gasten.',
+        placement: 'top',
+        tab: 'products',
+    },
+];
+const guidedTourTabs = {
+    details: {
+        linkId: 'details-tab',
+        paneId: 'details',
+    },
+    products: {
+        linkId: 'products-tab',
+        paneId: 'products',
+    },
+};
+let guidedTourStepIndex = 0;
+let guidedTourHighlightedElement = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     setPriceSliderBounds(priceSliderConfig.defaultMin, priceSliderConfig.defaultMax);
+    if (showGuidedTour) {
+        setTimeout(() => startGuidedTour(true), 300);
+    }
 });
 
 // Apply filters to already-fetched products
@@ -954,6 +1107,208 @@ function setPriceSliderBounds(minValue, maxValue) {
     maxSlider.max = sanitizedMax;
 
     setPriceSlider(sanitizedMin, sanitizedMax, false);
+}
+
+function startGuidedTour(forceShow = false) {
+    if (!forceShow && localStorage.getItem('guidedTourCompleted')) {
+        return;
+    }
+
+    const backdrop = document.getElementById('guidedTourBackdrop');
+    const tooltip = document.getElementById('guidedTourTooltip');
+    if (!backdrop || !tooltip || guidedTourSteps.length === 0) {
+        return;
+    }
+
+    backdrop.style.display = 'block';
+    tooltip.style.display = 'block';
+    guidedTourStepIndex = 0;
+    const initialTab = guidedTourSteps[0]?.tab;
+    if (initialTab && !isGuidedTabActive(initialTab)) {
+        activateGuidedTab(initialTab);
+        setTimeout(showGuidedTourStep, 200);
+    } else {
+        showGuidedTourStep();
+    }
+}
+
+function isGuidedTabActive(tabKey) {
+    const config = guidedTourTabs[tabKey];
+    if (!config) {
+        return true;
+    }
+
+    const link = document.getElementById(config.linkId);
+    const pane = document.getElementById(config.paneId);
+    return link?.classList.contains('active') && pane?.classList.contains('show');
+}
+
+function activateGuidedTab(tabKey) {
+    const config = guidedTourTabs[tabKey];
+    if (!config) {
+        return;
+    }
+
+    const link = document.getElementById(config.linkId);
+    if (!link) {
+        return;
+    }
+
+    if (isGuidedTabActive(tabKey)) {
+        return Promise.resolve();
+    }
+
+    return new Promise(resolve => {
+        let resolved = false;
+        const cleanup = () => {
+            if (resolved) {
+                return;
+            }
+            resolved = true;
+            link.removeEventListener('shown.bs.tab', handleShown);
+            resolve();
+        };
+
+        const handleShown = () => {
+            cleanup();
+        };
+
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+            link.addEventListener('shown.bs.tab', handleShown, { once: true });
+            const tabInstance = bootstrap.Tab.getOrCreateInstance(link);
+            tabInstance.show();
+        } else {
+            link.addEventListener('click', () => setTimeout(cleanup, 50), { once: true });
+            link.click();
+        }
+
+        setTimeout(cleanup, 500);
+    });
+}
+
+function showGuidedTourStep() {
+    const step = guidedTourSteps[guidedTourStepIndex];
+    const backdrop = document.getElementById('guidedTourBackdrop');
+    const tooltip = document.getElementById('guidedTourTooltip');
+
+    if (!step || !tooltip || !backdrop) {
+        return;
+    }
+
+    if (step.tab && !isGuidedTabActive(step.tab)) {
+        activateGuidedTab(step.tab).then(() => {
+            if (guidedTourSteps[guidedTourStepIndex] === step) {
+                showGuidedTourStep();
+            }
+        });
+        return;
+    }
+
+    const target = document.querySelector(step.selector);
+    if (!target) {
+        goToNextGuidedStep();
+        return;
+    }
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    clearPreviousHighlight();
+    guidedTourHighlightedElement = target;
+    target.classList.add('guided-tour-highlight');
+
+    tooltip.innerHTML = `
+        <h5>${step.title}</h5>
+        <p>${step.text}</p>
+        <div class="guided-tour-actions">
+            <button class="btn btn-outline-secondary btn-sm" id="guidedTourPrev" ${guidedTourStepIndex === 0 ? 'disabled' : ''}>Vorige</button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-danger btn-sm" id="guidedTourClose">Overslaan</button>
+                <button class="btn btn-primary btn-sm" id="guidedTourNext">${guidedTourStepIndex === guidedTourSteps.length - 1 ? 'Klaar' : 'Volgende'}</button>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('guidedTourPrev').addEventListener('click', goToPrevGuidedStep);
+    document.getElementById('guidedTourNext').addEventListener('click', goToNextGuidedStep);
+    document.getElementById('guidedTourClose').addEventListener('click', closeGuidedTour);
+
+    positionTourTooltip(target, tooltip, step.placement);
+}
+
+function goToNextGuidedStep() {
+    if (guidedTourStepIndex < guidedTourSteps.length - 1) {
+        guidedTourStepIndex++;
+        showGuidedTourStep();
+    } else {
+        completeGuidedTour();
+    }
+}
+
+function goToPrevGuidedStep() {
+    if (guidedTourStepIndex > 0) {
+        guidedTourStepIndex--;
+        showGuidedTourStep();
+    }
+}
+
+function closeGuidedTour() {
+    document.getElementById('guidedTourBackdrop').style.display = 'none';
+    document.getElementById('guidedTourTooltip').style.display = 'none';
+    clearPreviousHighlight();
+}
+
+function completeGuidedTour() {
+    localStorage.setItem('guidedTourCompleted', '1');
+    closeGuidedTour();
+}
+
+function clearPreviousHighlight() {
+    if (guidedTourHighlightedElement) {
+        guidedTourHighlightedElement.classList.remove('guided-tour-highlight');
+        guidedTourHighlightedElement = null;
+    }
+}
+
+function positionTourTooltip(target, tooltip, placement = 'bottom') {
+    const rect = target.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    let top = 0;
+    let left = 0;
+
+    switch (placement) {
+        case 'top':
+            top = rect.top - tooltipRect.height - 12;
+            left = rect.left + rect.width / 2 - tooltipRect.width / 2;
+            tooltip.classList.add('top');
+            tooltip.classList.remove('bottom', 'left', 'right');
+            break;
+        case 'left':
+            top = rect.top + rect.height / 2 - tooltipRect.height / 2;
+            left = rect.left - tooltipRect.width - 12;
+            tooltip.classList.add('left');
+            tooltip.classList.remove('top', 'bottom', 'right');
+            break;
+        case 'right':
+            top = rect.top + rect.height / 2 - tooltipRect.height / 2;
+            left = rect.right + 12;
+            tooltip.classList.add('right');
+            tooltip.classList.remove('top', 'bottom', 'left');
+            break;
+        default:
+            top = rect.bottom + 12;
+            left = rect.left + rect.width / 2 - tooltipRect.width / 2;
+            tooltip.classList.add('bottom');
+            tooltip.classList.remove('top', 'left', 'right');
+    }
+
+    const pad = 12;
+    const maxTop = window.innerHeight - tooltipRect.height - pad;
+    const maxLeft = window.innerWidth - tooltipRect.width - pad;
+    top = Math.min(Math.max(pad, top), Math.max(pad, maxTop));
+    left = Math.min(Math.max(pad, left), Math.max(pad, maxLeft));
+
+    tooltip.style.top = `${Math.max(12, top)}px`;
+    tooltip.style.left = `${Math.max(12, left)}px`;
 }
 
 function calculatePriceBounds(products) {

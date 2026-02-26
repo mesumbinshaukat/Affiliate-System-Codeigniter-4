@@ -180,8 +180,9 @@ class Auth extends BaseController
                     if ($listModel->insert($listData)) {
                         $listId = $listModel->getInsertID();
                         log_message('info', 'Default list created for user ' . $userId . ' with list ID: ' . $listId);
+                        session()->setFlashdata('show_tour', true);
                         
-                        return redirect()->to('/dashboard/list/edit/' . $listId . '?tab=products')
+                        return redirect()->to('/dashboard/list/edit/' . $listId . '?tab=details')
                             ->with('success', 'Welkom bij Maakjelijstje.nl, ' . $data['first_name'] . '! Maak nu uw eerste lijst.');
                     } else {
                         log_message('error', 'Failed to create default list for user ' . $userId . '. Errors: ' . json_encode($listModel->errors()));
